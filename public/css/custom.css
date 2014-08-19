@@ -1,0 +1,81 @@
+
+html {
+	/* Required in order to make the footer stick to the bottom..*/
+	position: relative;
+	min-height: 100%;
+}
+body {
+	/* Necessary due to the fixed navbar...*/
+	margin-top: 50px;
+	/*This should be the same as the footer*/
+	margin-bottom: 70px;
+	background-color: #282B36; 
+	/* 282B36 or 80838D */
+}
+
+.btn {
+	margin-top: 10px;
+}
+
+#input {
+	background-color: #D8D8D8;
+	border: 7.5px solid #5E5E5E;
+    border-radius: 15px;
+    padding: 10px 35px;
+    margin-top: 25px;
+}
+
+#results_box {
+	background-color: #D8D8D8;
+	border: 7.5px solid #5E5E5E;
+    border-radius: 15px;
+    padding: 10px 35px;
+    margin-top: 25px;
+}
+
+.page-header{
+	margin: 20px 0 20px;
+}
+
+#spinner {
+color: gray;
+  display:none;
+  position:absolute;
+}
+
+.fa-github {
+	color: #fff;
+	padding-top: 11px;
+	padding-bottom: 11px;
+}
+
+.checkbox.inline.no_indent+.checkbox.inline.no_indent {
+  margin-left: 0;
+  margin-right: 10px;
+}
+.checkbox.inline.no_indent:last-child {
+  margin-right: 0px;
+}
+
+label.checkbox-inline.no_indent {
+  margin-left: 0;
+  margin-right: 10px;
+
+}
+
+
+/* Footer
+-------------------------------------------------- */
+#footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	/* Fixed height of the footer here(Must be same as the margin bottom in html ) */
+	height: 70px;
+	background-color: #222;
+}
+
+/* for the text in the footer */
+.container .text-muted {
+	margin: 20px 0;
+}

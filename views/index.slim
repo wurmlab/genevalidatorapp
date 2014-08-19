@@ -1,0 +1,43 @@
+.col-md-12
+  form#input action="/input" method="POST" 
+    h2.page-header  
+      span  Genes Validator 
+      span.small  Identify problems with Gene Predictions
+    .form-group
+      label.control-label for="input"  Input Sequences:
+      textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false"
+    .form-group.form-inline
+      label.control-label for="advanced"  Advanced Parameters: Validations Types
+      br/
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#lenc type="checkbox" name="validations[]" value="lenc" 
+          | Length Validation (via clusterization)
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#lenr type="checkbox" name="validations[]" value="lenr" 
+          | Length Validation (via ranking)
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#dup type="checkbox" name="validations[]" value="dup" 
+          | Duplication Check
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#merge type="checkbox" name="validations[]" value="merge" 
+          | Gene Merge Validation
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#align type="checkbox" name="validations[]" value="align" 
+          | Multiple Alignment Validation (proteins)
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#frame type="checkbox" name="validations[]" value="frame" 
+          | Blast Reading Frame Validation (nucleotides)
+      label.checkbox-inline.no_indent.col-md-4.col-xs-12
+        input#orf type="checkbox" name="validations[]" value="orf" 
+          | Open Reading Frame Validation (nucleotides)
+    .clearfix
+    .form-group
+      button.btn.btn-lg.btn-primary.pull-right type="submit" value="input"  Analyse Genes
+      .clearfix
+    span 
+      a#server href="/response"  Call Server-side Functions &#124;  
+    span
+      a#time href="/time"  Get the time
+
+
+#output.col-md-12

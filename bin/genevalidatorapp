@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+require 'sinatra'
+require 'slim'
+require 'sinatra/base'
+#require 'genevalidator'
+require 'GeneValidatorApp'
+
+class GVapp < Sinatra::Base
+  helpers GeneValidatorApp
+
+  set :root, "#{File.dirname(__FILE__)}/../"
+
+  #########################
+  # Remove before Release 
+  # When false, it compresses the rendered HTML.
+  Slim::Engine.default_options[:pretty] = true
+  # A Simple Response - just here for testing purposes
+  get '/response' do 
+    insides = "Hello from the server"
+    create_results(insides)
+  end
+  # A Simple Response - just here for testing purposes
+  get '/time' do
+    sleep(60)
+    insides = "The time is " + Time.now.to_s
+    create_results(insides)
+  end
+  ###########################
+  #### Start of Actual Script
+
+  get '/' do
+    slim :index
+  end
+
+  post '/input' do
+    # Set up Variables 
+    sequences        = params[:seq]
+    validation_array = params[:validations].to_s  
+    datetime         = Time.new.strftime("%Y-%m-%d_%H-%M-%S") # add IP address; add unique id. 
+    Input_File       = "input_files/#{datetime}.fa"
+
+    # Convert Sequences into Fasta Format...
+    sequences = to_fasta(sequences)
+
+    #Write Sequence to a File (so that we can pass it to Genevalidator)
+    File.open(Input_File, 'w') { |f| f.write (sequences)}
+
+    # Run GeneValidator from the app... 
+     query = Validation.new(Input_File, validation_array, nil, nil, nil, nil, nil).validation 
+    
+    output = "<p>#{sequences.gsub("\n", "</p><p>" )}</p><br>#{validation_array.to_s}"
+
+    ##query.to_html
+
+    create_results(output)
+
+  end
+end
+GVapp.run!
