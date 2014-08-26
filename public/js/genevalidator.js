@@ -41,7 +41,7 @@ $(document).ready(function() {
         $('#output').html(response);
         // remove progress notification
         $('#spinner').modal('hide');
-      }
+      },
     })
   })
   
@@ -51,6 +51,8 @@ $(document).ready(function() {
       $('#input').trigger('submit');
     }
   });
+
+
 
 
 })

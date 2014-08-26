@@ -2,14 +2,18 @@
 
 require 'sinatra'
 require 'slim'
+require 'fileutils'
 require 'sinatra/base'
-#require 'genevalidator'
 require 'GeneValidatorApp'
+require "sinatra/config_file"
+require 'thin'
+#require 'genevalidator'
 
 class GVapp < Sinatra::Base
   helpers GeneValidatorApp
-
   set :root, "#{File.dirname(__FILE__)}/../"
+  register Sinatra::ConfigFile
+  config_file "#{File.dirname(__FILE__)}/../config.yml"
 
   #########################
   # Remove before Release 
@@ -22,9 +26,12 @@ class GVapp < Sinatra::Base
   end
   # A Simple Response - just here for testing purposes
   get '/time' do
-    sleep(60)
-    insides = "The time is " + Time.now.to_s
-    create_results(insides)
+    # sleep(3)
+    # insides = "The time is " + Time.now.to_s
+    # create_results(insides)
+    fileread = IO.read("/Volumes/Yosemite OS/Users/ismailm/Genevalidator/2014-08-20_11-01-53-241-241814000_127-0-0-1/table.html")
+    puts fileread.to_s
+    create_results(fileread.to_s)
   end
   ###########################
   #### Start of Actual Script
@@ -33,28 +40,55 @@ class GVapp < Sinatra::Base
     slim :index
   end
 
+  # get '/results/*'
+  #   unique_name = params[:splat]
+  #   working_folder   = File.join(Dir.home + '/Genevalidator/' + unique_name)
+
+  #   if File.exist?(working_folder)
+  #     results = IO.read("#{working_folder}/table.html")
+  #   else
+  #     results = "Sorry, no Results can be found at this URL. Please try again."
+  #   end
+  #   create_results(results)
+  # end
+
   post '/input' do
     # Set up Variables 
     sequences        = params[:seq]
-    validation_array = params[:validations].to_s  
-    datetime         = Time.new.strftime("%Y-%m-%d_%H-%M-%S") # add IP address; add unique id. 
-    Input_File       = "input_files/#{datetime}.fa"
+    validation_array = params[:validations].to_s.gsub(/[\[\]\"\,]/, '')
 
-    # Convert Sequences into Fasta Format...
+    unique_name      = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
+    working_folder   = File.join(Dir.home + '/Genevalidator/' + unique_name)
+
+    puts ''
+    puts 'Starting...'
+    puts 'Ensuring Sequences are in Fasta format.'
     sequences = to_fasta(sequences)
 
-    #Write Sequence to a File (so that we can pass it to Genevalidator)
-    File.open(Input_File, 'w') { |f| f.write (sequences)}
+    puts 'Creating the Working folder at ' + working_folder
 
-    # Run GeneValidator from the app... 
-     query = Validation.new(Input_File, validation_array, nil, nil, nil, nil, nil).validation 
+    # Loops through the following if the Folder already exist until a Unique name is created that doesn't exist.
+    # while File.exist?(working_folder)
+    #   unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
+    #   working_folder   = File.join(Dir.home + '/Genevalidator/' + unique_name)
+    # end
+       
+    # if the folder does not exist, one is created.
+    unless File.exist?(working_folder)
+      FileUtils.mkdir_p working_folder
+    end
+
+    puts 'Writing the input sequences into a fasta file.'
+    File.open(File.join(working_folder, "input_file.fa"), 'w+') do |f|
+      f.write sequences
+    end
+
+    # Run GeneValidator
+     run_genevalidator(validation_array, working_folder)
     
-    output = "<p>#{sequences.gsub("\n", "</p><p>" )}</p><br>#{validation_array.to_s}"
-
-    ##query.to_html
-
-    create_results(output)
-
+    results = IO.read("#{working_folder}/table.html")
+    
+    create_results(results)
   end
 end
 GVapp.run!
