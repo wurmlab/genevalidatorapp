@@ -1,4 +1,5 @@
 require "GeneValidatorApp/version"
+require 'fileutils'
 
 
 module GeneValidatorApp
@@ -29,47 +30,46 @@ module GeneValidatorApp
     return sequence
   end
 
-  def run_genevalidator (validation_array, working_folder)
+  def run_genevalidator (validation_array, working_folder, public_folder, unique_name)
+    index_folder = File.join(working_folder, 'input_file.fa.html')
 
     puts 'Running Genevalidator from a sub-shell'
     command = "time Genevalidator -v \"#{validation_array}\" #{working_folder}/input_file.fa"
     exit = system(command)
+    raise IOError("Genevalidator exited with the command code: #{exit}") unless exit
 
-    puts 'Checking the exit status.'
-    if exit != true
-      return "Sorry there has been a problem. The command exited with exit code:#{exit}."
-    else
-      puts ' Finished running the command sucessfully.'
-    end
-
-    html_table =  extract_table_html(working_folder)
+    html_table = extract_table_html(working_folder, public_folder, unique_name)
+    
     return html_table
   end
 
-  def extract_table_html(working_folder)
-
+  def extract_table_html(working_folder, public_folder, unique_name)
     index_file = File.join(working_folder, "/input_file.fa.html", "index.html")
-
-    raise error unless File.exist?(index_file)
+    raise IOError("GeneValidator has not created any results files...") unless File.exist?(index_file)
 
     puts 'Reading the html output file...'
     full_html = IO.binread(index_file)
-    cleanhtml = full_html.gsub(/[\n\t]/, '').gsub(/>\s*</, "><").gsub('  ',' ')
-
+    cleanhtml = full_html.gsub(/>\s*</, "><").gsub(/[\t\n]/, '').gsub('  ', ' ')
     cleanhtml.scan(/<div id="report">.*/) do |table|
-      @html_table = table.gsub('</div></body></html>','')    # tYW instead modify GeneValidator. 
-      #gsub name to full working dir path.. (to make the figures show...)
+      @html_table = table.gsub('</div></body></html>','').gsub(/input_file.fa_/, File.join('Genevalidator', unique_name, 'input_file.fa_'))  # tYW instead modify GeneValidator. 
     end
 
-    write_html_table(working_folder, @html_table)
+    copy_json_plots(working_folder, public_folder)
+    write_html_table(public_folder, @html_table)
 
     return @html_table
   end
 
-  def write_html_table(working_folder, html_table)
+  def write_html_table(public_folder, html_table)
     puts 'Writing the table to a file'
-    File.open("#{working_folder}/table.html", 'w') do |f|
+    File.open("#{public_folder}/table.html", 'w') do |f|
       f.write html_table
     end
+  end
+
+  def copy_json_plots(working_folder, public_folder)
+    puts "copying Json files"
+    json_files = File.join(working_folder, "/input_file.fa.html", "*.json")
+    FileUtils.cp_r Dir.glob(json_files), public_folder
   end
 end

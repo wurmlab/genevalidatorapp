@@ -217,23 +217,30 @@ svg {
 /* Ratings...
 ___________________________*/
 
-
-.rating-container {
+.ratings {
+  position: relative;
+  vertical-align: middle;
+  display: inline-block;
   color: #AAA;
+  overflow: hidden;
 }
 
-.rating-container
-.rating-stars {
-	color: #EDA100;
+.full-stars{
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #fde16d;
 }
 
-.rating-xs {
-  font-size: 1.25em;
+.empty-stars:before,
+.full-stars:before {
+  font-family: FontAwesome;
+  content: "\f005\f005\f005\f005\f005";
+  font-size: 14pt;
 }
 
-.rating-disabled {
-cursor: auto;
-}
 
 /* 
 ___________________________*/
