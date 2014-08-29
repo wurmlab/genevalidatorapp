@@ -51,7 +51,7 @@ class GVapp < Sinatra::Base
 
     puts 'Creating the Working folder at ' + working_folder
     
-    # ensure_unique_name(public_folder)
+    ensure_unique_name(public_folder)
 
     # if the folder does not exist, one is created.
     FileUtils.mkdir_p working_folder unless File.exist?(working_folder)
