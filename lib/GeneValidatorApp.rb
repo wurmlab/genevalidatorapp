@@ -49,7 +49,7 @@ module GeneValidatorApp
     raise IOError("Genevalidator exited with the command code: #{exit}") unless exit
 
     html_table = extract_table_html(working_folder, public_folder, unique_name)
-    
+
     return html_table
   end
 

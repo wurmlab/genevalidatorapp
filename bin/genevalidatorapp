@@ -9,19 +9,18 @@ require "sinatra/config_file"
 require 'thin'
 #require 'genevalidator'
 
-
 class GVapp < Sinatra::Base
   helpers GeneValidatorApp
+
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
   config_file "#{File.dirname(__FILE__)}/../config.yml"
   # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
-  
 
-  # before do
-  #   self.tempdir = Dir.mktmpdir
-  # end
+  get '/' do
+    slim :index
+  end
 
   # A Simple Response - just here for testing purposes
   get '/response' do 
@@ -32,15 +31,11 @@ class GVapp < Sinatra::Base
   get '/time' do
     # sleep(3)
     insides = "The time is " + Time.now.to_s
-    puts 'hey'
     create_results(insides)
   end
   ###########################
   #### Start of Actual Script
 
-  get '/' do
-    slim :index
-  end
 
   post '/input' do
     # Set up Variables 
@@ -76,8 +71,8 @@ class GVapp < Sinatra::Base
     create_results(results)
   end
 
-  get '/results/*'
-    unique_name = params[:splat]
+  get '/results/*' do
+    unique_name      = params[:splat]
     public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
     
     if File.exist?(public_folder)
@@ -85,7 +80,7 @@ class GVapp < Sinatra::Base
     else
       results = "Sorry, no Results can be found at this URL. Please try again."
     end
-
+    
     create_results(results)
   end
 

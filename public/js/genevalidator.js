@@ -39,6 +39,10 @@ $(document).ready(function() {
       data: $('#input').serialize(),
       success: function(response){
         $('#output').html(response);
+        // initiate the table sorter
+        $("#sortable_table").tablesorter( {cssHeader: "header", sortList: [[0,0]]} ); 
+        // Initiate the tooltips
+        $("[data-toggle='tooltip']").tooltip();
         // remove progress notification
         $('#spinner').modal('hide');
       },
