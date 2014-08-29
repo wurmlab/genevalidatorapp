@@ -22,21 +22,6 @@ class GVapp < Sinatra::Base
     slim :index
   end
 
-  # A Simple Response - just here for testing purposes
-  get '/response' do 
-    insides = "Hello from the server"
-    create_results(insides)
-  end
-  # A Simple Response - just here for testing purposes
-  get '/time' do
-    # sleep(3)
-    insides = "The time is " + Time.now.to_s
-    create_results(insides)
-  end
-  ###########################
-  #### Start of Actual Script
-
-
   post '/input' do
     # Set up Variables 
     sequences        = params[:seq]
@@ -46,28 +31,21 @@ class GVapp < Sinatra::Base
     working_folder   = File.join(Dir.home, '/Genevalidator', unique_name)
     public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
 
-    puts 'Ensuring Sequences are in Fasta format.'
     sequences = to_fasta(sequences)
-
-    puts 'Creating the Working folder at ' + working_folder
     
     ensure_unique_name(public_folder)
 
-    # if the folder does not exist, one is created.
     FileUtils.mkdir_p working_folder unless File.exist?(working_folder)
     FileUtils.mkdir_p public_folder unless File.exist?(public_folder)
-
-    puts 'Writing the input sequences into a fasta file.'
-    File.open(File.join(working_folder, "input_file.fa"), 'w+') do |f|
-      f.write sequences
-    end
+  
+    create_fasta_file(working_folder, sequences)
 
     # Run GeneValidator
     run_genevalidator(validation_array, working_folder, public_folder, unique_name)
     
-    # Remove the Working folder (We have a copy of everything useful in the public folder)
-    results = IO.read("#{public_folder}/table.html")
-    
+    # TODO:Remove the Working folder (We have a copy of everything useful in the public folder)
+
+    read_table(public_folder)
     create_results(results)
   end
 
