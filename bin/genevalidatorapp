@@ -37,7 +37,7 @@ class GVapp < Sinatra::Base
 
     FileUtils.mkdir_p working_folder unless File.exist?(working_folder)
     FileUtils.mkdir_p public_folder unless File.exist?(public_folder)
-  
+
     create_fasta_file(working_folder, sequences)
 
     # Run GeneValidator
@@ -45,7 +45,7 @@ class GVapp < Sinatra::Base
     
     # TODO:Remove the Working folder (We have a copy of everything useful in the public folder)
 
-    read_table(public_folder)
+    results = read_table(public_folder)
     create_results(results)
   end
 

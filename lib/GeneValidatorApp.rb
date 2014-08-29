@@ -94,7 +94,7 @@ module GeneValidatorApp
     table_file = File.join(public_folder, 'table.html')
     raise IOError, 'The table file cannot be found.' unless File.exist?(table_file)
     results = IO.read(table_file)
-
+    return results
   end
 
   def create_results(insides)
