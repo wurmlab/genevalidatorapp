@@ -1,31 +1,4 @@
 $(document).ready(function() {
-  $('#time').click(function(e) {
-    e.preventDefault();
-    // show activity spinner
-    $('#spinner').modal({
-        backdrop: 'static',
-        keyboard: 'false'
-      });
-    $('#output').load('/time', function(){
-      // remove progress notification
-      $('#spinner').modal('hide');
-    });
-
-  })
-
-  $('#server').click(function(e) {
-    e.preventDefault();
-    // show activity spinner
-    $('#spinner').modal({
-        backdrop: 'static',
-        keyboard: 'false'
-      });
-    $('#output').load('/response', function(){
-      // remove progress notification
-      $('#spinner').modal('hide');
-    });
-  })
-
   $('#input').submit(function(e) {
     e.preventDefault();
     // show activity spinner
@@ -55,8 +28,5 @@ $(document).ready(function() {
       $('#input').trigger('submit');
     }
   });
-
-
-
 
 })
