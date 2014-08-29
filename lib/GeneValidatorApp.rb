@@ -1,9 +1,14 @@
-require "GeneValidatorApp/version"
+require 'GeneValidatorApp/version'
 require 'fileutils'
 
 
 module GeneValidatorApp
-
+  # def initialize
+  #  check that GV exists in path 
+  #  check that can write to tempdir
+  #  check that db exists?
+  # end 
+  
   def create_unique_name
     puts 'creating a unique name'
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
@@ -49,7 +54,7 @@ module GeneValidatorApp
     index_folder = File.join(working_folder, 'input_file.fa.html')
 
     puts 'Running Genevalidator from a sub-shell'
-    command = "time Genevalidator -v \"#{validation_array}\" #{working_folder}/input_file.fa"
+    command = "Genevalidator -v \"#{validation_array}\" #{working_folder}/input_file.fa"
     exit = system(command)
     raise IOError, "Genevalidator exited with the command code: #{exit}" unless exit
 

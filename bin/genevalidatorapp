@@ -5,7 +5,7 @@ require 'slim'
 require 'fileutils'
 require 'sinatra/base'
 require 'GeneValidatorApp'
-require "sinatra/config_file"
+require "sinatra/config_file" # TODO: do we still need this... 
 require 'thin'
 #require 'genevalidator'
 

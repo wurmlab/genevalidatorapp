@@ -221,7 +221,7 @@ ___________________________*/
   position: relative;
   vertical-align: middle;
   display: inline-block;
-  color: #AAA;
+  color: #b1b1b1;
   overflow: hidden;
 }
 
@@ -241,16 +241,28 @@ ___________________________*/
   font-size: 14pt;
 }
 
+.empty-stars:before {
+  -webkit-text-stroke: 1px #848484;
+}
 
-/* 
+.full-stars:before {
+  -webkit-text-stroke: 1px orange;
+}
+
+//* 
 ___________________________*/
 
-[id^="toggle"] {
-  text-align:center;
+.menu_icon {
+  padding-left: 10px;
+  font-weight: bold;
 }
 
 #plot_btn {
   padding: 4px 5px 2px 3px;
+}
+
+[id^="toggle"] {
+  text-align:center;
 }
 
 .tooltip-inner {
@@ -262,13 +274,21 @@ ___________________________*/
   text-align: left;
 }
 
-.menu_icon {
-  padding-left: 10px;
-  font-weight: bold;
+/* Browser Specific 
+___________________________*/
 
-
-
-
-
-
-
+/* Border on Stars ________*/
+/* Webkit-text-stroke not support on firefox or IE */
+/* Firefox */
+@-moz-document url-prefix() {
+  .full-stars{
+    color: #ECBE24;
+  }
+}
+/* IE */
+<!--[if IE]>
+/*This will work for IE*/
+.full-stars{
+  color: #ECBE24;
+}
+<![endif]-->
