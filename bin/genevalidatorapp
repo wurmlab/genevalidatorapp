@@ -78,7 +78,7 @@ class GVapp < Sinatra::Base
     if File.exist?(public_folder)
       results = IO.read("#{public_folder}/table.html")
     else
-      results = "Sorry, no Results can be found at this URL. Please try again."
+      results = "Sorry, no results can be found at this URL. Please try again."
     end
     
     create_results(results)
