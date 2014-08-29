@@ -5,12 +5,22 @@ require 'fileutils'
 module GeneValidatorApp
 
   def create_results(insides)
-      puts 'creating results'
-      results = '<div id="results_box"><h2 class="page-header">Results</h2>'+ insides + '</div>'
-      puts 'Returning results '
-      return results
-    end
+    results = '<div id="results_box"><h2 class="page-header">Results</h2>'+ insides + '</div>'
+    return results
+  end
 
+  def create_unique_name
+    unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
+    return unique_name
+  end
+
+  # def ensure_unique_name(public_folder)
+  #   while File.exist?(public_folder)
+  #     unique_name    = create_unique_name
+  #     working_folder = File.join(Dir.home + '/Genevalidator/' + unique_name)
+  #     public_folder  = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
+  #   end
+  # end
 
   def to_fasta(sequence)
     sequence = sequence.lstrip

@@ -19,9 +19,9 @@ class GVapp < Sinatra::Base
   Slim::Engine.default_options[:pretty] = true
   
 
-  before do
-    # self.tempdir = Dir.mktmpdir
-  end
+  # before do
+  #   self.tempdir = Dir.mktmpdir
+  # end
 
   # A Simple Response - just here for testing purposes
   get '/response' do 
@@ -42,51 +42,25 @@ class GVapp < Sinatra::Base
     slim :index
   end
 
-  # get '/results/*'
-  #   unique_name = params[:splat]
-  #   working_folder  = File.join(Dir.home + '/Genevalidator/' + unique_name)
-
-  #   if File.exist?(working_folder)
-  #     results = IO.read("#{working_folder}/table.html")
-  #   else
-  #     results = "Sorry, no Results can be found at this URL. Please try again."
-  #   end
-  #   create_results(results)
-  # end
-    # puts working_folder
-    # puts "creating #{File.join(File.dirname(__FILE__), '/../public', 'new.css')}"
-    # File.open(File.join(File.dirname(__FILE__), '/../public', 'new.css'), 'w+') do |f|
-    #   f.write '.hi {text-align:left;}'
-    # end
-
   post '/input' do
     # Set up Variables 
     sequences        = params[:seq]
     validation_array = params[:validations].to_s.gsub(/[\[\]\"\,]/, '')
 
-    unique_name      = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
+    unique_name      = create_unique_name
     working_folder   = File.join(Dir.home, '/Genevalidator', unique_name)
     public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
 
-    puts ''
-    puts 'Starting...'
     puts 'Ensuring Sequences are in Fasta format.'
     sequences = to_fasta(sequences)
 
     puts 'Creating the Working folder at ' + working_folder
-    # Loops through the following if the Folder already exist until a Unique name is created that doesn't exist.
-    # while File.exist?(working_folder)
-    #   unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
-    #   working_folder   = File.join(Dir.home + '/Genevalidator/' + unique_name)
-    # end
-    # if the folder does not exist, one is created.
-    unless File.exist?(working_folder)
-      FileUtils.mkdir_p working_folder
-    end
+    
+    # ensure_unique_name(public_folder)
 
-    unless File.exist?(public_folder)
-      FileUtils.mkdir_p public_folder
-    end
+    # if the folder does not exist, one is created.
+    FileUtils.mkdir_p working_folder unless File.exist?(working_folder)
+    FileUtils.mkdir_p public_folder unless File.exist?(public_folder)
 
     puts 'Writing the input sequences into a fasta file.'
     File.open(File.join(working_folder, "input_file.fa"), 'w+') do |f|
@@ -95,14 +69,26 @@ class GVapp < Sinatra::Base
 
     # Run GeneValidator
     run_genevalidator(validation_array, working_folder, public_folder, unique_name)
-        
+    
+    # Remove the Working folder (We have a copy of everything useful in the public folder)
     results = IO.read("#{public_folder}/table.html")
     
     create_results(results)
   end
 
- # serve /results from: self.tempdir
+  get '/results/*'
+    unique_name = params[:splat]
+    public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
+    
+    if File.exist?(public_folder)
+      results = IO.read("#{public_folder}/table.html")
+    else
+      results = "Sorry, no Results can be found at this URL. Please try again."
+    end
 
- 
+    create_results(results)
+  end
+
 end
+
 GVapp.run!
