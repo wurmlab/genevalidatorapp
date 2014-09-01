@@ -1,15 +1,8 @@
 require 'GeneValidatorApp/version'
 require 'fileutils'
-# TODOs (Not Ordered)
-# 1. Create the init (or look at the possibility of the before - do sinatra apps have inits...)
-# 2.
+
 
 module GeneValidatorApp
-  # def initialize
-  #  check that GV exists in path 
-  #  check that can write to tempdir
-  #  check that db exists?
-  # end 
 
   def create_unique_name
     puts 'creating a unique name'
@@ -76,26 +69,7 @@ module GeneValidatorApp
     cleanhtml.scan(/<div id="report">.*/) do |table|
       @html_table = table.gsub('</div></body></html>','').gsub(/input_file.fa_/, File.join('Genevalidator', unique_name, "/input_file.fa.html", 'input_file.fa_'))  # tYW instead modify GeneValidator. 
     end
-
-    write_html_table(public_folder, @html_table)
-
     return @html_table
-  end
-
-  def write_html_table(public_folder, html_table)
-    puts 'Writing the table to a file'
-    table_file = File.join(public_folder, 'table.html')
-    File.open(table_file, 'w') do |f|
-      f.write html_table
-    end
-  end
-
-  def read_table(public_folder)
-    puts 'Reading the table file'
-    table_file = File.join(public_folder, 'table.html')
-    raise IOError, 'The table file cannot be found.' unless File.exist?(table_file)
-    results = IO.read(table_file)
-    return results
   end
 
   def create_results(insides)

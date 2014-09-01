@@ -28,6 +28,13 @@ class GVapp < Sinatra::Base
     @working_folder   = File.join(@tempdir, @unique_name)
     @unique_name      = ensure_unique_name(@working_folder) if File.exist?(@working_folder)
     @public_folder    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
+
+    # Do Validations 
+    #  check that GV exists in path 
+    #  check that can write to tempdir
+    #  check that db exists?
+
+
     raise IOError, 'A unique name cannot be created for this session.' if File.exist?(@working_folder)
   end
 
