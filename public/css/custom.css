@@ -82,7 +82,11 @@ label.checkbox-inline.no_indent {
 
 }
 
+label.radio-inline.no_indent {
+  margin-left: 0;
+  margin-right: 10px;
 
+}
 
 /* GeneValidator Results...
 -------------------------------------------------- */
@@ -253,7 +257,7 @@ ___________________________*/
   -webkit-text-stroke: 1px orange;
 }
 
-//* 
+/* Other
 ___________________________*/
 
 .menu_icon {
@@ -276,6 +280,18 @@ ___________________________*/
 
 #report {
   text-align: left;
+}
+
+
+/* Responsive CSS
+___________________________*/
+
+/* Targets large screens - i.e. larger than 1200px wide */
+
+@media (min-width:1200px){
+  .container{
+    width:99%;
+  }
 }
 
 /* Browser Specific 

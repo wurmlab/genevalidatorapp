@@ -9,6 +9,10 @@ require "sinatra/config_file" # TODO: do we still need this...
 require 'thin'
 #require 'genevalidator'
 
+# AnuragPriyam: 
+# * check the manner in which temp files are stored and served. 
+
+
 class GVapp < Sinatra::Base
   helpers GeneValidatorApp
 
@@ -20,7 +24,12 @@ class GVapp < Sinatra::Base
 
   # TODO: Alter the below to do the following:
   # Create a temp dir...
-  # Then make a soft link to the public folder...
+  before do
+    @unique_name      = create_unique_name
+    @working_folder   = File.join(Dir.home, '/Genevalidator', @unique_name)
+    @public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/GeneValidator', @unique_name)
+    ensure_unique_name(@working_folder) if File.exist?(@working_folder)
+  end
 
   get '/' do
     slim :index
@@ -30,32 +39,26 @@ class GVapp < Sinatra::Base
     # Set up Variables 
     sequences        = params[:seq]
     validation_array = params[:validations].to_s.gsub(/[\[\]\"\,]/, '')
+    database         = params[:database]
+
+    FileUtils.mkdir_p @working_folder unless File.exist?(@working_folder)
+    FileUtils.ln_s "#{@working_folder}", "#{@public_folder}"
 
     sequences = to_fasta(sequences)
+    create_fasta_file(@working_folder, sequences)
 
-    unique_name      = create_unique_name
-    working_folder   = File.join(Dir.home, '/Genevalidator', unique_name)
-    public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
+    run_genevalidator(validation_array, @working_folder, @public_folder, @unique_name)
 
-    ensure_unique_name(public_folder)
-
-    FileUtils.mkdir_p working_folder unless File.exist?(working_folder)
-    FileUtils.mkdir_p public_folder unless File.exist?(public_folder)
-
-    create_fasta_file(working_folder, sequences)
-
-    run_genevalidator(validation_array, working_folder, public_folder, unique_name)
-
-    results = read_table(public_folder)
+    results = read_table(@public_folder)
     create_results(results)
   end
 
   # TODO: Get the below to work...
   get '/results/*' do
-    unique_name      = params[:splat]
-    public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
+    @existing_unique_name      = params[:splat]
+    @existing_public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/GeneValidator', @existing_unique_name)
 
-    if File.exist?(public_folder)
+    if File.exist?(@existing_public_folder)
       results = IO.read("#{public_folder}/table.html")
     else
       results = "Sorry, no results can be found at this URL. Please try again."

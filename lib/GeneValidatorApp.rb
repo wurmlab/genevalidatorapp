@@ -10,6 +10,7 @@ module GeneValidatorApp
   #  check that can write to tempdir
   #  check that db exists?
   # end 
+
   
   def create_unique_name
     puts 'creating a unique name'
@@ -17,12 +18,11 @@ module GeneValidatorApp
     return unique_name
   end
 
-  def ensure_unique_name(public_folder)
+  def ensure_unique_name(working_folder)
     puts 'Ensuring the run has a unique name'
-    while File.exist?(public_folder)
+    while File.exist?(working_folder)
       unique_name    = create_unique_name
       working_folder = File.join(Dir.home + '/Genevalidator/' + unique_name)
-      public_folder  = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
     end
   end
 
