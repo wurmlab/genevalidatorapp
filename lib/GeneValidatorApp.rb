@@ -11,7 +11,6 @@ module GeneValidatorApp
   #  check that db exists?
   # end 
 
-  
   def create_unique_name
     puts 'creating a unique name'
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
@@ -22,10 +21,12 @@ module GeneValidatorApp
     puts 'Ensuring the run has a unique name'
     while File.exist?(working_folder)
       unique_name    = create_unique_name
-      working_folder = File.join(Dir.home + '/Genevalidator/' + unique_name)
+      working_folder = File.join(Dir.home + 'Genevalidator' + unique_name)
     end
+    return unique_name
   end
 
+  # Taken from SequenceServer
   def to_fasta(sequence)
     puts 'Converting Sequences to Fasta format if necessary.'
     sequence = sequence.lstrip
@@ -73,19 +74,12 @@ module GeneValidatorApp
     full_html = IO.binread(index_file)
     cleanhtml = full_html.gsub(/>\s*</, "><").gsub(/[\t\n]/, '').gsub('  ', ' ')
     cleanhtml.scan(/<div id="report">.*/) do |table|
-      @html_table = table.gsub('</div></body></html>','').gsub(/input_file.fa_/, File.join('Genevalidator', unique_name, 'input_file.fa_'))  # tYW instead modify GeneValidator. 
+      @html_table = table.gsub('</div></body></html>','').gsub(/input_file.fa_/, File.join('Genevalidator', unique_name, "/input_file.fa.html", 'input_file.fa_'))  # tYW instead modify GeneValidator. 
     end
 
-    copy_json_plots(working_folder, public_folder)
     write_html_table(public_folder, @html_table)
 
     return @html_table
-  end
-
-  def copy_json_plots(working_folder, public_folder)
-    puts "copying Json files"
-    json_files = File.join(working_folder, "/input_file.fa.html", "*.json")
-    FileUtils.cp_r Dir.glob(json_files), public_folder
   end
 
   def write_html_table(public_folder, html_table)

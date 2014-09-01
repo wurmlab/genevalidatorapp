@@ -22,13 +22,13 @@ class GVapp < Sinatra::Base
   # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
 
-  # TODO: Alter the below to do the following:
-  # Create a temp dir...
   before do
+    @tempdir          = settings.tempdir
     @unique_name      = create_unique_name
-    @working_folder   = File.join(Dir.home, '/Genevalidator', @unique_name)
-    @public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/GeneValidator', @unique_name)
-    ensure_unique_name(@working_folder) if File.exist?(@working_folder)
+    @working_folder   = File.join(@tempdir, @unique_name)
+    @unique_name      = ensure_unique_name(@working_folder) if File.exist?(@working_folder)
+    @public_folder    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
+    raise IOError, 'A unique name cannot be created for this session.' if File.exist?(@working_folder)
   end
 
   get '/' do
@@ -40,32 +40,33 @@ class GVapp < Sinatra::Base
     sequences        = params[:seq]
     validation_array = params[:validations].to_s.gsub(/[\[\]\"\,]/, '')
     database         = params[:database]
-
-    FileUtils.mkdir_p @working_folder unless File.exist?(@working_folder)
+    # Create the working folder (within the temp folder). and then creating
+    #   a soft link in the public folder to the working folder.
+    FileUtils.mkdir_p @working_folder
     FileUtils.ln_s "#{@working_folder}", "#{@public_folder}"
-
+    # Ensuring seqs are in fasta and then writing them to file.
     sequences = to_fasta(sequences)
     create_fasta_file(@working_folder, sequences)
+    results = run_genevalidator(validation_array, @working_folder, @public_folder, @unique_name)
 
-    run_genevalidator(validation_array, @working_folder, @public_folder, @unique_name)
-
-    results = read_table(@public_folder)
     create_results(results)
   end
 
   # TODO: Get the below to work...
-  get '/results/*' do
-    @existing_unique_name      = params[:splat]
-    @existing_public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/GeneValidator', @existing_unique_name)
+  # get '/results/*' do
+  #   @existing_unique_name      = params[:splat]
+  #   @existing_public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/GeneValidator', @existing_unique_name)
 
-    if File.exist?(@existing_public_folder)
-      results = IO.read("#{public_folder}/table.html")
-    else
-      results = "Sorry, no results can be found at this URL. Please try again."
-    end
+  #   if File.exist?(@existing_public_folder)
+  #     @results = IO.read("#{@existing_public_folder}/table.html")
+  #   else
+  #     @results = "Sorry, no results can be found at this URL. Please try again."
+  #   end
 
-    create_results(results)
-  end
+  #   slim :index
+  # end
 end
 
+GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')
 GVapp.run!
+
