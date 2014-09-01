@@ -1,4 +1,6 @@
 
+/* Main s...
+-------------------------------------------------- */
 html {
 	/* Required in order to make the footer stick to the bottom..*/
 	position: relative;
@@ -13,6 +15,23 @@ body {
 	background-color: #282B36; 
 	/* 282B36 or 80838D */
 }
+
+/* Footer
+-------------------------------------------------- */
+#footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Fixed height of the footer here(Must be same as the margin bottom in html ) */
+  height: 70px;
+  background-color: #222;
+}
+
+/* for the text in the footer */
+.container .text-muted {
+  margin: 20px 0;
+}
+
 
 .btn {
 	margin-top: 10px;
@@ -64,21 +83,6 @@ label.checkbox-inline.no_indent {
 }
 
 
-/* Footer
--------------------------------------------------- */
-#footer {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	/* Fixed height of the footer here(Must be same as the margin bottom in html ) */
-	height: 70px;
-	background-color: #222;
-}
-
-/* for the text in the footer */
-.container .text-muted {
-	margin: 20px 0;
-}
 
 /* GeneValidator Results...
 -------------------------------------------------- */

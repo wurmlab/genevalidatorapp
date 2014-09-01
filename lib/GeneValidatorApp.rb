@@ -1,6 +1,8 @@
 require 'GeneValidatorApp/version'
 require 'fileutils'
-
+# TODOs (Not Ordered)
+# 1. Create the init (or look at the possibility of the before - do sinatra apps have inits...)
+# 2.
 
 module GeneValidatorApp
   # def initialize

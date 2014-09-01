@@ -18,6 +18,10 @@ class GVapp < Sinatra::Base
   # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
 
+  # TODO: Alter the below to do the following:
+  # Create a temp dir...
+  # Then make a soft link to the public folder...
+
   get '/' do
     slim :index
   end
@@ -27,12 +31,12 @@ class GVapp < Sinatra::Base
     sequences        = params[:seq]
     validation_array = params[:validations].to_s.gsub(/[\[\]\"\,]/, '')
 
+    sequences = to_fasta(sequences)
+
     unique_name      = create_unique_name
     working_folder   = File.join(Dir.home, '/Genevalidator', unique_name)
     public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
 
-    sequences = to_fasta(sequences)
-    
     ensure_unique_name(public_folder)
 
     FileUtils.mkdir_p working_folder unless File.exist?(working_folder)
@@ -40,28 +44,25 @@ class GVapp < Sinatra::Base
 
     create_fasta_file(working_folder, sequences)
 
-    # Run GeneValidator
     run_genevalidator(validation_array, working_folder, public_folder, unique_name)
-    
-    # TODO:Remove the Working folder (We have a copy of everything useful in the public folder)
 
     results = read_table(public_folder)
     create_results(results)
   end
 
+  # TODO: Get the below to work...
   get '/results/*' do
     unique_name      = params[:splat]
     public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/Genevalidator', unique_name)
-    
+
     if File.exist?(public_folder)
       results = IO.read("#{public_folder}/table.html")
     else
       results = "Sorry, no results can be found at this URL. Please try again."
     end
-    
+
     create_results(results)
   end
-
 end
 
 GVapp.run!
