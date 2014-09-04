@@ -28,5 +28,10 @@ $(document).ready(function() {
       $('#input').trigger('submit');
     }
   });
-
 })
+
+  function change_adv_params_btn_text(){
+    var btn = document.getElementById("adv_params_btn");
+    if (btn.text === "&nbsp;&nbsp;Show Advanced Parameters") btn.text = "&nbsp;&nbsp;Hide Advanced Parameters";
+    else btn.text = "&nbsp;&nbsp;Show Advanced Parameters";
+  }

@@ -18,23 +18,30 @@ class GVapp < Sinatra::Base
 
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
+  enable :sessions
   config_file "#{File.dirname(__FILE__)}/../config.yml"
   # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
 
   before do
+    puts "\nStarting..."
     @tempdir          = settings.tempdir
     @unique_name      = create_unique_name
     @working_folder   = File.join(@tempdir, @unique_name)
-    @unique_name      = ensure_unique_name(@working_folder) if File.exist?(@working_folder)
+    @unique_name      = ensure_unique_name(@working_folder, @tempdir) if File.exist?(@working_folder)
     @public_folder    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
+
+    # Set the default class of the adv params btn 
+    if session[:adv_params] == 'adv_user'
+      @adv_params_btn_class = "collapse in"
+    else
+      @adv_params_btn_class = "collapse"
+    end
 
     # Do Validations 
     #  check that GV exists in path 
     #  check that can write to tempdir
     #  check that db exists?
-
-
     raise IOError, 'A unique name cannot be created for this session.' if File.exist?(@working_folder)
   end
 
@@ -45,8 +52,15 @@ class GVapp < Sinatra::Base
   post '/input' do
     # Set up Variables 
     sequences        = params[:seq]
-    validation_array = params[:validations].to_s.gsub(/[\[\]\"\,]/, '')
+    validation_array = params[:validations].to_s.gsub(/[\[\]\"]/, '')
     database         = params[:database]
+
+    if (validation_array != 'lenc, lenr, dup, merge, align, frame, orf') || (database != 'sp')
+      session[:adv_params] = 'adv_user'
+    end
+    puts "@adv_params_btn_class = #{@adv_params_btn_class}"
+    puts "session[:adv_params] = #{session[:adv_params]}"
+
     # Create the working folder (within the temp folder). and then creating
     #   a soft link in the public folder to the working folder.
     FileUtils.mkdir_p @working_folder
@@ -54,7 +68,7 @@ class GVapp < Sinatra::Base
     # Ensuring seqs are in fasta and then writing them to file.
     sequences = to_fasta(sequences)
     create_fasta_file(@working_folder, sequences)
-    results = run_genevalidator(validation_array, @working_folder, @public_folder, @unique_name)
+    results = run_genevalidator(validation_array, database, @working_folder, @public_folder, @unique_name)
 
     create_results(results)
   end
@@ -72,6 +86,8 @@ class GVapp < Sinatra::Base
 
   #   slim :index
   # end
+
+   
 end
 
 GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')

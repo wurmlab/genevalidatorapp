@@ -10,11 +10,11 @@ module GeneValidatorApp
     return unique_name
   end
 
-  def ensure_unique_name(working_folder)
+  def ensure_unique_name(working_folder, tempdir)
     puts 'Ensuring the run has a unique name'
     while File.exist?(working_folder)
       unique_name    = create_unique_name
-      working_folder = File.join(Dir.home + 'Genevalidator' + unique_name)
+      working_folder = File.join(@tempdir, @unique_name)
     end
     return unique_name
   end
@@ -46,11 +46,11 @@ module GeneValidatorApp
     end
   end
 
-  def run_genevalidator (validation_array, working_folder, public_folder, unique_name)
+  def run_genevalidator (validation_array, database, working_folder, public_folder, unique_name)
     index_folder = File.join(working_folder, 'input_file.fa.html')
 
     puts 'Running Genevalidator from a sub-shell'
-    command = "Genevalidator -v \"#{validation_array}\" #{working_folder}/input_file.fa"
+    command = "Genevalidator -v \"#{validation_array}\" -d \"#{database}\" #{working_folder}/input_file.fa"
     exit = system(command)
     raise IOError, "Genevalidator exited with the command code: #{exit}" unless exit
 
