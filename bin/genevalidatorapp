@@ -19,7 +19,7 @@ class GVapp < Sinatra::Base
 
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
-  enable :sessions
+  # enable :sessions
   config_file "#{File.dirname(__FILE__)}/../config.yml"
   # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
@@ -33,13 +33,13 @@ class GVapp < Sinatra::Base
     @public_folder    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
 
     # Set the default class of the adv params btn 
-    if session[:adv_params] == 'adv_user'
-      @adv_params_btn_class = "collapse in"
-      @btn_text = "Hide Advanced Parameters"
-    else
-      @adv_params_btn_class = "collapse"
-      @btn_text = "Show Advanced Parameters"
-    end
+    # if session[:adv_params] == 'adv_user'
+    #   @adv_params_btn_class = "collapse in"
+    #   @btn_text = "Hide Advanced Parameters"
+    # else
+    #   @adv_params_btn_class = "collapse"
+    #   @btn_text = "Show Advanced Parameters"
+    # end
 
     # Do Validations 
     #  check that GV exists in path 
@@ -70,8 +70,8 @@ class GVapp < Sinatra::Base
     if (validation_array != 'lenc, lenr, dup, merge, align, frame, orf') || (database != 'sp')
       session[:adv_params] = 'adv_user'
     end
-    puts "@adv_params_btn_class = #{@adv_params_btn_class}"
-    puts "session[:adv_params] = #{session[:adv_params]}"
+    # puts "@adv_params_btn_class = #{@adv_params_btn_class}"
+    # puts "session[:adv_params] = #{session[:adv_params]}"
 
     # Create the working folder (within the temp folder). and then creating
     #   a soft link in the public folder to the working folder.

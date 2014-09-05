@@ -51,7 +51,8 @@ $(document).ready(function() {
               },
             });
 
-
+        
+        check_collapse_state()
 
         // Initiate the tooltips
         $("[data-toggle='tooltip']").tooltip();
@@ -88,9 +89,32 @@ function change_adv_params_btn_text(adv_user){
   if (btn.innerHTML === '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters') {
     btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Hide Advanced Parameters';
     $('#adv_params').collapse('show');
+    $.cookie('adv_params_status', 'open');
   }
   else {
     btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters';
     $('#adv_params').collapse('hide');
-  }
+    $.cookie('adv_params_status', 'closed');
+
+
+  };
 }
+
+
+function check_collapse_state() {
+  if ($.cookie('adv_params_status')){
+    var adv_params_status = $.cookie('adv_params_status');
+    var btn = document.getElementById("adv_params_btn");
+    if (adv_params_status === 'open') {
+        if (btn.innerHTML === '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters') {
+          btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Hide Advanced Parameters';
+        };
+        $('#adv_params').collapse('show');
+    } else if (adv_params_status === 'closed') {
+        btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters';
+        $('#adv_params').collapse('hide');
+    };
+  };
+}
+
+

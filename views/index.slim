@@ -9,9 +9,9 @@
     .clearfix
     button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="change_adv_params_btn_text()"
       i.fa.fa-pencil-square-o
-      | &nbsp;&nbsp;#{@btn_text}
+      | &nbsp;&nbsp;Show Advanced Parameters
     .clearfix
-    #adv_params class=@adv_params_btn_class
+    #adv_params.collapse
       .form-group.form-inline
         br/
         label.control-label for="advanced"  Advanced Parameters: Validations Types
