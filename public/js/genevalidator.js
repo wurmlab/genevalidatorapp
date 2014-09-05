@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  check_collapse_state();
+
   $('#input').submit(function(e) {
     e.preventDefault();
     // show activity spinner
@@ -9,11 +11,14 @@ $(document).ready(function() {
 
     // Check the type of the sequence...
     // check numbers
-    var input = document.forms["input"]['seq'].value;
-    // console.log(input)
+    if (checkInputSeq()) {
+      $('#spinner').modal('hide');
+      //  Load an error Modal...
+      return;
+    }
 
     // Ckeck if no  Validations 
-    if (check_val_empty()) {
+    if (checkEmptyValidation()) {
       $('#spinner').modal('hide');
       //  Load an error Modal...
       return;
@@ -31,9 +36,7 @@ $(document).ready(function() {
              // add custom parser to make the stars column to sort according to attr.
             $.tablesorter.addParser({
               id: 'star_scores', // called later when init the tablesorter
-              is: function(s) {
-                return false; // return false so this parser is not auto detected
-              },
+              is: function(s) {return false;},
               format: function(s, table, cell, cellIndex) {
                 var $cell = $(cell);
                 if (cellIndex === 2) {
@@ -42,7 +45,7 @@ $(document).ready(function() {
                 return s;
               },
               parsed: false,
-              type: 'numeric' // Setting type of data...
+              type: 'numeric'
             });
 
             $('table').tablesorter({
@@ -50,9 +53,6 @@ $(document).ready(function() {
                 2 : { sorter: 'star_scores' } // Telling it to use custom parser...
               },
             });
-
-        
-        check_collapse_state()
 
         // Initiate the tooltips
         $("[data-toggle='tooltip']").tooltip();
@@ -70,7 +70,30 @@ $(document).ready(function() {
   });
 })
 
-function check_val_empty() {
+
+
+// Validate the input
+// Check the input type 
+//// Can only have one type of sequence (not a mixture )
+//// No Numbers....
+function checkInputSeq(){
+    var fasta = require('bionode-fasta')
+    var seq = require('bionode-seq');
+    var input = document.forms["input"]['seq'].value;
+    // var type = seq.checkType(input)
+    // console.log(type);
+    // console.log("hi")
+
+    // fasta.obj('seq').on('data', console.log) // Returns Objects
+
+    // return true; // Kills the app...
+}
+
+
+
+
+
+function checkEmptyValidation() {
   var val = document.forms["input"]['validations[]'];
   var checkedVal = [];
   var valLength = val.length
@@ -95,8 +118,6 @@ function change_adv_params_btn_text(adv_user){
     btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters';
     $('#adv_params').collapse('hide');
     $.cookie('adv_params_status', 'closed');
-
-
   };
 }
 
@@ -104,15 +125,10 @@ function change_adv_params_btn_text(adv_user){
 function check_collapse_state() {
   if ($.cookie('adv_params_status')){
     var adv_params_status = $.cookie('adv_params_status');
-    var btn = document.getElementById("adv_params_btn");
     if (adv_params_status === 'open') {
-        if (btn.innerHTML === '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters') {
-          btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Hide Advanced Parameters';
-        };
-        $('#adv_params').collapse('show');
-    } else if (adv_params_status === 'closed') {
-        btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters';
-        $('#adv_params').collapse('hide');
+        var btn = document.getElementById("adv_params_btn");
+        btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Hide Advanced Parameters';
+        $('#adv_params').addClass('in');
     };
   };
 }

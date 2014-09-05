@@ -32,15 +32,6 @@ class GVapp < Sinatra::Base
     @unique_name      = ensure_unique_name(@working_folder, @tempdir) if File.exist?(@working_folder)
     @public_folder    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
 
-    # Set the default class of the adv params btn 
-    # if session[:adv_params] == 'adv_user'
-    #   @adv_params_btn_class = "collapse in"
-    #   @btn_text = "Hide Advanced Parameters"
-    # else
-    #   @adv_params_btn_class = "collapse"
-    #   @btn_text = "Show Advanced Parameters"
-    # end
-
     # Do Validations 
     #  check that GV exists in path 
     #  check that can write to tempdir
@@ -67,17 +58,8 @@ class GVapp < Sinatra::Base
         db = settings.nr
     end
 
-    if (validation_array != 'lenc, lenr, dup, merge, align, frame, orf') || (database != 'sp')
-      session[:adv_params] = 'adv_user'
-    end
-    # puts "@adv_params_btn_class = #{@adv_params_btn_class}"
-    # puts "session[:adv_params] = #{session[:adv_params]}"
-
-    # Create the working folder (within the temp folder). and then creating
-    #   a soft link in the public folder to the working folder.
     FileUtils.mkdir_p @working_folder
     FileUtils.ln_s "#{@working_folder}", "#{@public_folder}"
-    # Ensuring seqs are in fasta format and then writing them to file.
     sequences = to_fasta(sequences)
     create_fasta_file(@working_folder, sequences)
     results = run_genevalidator(validation_array, db, @working_folder, @public_folder, @unique_name)
@@ -104,13 +86,10 @@ end
 
 
 # Use this to supply the names of dbs to the app...
-swissprot_db_name = 'sp'
-uniprot_db_name = 'up'
-nr_db_name = 'nr'
 
-GVapp.set :swissprot, swissprot_db_name
-GVapp.set :uniprot, uniprot_db_name
-GVapp.set :nr, nr_db_name
+GVapp.set :swissprot, swissprot_db_name = 'sp'
+GVapp.set :uniprot, uniprot_db_name = 'up'
+GVapp.set :nr, nr_db_name = 'nr'
 
 GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')
 GVapp.run!
