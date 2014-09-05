@@ -6,11 +6,14 @@
     .form-group
       label.control-label for="input"  Input Sequences:
       textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false"
-      button#adv_params_btn.btn.btn-primary data-target="#adv_params" data-toggle="collapse" type="button" onclick="change_adv_params_btn_text()"
-        i.fa.fa-pencil
-        | &nbsp;&nbsp;Show Advanced Parameters
+    .clearfix
+    button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="change_adv_params_btn_text()"
+      i.fa.fa-pencil-square-o
+      | &nbsp;&nbsp;#{@btn_text}
+    .clearfix
     #adv_params class=@adv_params_btn_class
       .form-group.form-inline
+        br/
         label.control-label for="advanced"  Advanced Parameters: Validations Types
         br/
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
@@ -50,7 +53,7 @@
             | Non-Redundant database
       .clearfix
     .form-group
-      button.btn.btn-lg.btn-primary.pull-right type="submit" value="input"
+      button#input_btn.btn.btn-lg.btn-primary.pull-right type="submit" value="input"
         i.fa.fa-search
         | &nbsp;&nbsp;Analyse Sequences
       .clearfix
