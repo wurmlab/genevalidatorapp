@@ -6,37 +6,33 @@ require 'thin'
 require 'GeneValidatorApp'
 require 'fileutils'
 require 'sinatra/base'
-require "sinatra/config_file" 
-# TODO: do we still need a config file... (was initally put in to stop the browser timing out.)
+require 'sinatra/config_file'
+# TODO: do we still need a config file...
+##      (was initally put in to stop the browser timing out.)
 
+# AnuragPriyam:
+# * check the manner in which temp files are stored and served.
 
-# AnuragPriyam: 
-# * check the manner in which temp files are stored and served. 
-
-
+# The Actual App...
 class GVapp < Sinatra::Base
   helpers GeneValidatorApp
-
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
-  # enable :sessions
   config_file "#{File.dirname(__FILE__)}/../config.yml"
-  # Remove before Release When false, it compresses the rendered HTML.
-  Slim::Engine.default_options[:pretty] = true
 
   before do
     puts "\nStarting..."
-    @tempdir          = settings.tempdir
-    @unique_name      = create_unique_name
-    @working_folder   = File.join(@tempdir, @unique_name)
-    @unique_name      = ensure_unique_name(@working_folder, @tempdir) if File.exist?(@working_folder)
-    @public_folder    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
-
-    # Do Validations 
-    #  check that GV exists in path 
-    #  check that can write to tempdir
-    #  check that db exists?
-    raise IOError, 'A unique name cannot be created for this session.' if File.exist?(@working_folder)
+    @tempdir       = settings.tempdir
+    @unique_name   = create_unique_name
+    @working_dir   = File.join(@tempdir, @unique_name)
+    if File.exist?(@working_dir)
+      @unique_name = ensure_unique_name(@working_dir, @tempdir)
+    end
+    @public_dir    = File.join("#{File.dirname(__FILE__)}", '..', 'public',
+                               'GeneValidator', @unique_name)
+    if File.exist?(@working_dir)
+      raise IOError, 'A unique name cannot be created for this session.'
+    end
   end
 
   get '/' do
@@ -44,53 +40,47 @@ class GVapp < Sinatra::Base
   end
 
   post '/input' do
-    # Set up Variables 
-    sequences        = params[:seq]
-    validation_array = params[:validations].to_s.gsub(/[\[\]\"]/, '')
-    database         = params[:database]
+    sequences   = params[:seq]
+    validations = params[:validations].to_s.gsub(/[\[\]\"]/, '')
+    database    = params[:database]
 
     case database
-      when 'sp'
-        db = settings.swissprot
-      when 'up'
-        db = settings.uniprot
-      when 'nr'
-        db = settings.nr
+    when 'sp'
+      db = settings.swissprot
+    when 'up'
+      db = settings.uniprot
+    when 'nr'
+      db = settings.nr
     end
-
-    FileUtils.mkdir_p @working_folder
-    FileUtils.ln_s "#{@working_folder}", "#{@public_folder}"
+    FileUtils.mkdir_p @working_dir
+    FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
     sequences = to_fasta(sequences)
-    create_fasta_file(@working_folder, sequences)
-    results = run_genevalidator(validation_array, db, @working_folder, @public_folder, @unique_name)
-
-    create_results(results)
+    create_fasta_file(@working_dir, sequences)
+    run_genevalidator(validations, db, @working_dir, @unique_name)
   end
 
   # TODO: Get the below to work...
   # get '/results/*' do
-  #   @existing_unique_name      = params[:splat]
-  #   @existing_public_folder    = File.join("#{File.dirname(__FILE__)}", '/../public/GeneValidator', @existing_unique_name)
-
-  #   if File.exist?(@existing_public_folder)
-  #     @results = IO.read("#{@existing_public_folder}/table.html")
+  #   @ex_unique_name   = params[:splat]
+  #   @ex_public_dir = File.join("#{File.dirname(__FILE__)}", '..', 'public'
+  #                                 'GeneValidator', @existing_unique_name)
+  #   if File.exist?(@existing_public_dir)
+  #     @results = IO.read("#{@existing_public_dir}/table.html")
   #   else
-  #     @results = "Sorry, no results can be found at this URL. Please try again."
+  #     @results = "Sorry, no results can be found at this URL."
   #   end
-
   #   slim :index
   # end
-
-   
 end
 
+# Do Validations here = So only run once after installation
+#  check that GV exists in path
+#  check that can write to tempdir
+#  check that db exists?
 
 # Use this to supply the names of dbs to the app...
-
 GVapp.set :swissprot, swissprot_db_name = 'sp'
 GVapp.set :uniprot, uniprot_db_name = 'up'
 GVapp.set :nr, nr_db_name = 'nr'
-
 GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')
 GVapp.run!
-

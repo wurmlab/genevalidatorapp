@@ -11,11 +11,11 @@ $(document).ready(function() {
 
     // Check the type of the sequence...
     // check numbers
-    if (checkInputSeq()) {
-      $('#spinner').modal('hide');
-      //  Load an error Modal...
-      return;
-    }
+    // if (checkInputSeq()) {
+    //   $('#spinner').modal('hide');
+    //   //  Load an error Modal...
+    //   return;
+    // }
 
     // Ckeck if no  Validations 
     if (checkEmptyValidation()) {

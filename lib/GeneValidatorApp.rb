@@ -1,36 +1,39 @@
 require 'GeneValidatorApp/version'
 require 'fileutils'
 
-
+# A helper module for the GVApp
 module GeneValidatorApp
-
+  # Creates a Unique name using the time (in nanoseconds) + the IP address
   def create_unique_name
     puts 'creating a unique name'
-    unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' + request.ip.gsub('.','-')
+    unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' +
+                  request.ip.gsub('.', '-')
     return unique_name
   end
 
-  def ensure_unique_name(working_folder, tempdir)
+  # If the unique name isn't unique, this loop is run until, a unique name is
+  #   found.
+  def ensure_unique_name(working_dir, tempdir)
     puts 'Ensuring the run has a unique name'
-    while File.exist?(working_folder)
+    while File.exist?(working_dir)
       unique_name    = create_unique_name
-      working_folder = File.join(@tempdir, @unique_name)
+      working_dir = File.join(tempdir, unique_name)
     end
     return unique_name
   end
 
-  # Taken from SequenceServer
+  # Adds a ID (based on the submission time) to sequences that are not in fasta
+  #   format. Adapted from SequenceServer.
   def to_fasta(sequence)
-    puts 'Converting Sequences to Fasta format if necessary.'
     sequence = sequence.lstrip
-    unique_queries = Hash.new()
-    if sequence[0,1] != '>'
-      sequence.insert(0, ">Submitted at #{Time.now.strftime('%H:%M, %A, %B %d, %Y')}\n")
+    unique_queries = {}
+    if sequence[0, 1] != '>'
+      sequence.insert(0, ">Submitted:#{Time.now.strftime('%H:%M-%B_%d_%Y')}\n")
     end
     sequence.gsub!(/^\>(\S+)/) do |s|
-      if unique_queries.has_key?(s)
+      if unique_queries.key?(s)
         unique_queries[s] += 1
-        s + '_' + (unique_queries[s]-1).to_s
+        s + '_' + (unique_queries[s] - 1).to_s
       else
         unique_queries[s] = 1
         s
@@ -39,42 +42,53 @@ module GeneValidatorApp
     return sequence
   end
 
-  def create_fasta_file(working_folder, sequences)
+  # Writes the input sequences to a fasta file.
+  def create_fasta_file(working_dir, sequences)
     puts 'Writing the input sequences into a fasta file.'
-    File.open(File.join(working_folder, "input_file.fa"), 'w+') do |f|
+    File.open(File.join(working_dir, 'input_file.fa'), 'w+') do |f|
       f.write sequences
     end
   end
 
-  def run_genevalidator (validation_array, database, working_folder, public_folder, unique_name)
-    index_folder = File.join(working_folder, 'input_file.fa.html')
-
-    puts 'Running Genevalidator from a sub-shell'
-    command = "Genevalidator -v \"#{validation_array}\" -d \"#{database}\" #{working_folder}/input_file.fa"
-    exit = system(command)
-    raise IOError, "Genevalidator exited with the command code: #{exit}" unless exit
-
-    html_table = extract_table_html(working_folder, public_folder, unique_name)
-
+  # Runs GeneValidator from the command line and return just the table html...
+  def run_genevalidator(validations, db, working_dir, unique_name)
+    index_file = File.join(working_dir, 'input_file.fa.html', 'index.html')
+    command    = 'Genevalidator -v "' + validations + '" -d ' + db + ' ' +
+                  File.join(working_dir, 'input_file.fa')
+    exit       = system(command)
+    unless exit
+      raise IOError, "Genevalidator exited with the command code: #{exit}."
+    end
+    unless File.exist?(index_file)
+      raise IOError, 'GeneValidator has not created any results files...'
+    end
+    html_table = extract_table_html(index_file, unique_name)
     return html_table
   end
 
-  def extract_table_html(working_folder, public_folder, unique_name)
-    index_file = File.join(working_folder, "/input_file.fa.html", "index.html")
-    raise IOError, "GeneValidator has not created any results files..." unless File.exist?(index_file)
+  # Extracts the HTML table from the output index file. And then edits it
+  #   slighly to embeded into the app...
+  def extract_table_html(index_file, unique_name)
+    plots_dir  = File.join('Genevalidator', unique_name, 'input_file.fa.html',
+                           'input_file.fa_')
 
-    puts 'Reading the html output file...'
     full_html = IO.binread(index_file)
-    cleanhtml = full_html.gsub(/>\s*</, "><").gsub(/[\t\n]/, '').gsub('  ', ' ')
+    cleanhtml = full_html.gsub(/>\s*</, '><').gsub(/[\t\n]/, '').gsub('  ', ' ')
     cleanhtml.scan(/<div id="report">.*/) do |table|
-      @html_table = table.gsub('</div></body></html>','').gsub(/input_file.fa_/, File.join('Genevalidator', unique_name, "/input_file.fa.html", 'input_file.fa_'))  # tYW instead modify GeneValidator. 
+      # tYW instead modify GeneValidator.
+      @table = table.gsub('</div></body></html>', '').gsub(/input_file.fa_/,
+                                                          plots_dir)
     end
-    return @html_table
+    results = create_results(@table)
+    return results
   end
 
+  # Edits the results so that they are embedded in a nice box
+  ### TODO: PUT this into the template with display:none and then use javascript
   def create_results(insides)
     puts 'creating results'
-    results = '<div id="results_box"><h2 class="page-header">Results</h2>'+ insides + '</div>'
+    results = '<div id="results_box"><h2 class="page-header">Results</h2>' +
+              insides + '</div>'
     return results
   end
 end
