@@ -8,7 +8,7 @@ require 'fileutils'
 require 'sinatra/base'
 require 'sinatra/config_file'
 # TODO: do we still need a config file...
-##      (was initally put in to stop the browser timing out.)
+##      (was initially put in to stop the browser timing out.)
 
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
@@ -32,6 +32,9 @@ class GVapp < Sinatra::Base
                                'GeneValidator', @unique_name)
     if File.exist?(@working_dir)
       raise IOError, 'A unique name cannot be created for this session.'
+    end
+    unless File.exist?(@tempdir)
+      raise IOError, 'The Temporary folder cannot be found.'
     end
   end
 
@@ -58,29 +61,15 @@ class GVapp < Sinatra::Base
     create_fasta_file(@working_dir, sequences)
     run_genevalidator(validations, db, @working_dir, @unique_name)
   end
-
-  # TODO: Get the below to work...
-  # get '/results/*' do
-  #   @ex_unique_name   = params[:splat]
-  #   @ex_public_dir = File.join("#{File.dirname(__FILE__)}", '..', 'public'
-  #                                 'GeneValidator', @existing_unique_name)
-  #   if File.exist?(@existing_public_dir)
-  #     @results = IO.read("#{@existing_public_dir}/table.html")
-  #   else
-  #     @results = "Sorry, no results can be found at this URL."
-  #   end
-  #   slim :index
-  # end
 end
 
 # Do Validations here = So only run once after installation
 #  check that GV exists in path
-#  check that can write to tempdir
 #  check that db exists?
 
 # Use this to supply the names of dbs to the app...
-GVapp.set :swissprot, swissprot_db_name = 'sp'
-GVapp.set :uniprot, uniprot_db_name = 'up'
-GVapp.set :nr, nr_db_name = 'nr'
+GVapp.set :swissprot, 'sp'
+GVapp.set :uniprot, 'up'
+GVapp.set :nr, 'nr'
 GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')
 GVapp.run!
