@@ -11,11 +11,11 @@ $(document).ready(function() {
 
     // Check the type of the sequence...
     // check numbers
-    // if (checkInputSeq()) {
-    //   $('#spinner').modal('hide')
-    //   //  Load an error Modal...
-    //   return
-    // }
+    if (checkInputSeq()) {
+      $('#spinner').modal('hide')
+      //  Load an error Modal...
+      return
+    }
 
     // Ckeck if no  Validations 
     if (checkEmptyValidation()) {
@@ -57,17 +57,81 @@ $(document).ready(function() {
 //// Can only have one type of sequence (not a mixture )
 //// No Numbers....
 function checkInputSeq(){
-    var fasta = require('bionode-fasta')
-    var seq = require('bionode-seq')
-    var input = document.forms["input"]['seq'].value
-    // var type = seq.checkType(input)
-    // console.log(type)
-    // console.log("hi")
+  var fasta = require('bionode-fasta')
+  var seq = require('bionode-seq')
+  var data = document.forms["input"]['seq'].value
+  var results = []
 
-    // fasta.obj('seq').on('data', console.log) // Returns Objects
+  // Checks for Empty Space(s)
+  if (data.replace(/\s/g, "").length === 0) {
+    console.log('Empty Input')
+    return true
+  };
 
-    // return true; // Kills the app...
+  if (data.charAt(0) === '>') {
+    var parser = fasta.obj(); // Returns objects
+    parser.write(data);
+    parser.end();
+    parser.on('data', storeData)
+    function storeData(data) {
+      var sequence = data.seq
+      var type = checkType(sequence, 0.9)
+      results.push(type)
+      console.log('1: ' + results)
+    }
+      console.log('2: ' + results)
+  } else {
+    var type = checkType(data, 0.9)
+    if (proteinOrDNA(type)) {return true}
+  }
+
+  console.log('3: ' + results)
+  return true
 }
+
+
+
+
+checkType = function (sequence, threshold) {
+  var total = sequence.length
+  var acgMatch = ((sequence.match(/[ACG]/gi) || []).length) / total
+  var tMatch = ((sequence.match(/[T]/gi) || []).length) / total
+  var uMatch = ((sequence.match(/[U]/gi) || []).length) / total
+  var proteinMatch = ((sequence.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / total
+
+  if (((acgMatch + tMatch) > threshold) || ((acgMatch + uMatch) > threshold)) {
+    if (tMatch > uMatch) {
+      return 'dna'
+    } else if (uMatch > tMatch) {
+      return 'rna'
+    };
+  } else if (proteinMatch > threshold) {
+    return 'protein'
+  }
+}
+
+function checkEmptyValidation() {
+  var val = document.forms["input"]['validations[]']
+  var checkedVal = []
+  var valLength = val.length
+
+  for (var i = 0; i < valLength; i++) {
+    if (val[i].checked) {
+      checkedVal.push(val[i])
+    }
+  }
+  return checkedVal.length === 0 ? true : false;
+}
+
+
+function proteinOrDNA(type){
+  if ((type === 'protein') || (type === 'dna') || (type === 'rna')) {
+    return false
+  } else {
+    return true
+  }
+}
+
 
 
 
@@ -100,8 +164,9 @@ function ChangeAdvParamsBtnText() {
     $.cookie('adv_params_status', 'closed')
   }
 }
-
-
+////  TODO: Change the cookie name so that it has a Genevalidator prefix...  
+// Looks for a cookie (called 'adv_params_status') to check the state of the adv_params box when it was last closed. 
+//  This function is called upon as soon as the website is loaded;  
 function checkCollapseState() {
   if ($.cookie('adv_params_status')){
     var adv_params_status = $.cookie('adv_params_status')
@@ -113,7 +178,7 @@ function checkCollapseState() {
   }
 }
 
-// A Table sortert Initialiser 
+//  Table sortert Initialiser 
 //   Contains a custom parser that allows the Stars to be sorted. 
 function initTableSorter() {
   $.tablesorter.addParser({
