@@ -7,7 +7,7 @@
       label.control-label for="input"  Input Sequences:
       textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false"
     .clearfix
-    button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="change_adv_params_btn_text()"
+    button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="ChangeAdvParamsBtnText()"
       i.fa.fa-pencil-square-o
       | &nbsp;&nbsp;Show Advanced Parameters
     .clearfix
@@ -42,15 +42,13 @@
       .form-group.form-inline
         label.control-label for="database"  Advanced Parameters: Database
         br/
-        label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#sp type="radio" name="database" value="sp" checked=""
-            | Swiss-Prot database
-        label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#nr type="radio" name="database" value="up"
-            | UniProtKB database
-        label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#nr type="radio" name="database" value="nr"
-            | Non-Redundant database
+        - @default_db.each do |title, hash|
+          label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
+            input#sp type="radio" name="database" value="#{title}" checked="" #{title}
+        - unless @non_default_dbs.empty?
+          - @non_default_dbs.each do |title, hash|
+            label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
+              input#sp type="radio" name="database" value="#{title}" #{title}
       .clearfix
     .form-group
       button#input_btn.btn.btn-lg.btn-primary.pull-right type="submit" value="input"

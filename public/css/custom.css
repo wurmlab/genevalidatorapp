@@ -120,6 +120,16 @@ tr {
   height: 39px;
 }
 
+.expanded-child{
+  display: block;
+  text-align: center;
+}
+
+/* table striped backgrounds ___________*/
+
+tbody > tr:nth-child(4n+1), tbody > tr:nth-child(4n+2) {
+  background-color: #fff;
+}
 
 
 /* table sorter ___________*/
@@ -236,10 +246,6 @@ svg:not(:root) {
 svg {
   margin:30px;
 }
-.expanded-child{
-  display: block;
-  text-align: center;
-}
 
 /* Ratings...
 ___________________________*/
@@ -284,11 +290,7 @@ ___________________________*/
   font-weight: bold;
 }
 
-#plot_btn {
-  padding: 4px 5px 2px 3px;
-}
-
-[id^="toggle"] {
+#toggle {
   text-align:center;
 }
 

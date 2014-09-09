@@ -7,6 +7,7 @@ require 'GeneValidatorApp'
 require 'fileutils'
 require 'sinatra/base'
 require 'sinatra/config_file'
+require 'genevalidator'
 # TODO: do we still need a config file...
 ##      (was initially put in to stop the browser timing out.)
 
@@ -28,13 +29,19 @@ class GVapp < Sinatra::Base
     if File.exist?(@working_dir)
       @unique_name = ensure_unique_name(@working_dir, @tempdir)
     end
+    
     @public_dir    = File.join("#{File.dirname(__FILE__)}", '..', 'public',
                                'GeneValidator', @unique_name)
+
+    # Set up dbs...
+    @non_default_dbs = settings.non_default
+    @default_db      = settings.default_db
+
     if File.exist?(@working_dir)
-      raise IOError, 'A unique name cannot be created for this session.'
+      halt 400, 'A unique name cannot be created for this session.'
     end
     unless File.exist?(@tempdir)
-      raise IOError, 'The Temporary folder cannot be found.'
+      halt 400, 'The Temporary folder cannot be found.'
     end
   end
 
@@ -45,16 +52,8 @@ class GVapp < Sinatra::Base
   post '/input' do
     sequences   = params[:seq]
     validations = params[:validations].to_s.gsub(/[\[\]\"]/, '')
-    database    = params[:database]
+    db          = params[:database]
 
-    case database
-    when 'sp'
-      db = settings.swissprot
-    when 'up'
-      db = settings.uniprot
-    when 'nr'
-      db = settings.nr
-    end
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
     sequences = to_fasta(sequences)
@@ -64,12 +63,25 @@ class GVapp < Sinatra::Base
 end
 
 # Do Validations here = So only run once after installation
-#  check that GV exists in path
-#  check that db exists?
+#  Check that GV exists in path
+#  Check by either:
+    # -> Creating a small enough test unit and run Genevalidator in a subshell.
+    # -> require GeneValidator and initilise the init (which checks if everything works perfectly...)
 
-# Use this to supply the names of dbs to the app...
-GVapp.set :swissprot, 'sp'
-GVapp.set :uniprot, 'up'
-GVapp.set :nr, 'nr'
+db_root   =  File.join(Dir.home, 'blastdb') # ARGV[0]
+### Possibly take the name of the default DB as a second argument. 
+
+
+### Sort out the DBs...
+default_db = {}
+dbs = scan_blast_database_directory(db_root)
+default_db_name = choose_default(dbs)
+# Create a separate Hash for the the default and everything else...
+default_db[default_db_name] = dbs[default_db_name]
+dbs.delete(default_db_name)
+
+
+GVapp.set :non_default, dbs
+GVapp.set :default_db, default_db
 GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')
 GVapp.run!
