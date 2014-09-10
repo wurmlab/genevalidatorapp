@@ -8,11 +8,53 @@ require 'fileutils'
 require 'sinatra/base'
 require 'sinatra/config_file'
 require 'genevalidator'
-# TODO: do we still need a config file...
-##      (was initially put in to stop the browser timing out.)
 
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
+
+
+### App Arguments = TODO...
+# First Argument - location of te DB_Root
+db_root =  File.join(Dir.home, 'blastdb') # ARGV[0]
+
+# Second Argument, the name of the default db 
+
+ 
+tempdir = Dir.mktmpdir('GeneValidator_')
+
+
+
+## Run TESTS 
+
+puts # a blank line.
+puts "Looking for Databases in #{db_root}..."
+puts # a blank line.
+
+default_db      = {}
+dbs             = scan_blast_database_directory(db_root)
+default_db_name = choose_default(dbs)
+
+# Create a one Hash for the the default and one for everything else...
+#   This is so that I can easily set the default in the advanced parameters field on the web app.
+default_db[default_db_name] = dbs[default_db_name]
+# Remove the default db from the dbs hash.
+dbs.delete(default_db_name)
+
+
+puts 'Testing if Genevalidator (and all it\'s dependencies) are working.'
+GV_test(tempdir, default_db_name)
+
+
+
+GVapp.set :non_default, dbs
+GVapp.set :default_db, default_db
+GVapp.set :tempdir, tempdir
+GVapp.run!
+
+
+
+
+###################
 
 # The Actual App...
 class GVapp < Sinatra::Base
@@ -60,45 +102,3 @@ class GVapp < Sinatra::Base
     run_genevalidator(vals, db, @working_dir, @unique_name)
   end
 end
-
-# Do Validations here = So only run once after installation
-#  Check that GV exists in path
-#  Check by either:
-    # -> Creating a small enough test unit and run Genevalidator in a subshell.
-    # -> require GeneValidator and initilise the init (which checks if everything works perfectly...)
-
-db_root   =  File.join(Dir.home, 'blastdb') # ARGV[0]
-### Possibly take the name of the default DB as a second argument. 
-
-puts # a blank line.
-puts "Looking for Databases in #{db_root}..."
-puts # a blank line.
-### Sort out the DBs...
-default_db      = {}
-dbs             = scan_blast_database_directory(db_root)
-default_db_name = choose_default(dbs)
-
-# Create a one Hash for the the default and one for everything else...
-#   This is so that I can easily set the default in the advanced parameters field on the web app.
-default_db[default_db_name] = dbs[default_db_name]
-# Remove the default db from the dbs hash.
-dbs.delete(default_db_name)
-
-puts 'Testing if Genevalidator (and all it\'s dependencies) are working.'
-tempdir       = Dir.mktmpdir('GeneValidator_')
-initial_tests = File.join(tempdir, 'initial_tests')
-test_file     = File.join("#{File.dirname(__FILE__)}", '..', 'public',
-                               'GeneValidator', 'initial_tests', 'inital_test.fa')
-
-FileUtils.mkdir_p(initial_tests)
-FileUtils.cp(test_file, initial_tests)
-
-
-# Validation.new(test_file, options[:vlist], options[:tabular], options[:skip_blast], options[:db], options[:raw], options[:mafft], options[:start])
-
-# Validation.new(Input_File, nil , nil, nil, nil, nil, nil)
-
-GVapp.set :non_default, dbs
-GVapp.set :default_db, default_db
-GVapp.set :tempdir, tempdir
-GVapp.run!

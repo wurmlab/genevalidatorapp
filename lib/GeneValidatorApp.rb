@@ -139,8 +139,11 @@ end
       exit
     elsif db_list.match(/BLAST Database error/)
       puts "*** Error parsing one of the BLAST databases."
-      puts "    Mostly likely some of your BLAST databases were created by an old version of 'makeblastdb'."
-      puts "    You will have to manually delete problematic BLAST databases and subsequently use the latest version of BLAST + to create new ones."
+      puts "    Mostly likely some of your BLAST databases were created by an "
+      puts "    old version of 'makeblastdb'."
+      puts "    You will have to manually delete problematic BLAST databases "
+      puts "    and subsequently use the latest version of BLAST + to create "
+      puts "    new ones."
       exit
     elsif not $?.success?
       puts "*** Error obtaining BLAST databases."
@@ -178,12 +181,12 @@ end
 ### Ensures that GV is installed and is of the correct version...
 def assert_gv_installed_and_compatible()
   unless command? 'genevalidator'
-    puts "*** Could not find GeneValidator."
-    puts "    Please Confirm that you have GeneValidator installed and try again. "
+    puts "*** Could not find GeneValidator. Please Confirm that you have "
+    puts "    GeneValidator installed and try again. "
     puts "    Please refer to ...Link... for more information."
     exit
   end
-  ### Add the --version argument to GeneValidator
+  ### TODO: Add the --version argument to GeneValidator
   # version = %x|genevalidator -version|.split[1]
   # unless version >= '1.0'
   #   puts "*** Your GeneValidator version #{version} is outdated."
@@ -228,4 +231,23 @@ def choose_default(databases)
 
   
   return default_db
+end
+
+
+def GV_test(tempdir, default_db)
+  initial_tests = File.join(tempdir, 'initial_tests')
+  test_file     = File.join("#{File.dirname(__FILE__)}", '..', 'public',
+                            'GeneValidator', 'initial_tests', 'inital_test.fa')
+
+  FileUtils.mkdir_p(initial_tests)
+  FileUtils.cp(test_file, initial_tests)
+
+  command    = "Genevalidator -d #{default_db} '#{File.join(tempdir,"
+               "'input_file.fa')}'"
+  exit       = system(command)
+  unless exit
+    raise IOError, "Genevalidator exited with the command code: #{exit}." \
+                   " It is possible that GeneValidator has not properly been " 
+                   "installed."
+  end
 end
