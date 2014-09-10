@@ -133,24 +133,6 @@ function proteinOrDNA(type){
 }
 
 
-
-
-
-
-function checkEmptyValidation() {
-  var val = document.forms["input"]['validations[]']
-  var checkedVal = []
-  var valLength = val.length
-
-  for (var i = 0; i < valLength; i++) {
-    if (val[i].checked) {
-      checkedVal.push(val[i])
-    }
-  }
-  return checkedVal.length === 0 ? true : false
-}
-
-
 function ChangeAdvParamsBtnText() {
   var btn = document.getElementById("adv_params_btn")
   if (btn.innerHTML === '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters') {
