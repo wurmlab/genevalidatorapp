@@ -24,18 +24,17 @@ class GVapp < Sinatra::Base
   before do
     puts "\nStarting..."
     @tempdir       = settings.tempdir
+    @default_db      = settings.default_db
+    @non_default_dbs = settings.non_default
+
     @unique_name   = create_unique_name
     @working_dir   = File.join(@tempdir, @unique_name)
     if File.exist?(@working_dir)
       @unique_name = ensure_unique_name(@working_dir, @tempdir)
-    end
-    
+    end    
     @public_dir    = File.join("#{File.dirname(__FILE__)}", '..', 'public',
                                'GeneValidator', @unique_name)
 
-    # Set up dbs...
-    @non_default_dbs = settings.non_default
-    @default_db      = settings.default_db
 
     if File.exist?(@working_dir)
       halt 400, 'A unique name cannot be created for this session.'
@@ -50,15 +49,15 @@ class GVapp < Sinatra::Base
   end
 
   post '/input' do
-    sequences   = params[:seq]
-    validations = params[:validations].to_s.gsub(/[\[\]\"]/, '')
-    db          = params[:database]
+    seqs = params[:seq]
+    vals = params[:validations].to_s.gsub(/[\[\]\"]/, '')
+    db   = params[:database]
 
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
-    sequences = to_fasta(sequences)
-    create_fasta_file(@working_dir, sequences)
-    run_genevalidator(validations, db, @working_dir, @unique_name)
+    seqs = to_fasta(seqs)
+    create_fasta_file(@working_dir, seqs)
+    run_genevalidator(vals, db, @working_dir, @unique_name)
   end
 end
 
@@ -71,17 +70,35 @@ end
 db_root   =  File.join(Dir.home, 'blastdb') # ARGV[0]
 ### Possibly take the name of the default DB as a second argument. 
 
-
+puts # a blank line.
+puts "Looking for Databases in #{db_root}..."
+puts # a blank line.
 ### Sort out the DBs...
-default_db = {}
-dbs = scan_blast_database_directory(db_root)
+default_db      = {}
+dbs             = scan_blast_database_directory(db_root)
 default_db_name = choose_default(dbs)
-# Create a separate Hash for the the default and everything else...
+
+# Create a one Hash for the the default and one for everything else...
+#   This is so that I can easily set the default in the advanced parameters field on the web app.
 default_db[default_db_name] = dbs[default_db_name]
+# Remove the default db from the dbs hash.
 dbs.delete(default_db_name)
 
+puts 'Testing if Genevalidator (and all it\'s dependencies) are working.'
+tempdir       = Dir.mktmpdir('GeneValidator_')
+initial_tests = File.join(tempdir, 'initial_tests')
+test_file     = File.join("#{File.dirname(__FILE__)}", '..', 'public',
+                               'GeneValidator', 'initial_tests', 'inital_test.fa')
+
+FileUtils.mkdir_p(initial_tests)
+FileUtils.cp(test_file, initial_tests)
+
+
+# Validation.new(test_file, options[:vlist], options[:tabular], options[:skip_blast], options[:db], options[:raw], options[:mafft], options[:start])
+
+# Validation.new(Input_File, nil , nil, nil, nil, nil, nil)
 
 GVapp.set :non_default, dbs
 GVapp.set :default_db, default_db
-GVapp.set :tempdir, Dir.mktmpdir('GeneValidator_')
+GVapp.set :tempdir, tempdir
 GVapp.run!

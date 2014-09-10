@@ -170,7 +170,6 @@ end
       puts "Found #{type} database: #{title} at #{name}"
       # logger.info("Found #{type} database: #{title} at #{name}")
     end
-    puts db
     db
   end
 

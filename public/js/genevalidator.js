@@ -86,7 +86,6 @@ function checkInputSeq(){
   }
 
   console.log('3: ' + results)
-  return true
 }
 
 
