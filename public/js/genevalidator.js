@@ -11,19 +11,20 @@ $(document).ready(function() {
 
     // Check the type of the sequence...
     // check numbers
-    if (checkInputSeq()) {
-      $('#spinner').modal('hide')
-      //  Load an error Modal...
-      return
-    }
 
-    // Ckeck if no  Validations 
+    if (checkInputSeq(function(bool) {
+
+      if (bool) {
+        $('#spinner').modal('hide')
+        return
+      } 
+
+       // Ckeck if no  Validations 
     if (checkEmptyValidation()) {
       $('#spinner').modal('hide')
-      //  Load an error Modal...
       return
     }
-
+    
     $.ajax({
       type: 'POST',
       url: '/input',
@@ -40,6 +41,14 @@ $(document).ready(function() {
         $('#spinner').modal('hide')
       },
     })
+
+
+    })) {
+
+    }
+
+
+   
   })
   
   // Handles the form submission when Ctrl+Enter is pressed anywhere on page. taken from SequenceServer...
@@ -56,7 +65,7 @@ $(document).ready(function() {
 // Check the input type 
 //// Can only have one type of sequence (not a mixture )
 //// No Numbers....
-function checkInputSeq(){
+function checkInputSeq(cb){
   var fasta = require('bionode-fasta')
   var seq = require('bionode-seq')
   var data = document.forms["input"]['seq'].value
@@ -64,9 +73,11 @@ function checkInputSeq(){
 
   // Checks for Empty Space(s)
   if (data.replace(/\s/g, "").length === 0) {
-    console.log('Empty Input')
-    return true
-  };
+    $('#input_seq_group').addClass("has-error")
+    $('#seq_alert').html('Please ensure that the Input Sequence is not Empty.')
+    $('#seq_alert').show()
+    return cb(true)
+  } 
 
   if (data.charAt(0) === '>') {
     var parser = fasta.obj(); // Returns objects
@@ -77,15 +88,34 @@ function checkInputSeq(){
       var sequence = data.seq
       var type = checkType(sequence, 0.9)
       results.push(type)
-      console.log('1: ' + results)
     }
-      console.log('2: ' + results)
+    parser.on('end', function() {
+      results.forEach(checkEach)
+        
+        function checkEach(type) {
+          if (proteinOrDNA(type)) {
+            $('#input_seq_group').addClass("has-error")
+            $('#seq_alert').html('Please ensure that the Input Sequence contains either protein or genetic data.')
+            $('#seq_alert').show()
+            return cb(true)
+          } else {
+            return cb(false)
+          }
+        }
+
+    })
+
   } else {
     var type = checkType(data, 0.9)
-    if (proteinOrDNA(type)) {return true}
+    if (proteinOrDNA(type)) {
+      $('#input_seq_group').addClass("has-error")
+      $('#seq_alert').html('Please ensure that the Input Sequence contains either protein or genetic data.')
+      $('#seq_alert').show()
+      return cb(true)
+    } else {
+      return cb(false)
+    }
   }
-
-  console.log('3: ' + results)
 }
 
 
@@ -119,11 +149,17 @@ function checkEmptyValidation() {
       checkedVal.push(val[i])
     }
   }
-  return checkedVal.length === 0 ? true : false;
+  if (checkedVal.length === 0) {
+    $('#validations_group').addClass("has-error")
+    $('#validation_alert').show()
+    return true
+  } else {
+    return false
+  }
 }
 
 
-function proteinOrDNA(type){
+function proteinOrDNA(type) {
   if ((type === 'protein') || (type === 'dna') || (type === 'rna')) {
     return false
   } else {
