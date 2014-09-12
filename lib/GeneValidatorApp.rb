@@ -1,11 +1,7 @@
 require 'GeneValidatorApp/version'
 require 'GeneValidatorApp/PreRunValidation.rb'
 require 'fileutils'
-require 'sinatra'
-require 'slim'
-require 'thin'
-require 'sinatra/base'
-require 'sinatra/config_file'
+
 
 
 # A helper module for the GVApp

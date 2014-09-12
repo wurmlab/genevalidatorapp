@@ -2,6 +2,11 @@
 
 require 'GeneValidatorApp'
 require 'fileutils'
+require 'sinatra'
+require 'thin'
+require 'slim'
+require 'sinatra/base'
+require 'sinatra/config_file'
 
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
@@ -12,6 +17,7 @@ class GVapp < Sinatra::Base
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
   config_file "#{File.dirname(__FILE__)}/../config.yml"
+  puts config_file
 
     # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
