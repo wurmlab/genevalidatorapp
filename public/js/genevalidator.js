@@ -1,42 +1,113 @@
 $(document).ready(function() {
   checkCollapseState()
-
-  $('#input').submit(function(e) {
-    e.preventDefault()
-    // show activity spinner
-    $('#spinner').modal({
-      backdrop: 'static',
-      keyboard: 'false'
-    })
-    if (checkInputSeq()) {
-      $('#spinner').modal('hide')
-      return
+  
+  jQuery.validator.addMethod("checkInputType", function(value, element) {
+    types = []
+    if (value.charAt(0) === '>') {
+      lines = value.split('\n')
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].match(/^>/)) {
+        } else {
+          var type = checkType(lines[i], 0.9)
+          types.push(type)
+          if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
+            return false
+          }
+        }
+      }
+      console.log(types)
+      var firstType = types[0]
+      for (var i = 0; i < types.length; i++) {
+        if (types[i] !== firstType){
+          return false
+        }
+      }
+      return true
+    } else {
+      var type = checkType(value, 0.9)
+        if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
+          return false
+        } else {
+          return true
+        }
     }
 
-    // Ckeck if no  Validations 
-    if (checkEmptyValidation()) {
-      $('#spinner').modal('hide')
-      return
-    }
+  }, "* The Input must be either genetic or protein Sequence(s).");
 
-    $.ajax({
-      type: 'POST',
-      url: '/input',
-      data: $('#input').serialize(),
-      success: function(response){
-        console.log('2hey')
-        $('#output').html(response)
-        // initiate the table sorter
-        initTableSorter()
-        // Initiate the tooltips
-        $("[data-toggle='tooltip']").tooltip()
-        // Remove Unwanted Columns
-        removeEmptyColumns(); 
-        // remove progress notification
-        $('#spinner').modal('hide')
+    $('#input').validate({
+      rules: {
+          seq: {
+              minlength: 5,
+              required: true,
+              checkInputType: true
+
+          },
+          'validations[]': {
+             required: true,
+          }
       },
+      highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+      },
+      unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+      },
+      errorElement: 'span',
+      errorClass: 'help-block',
+      errorPlacement: function(error, element) {
+        console.log()
+        //  if (element.parent().parent(_.hasClass("input-append")) {
+        //   console.log('cwcwdwdc')
+        // }
+        //   console.log(element.parent().child())
+        //   // error.insertAfter()
+        // } else {
+          if (element.parent().parent().attr('id') === 'validations_group') {
+            var helpText = document.getElementById('lastValidation')
+            error.insertAfter(helpText);
+          } else{
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+          }
+
+
+
+        // }
+      },
+
+      submitHandler: function(form) {
+
+        $('#spinner').modal({
+          backdrop: 'static',
+          keyboard: 'false'
+        })
+
+        $.ajax({
+          type: 'POST',
+          url: '/input',
+          data: $('#input').serialize(),
+          success: function(response){
+            console.log('2hey')
+            $('#output').html(response)
+            // initiate the table sorter
+            initTableSorter()
+            // Initiate the tooltips
+            $("[data-toggle='tooltip']").tooltip()
+            // Remove Unwanted Columns
+            removeEmptyColumns(); 
+            // remove progress notification
+            $('#spinner').modal('hide')
+          },
+          failure: function(){
+            return
+          }
+        })
+
+      }
     })
-  })
 
   $(document).bind("keydown", function (e) {
     if (e.ctrlKey && e.keyCode === 13 ) {
@@ -64,68 +135,6 @@ checkType = function (sequence, threshold) {
 }
 
 
-function checkInputSeq() {
-  var data = document.forms["input"]['seq'].value
-  var seqs_array = []
-  var seq_type = ''
-  // Checks for Empty Space(s)
-  if (data.replace(/\s/g, "").length === 0) {
-    $('#input_seq_group').addClass("has-error")
-    $('#seq_alert').html('Please ensure that the Input Sequence is not Empty.')
-    $('#seq_alert').show()
-    return true
-  } 
-
-  if (data.charAt(0) === '>') {
-    var sequences = data.split('\n>')
-    var seqs = []
-    for (var i = 0; i < sequences.length; i++) {
-      var seq = new Object()
-      var lines = sequences[i].split('\n')
-      if (lines[0].charAt(0) === '>') {
-        seq.id = lines[0]
-      } else {
-        seq.id = '>' + lines[0]
-      }
-
-      lines.splice(0,1)
-      seq.sequence = lines.join()
-      seqs_array.push(seq)  
-    }
-    for (var i = 0; i < seqs_array.length; i ++) {
-      var seq = seqs_array[i]['sequence']
-      var type = checkType(data, 0.9)
-      if (seq_type === '') {
-       seq_type = type
-      } else {
-        if (seq_type === type) {
-        } else {
-          $('#input_seq_group').addClass("has-error")
-          $('#seq_alert').html('Please ensure that the input Sequences are of a single type (i.e. either all protein sequences or all genetic sequences).')
-          $('#seq_alert').show()
-          return true
-        }
-      }
-      if (proteinOrDNA(seq_type)) {
-        $('#input_seq_group').addClass("has-error")
-        $('#seq_alert').html('Please ensure that the Input Sequence contains either protein or genetic data.')
-        $('#seq_alert').show()
-        return true
-      }
-    }
-  } else {
-    var type = checkType(data, 0.9)
-    if (proteinOrDNA(type)) {
-      $('#input_seq_group').addClass("has-error")
-      $('#seq_alert').html('Please ensure that the Input Sequence contains either protein or genetic data.')
-      $('#seq_alert').show()
-      return true
-    }
-  } 
-
-}
-
-
 function checkEmptyValidation() {
   var val = document.forms["input"]['validations[]']
   var checkedVal = []
@@ -145,36 +154,27 @@ function checkEmptyValidation() {
   }
 }
 
-function proteinOrDNA(type) {
-  if ((type === 'protein') || (type === 'dna') || (type === 'rna')) {
-    return false
-  } else {
-    return true
-  }
-}
-
 function ChangeAdvParamsBtnText() {
   var btn = document.getElementById("adv_params_btn")
   if (btn.innerHTML === '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters') {
     btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Hide Advanced Parameters'
     $('#adv_params').collapse('show')
-    $.cookie('adv_params_status', 'open')
+    $.cookie('GeneValidator_adv_params_status', 'open')
   }
   else {
     btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters'
     $('#adv_params').collapse('hide')
-    $.cookie('adv_params_status', 'closed')
+    $.cookie('GeneValidator_adv_params_status', 'closed')
   }
 }
-
 
 
 ////  TODO: Change the cookie name so that it has a Genevalidator prefix...  
 // Looks for a cookie (called 'adv_params_status') to check the state of the adv_params box when it was last closed. 
 //  This function is called upon as soon as the website is loaded;  
 function checkCollapseState() {
-  if ($.cookie('adv_params_status')){
-    var adv_params_status = $.cookie('adv_params_status')
+  if ($.cookie('GeneValidator_adv_params_status')){
+    var adv_params_status = $.cookie('GeneValidator_adv_params_status')
     if (adv_params_status === 'open') {
         var btn = document.getElementById("adv_params_btn")
         btn.innerHTML = '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Hide Advanced Parameters'

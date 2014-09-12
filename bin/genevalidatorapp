@@ -3,7 +3,6 @@
 require 'GeneValidatorApp'
 require 'fileutils'
 require 'sinatra'
-require 'thin'
 require 'slim'
 require 'sinatra/base'
 require 'sinatra/config_file'
@@ -66,8 +65,7 @@ end
 ### App Arguments = TODO...
 # First Argument - location of te DB_Root
 db_root =  File.join(Dir.home, 'blastdb') # ARGV[0]
-
-# Second Argument, the name of the default db 
+# Second Argument, the name of the default db ???
  
 tempdir = Dir.mktmpdir('GeneValidator_')
 
