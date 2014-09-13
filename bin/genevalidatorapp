@@ -16,13 +16,13 @@ class GVapp < Sinatra::Base
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
   config_file "#{File.dirname(__FILE__)}/../config.yml"
-  puts config_file
 
     # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
 
   before do
     puts "\nStarting..."
+    @root_dir        = settings.root_dir
     @tempdir         = settings.tempdir
     @default_db      = settings.default_db
     @non_default_dbs = settings.non_default
@@ -32,7 +32,7 @@ class GVapp < Sinatra::Base
     if File.exist?(@working_dir)
       @unique_name = ensure_unique_name(@working_dir, @tempdir)
     end
-    @public_dir    = File.join("#{File.dirname(__FILE__)}", '..', 'public', 'GeneValidator', @unique_name)
+    @public_dir    = File.join(@root_dir, '..', 'public', 'GeneValidator', @unique_name)
 
     if File.exist?(@working_dir)
       halt 400, 'A unique name cannot be created for this session.'
@@ -60,8 +60,6 @@ class GVapp < Sinatra::Base
 end
 
 #### BELOW is only run once - i.e. with the 
-
-
 ### App Arguments = TODO...
 # First Argument - location of te DB_Root
 db_root =  File.join(Dir.home, 'blastdb') # ARGV[0]
@@ -91,7 +89,7 @@ puts # a blank line
 puts 'All pre-run tests have passed.'
 puts # a blank line
 
-
+GVapp.set :root_dir, "#{File.dirname(__FILE__)}"
 GVapp.set :non_default, dbs
 GVapp.set :default_db, default_db
 GVapp.set :tempdir, tempdir

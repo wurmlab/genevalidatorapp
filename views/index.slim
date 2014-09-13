@@ -6,7 +6,6 @@
     .form-group#input_seq_group
       label.control-label for="seq"  Input Sequences:
       textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false"
-      span#seq_alert.help-block style="display:none;"
     .clearfix
     button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="ChangeAdvParamsBtnText()"
       i.fa.fa-pencil-square-o
@@ -38,7 +37,6 @@
         label#lastValidation.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
           input#orf.check type="checkbox" name="validations[]" checked="" value="orf" 
             | Open Reading Frame Validation (nucleotides)
-        span#validation_alert.help-block style="display:none;" Please choose at least one validation to run on the input Sequences
       .clearfix
       br/
       .form-group.form-inline
@@ -57,4 +55,7 @@
         i.fa.fa-search
         | &nbsp;&nbsp;Analyse Sequences
       .clearfix
-#output.col-md-12
+.col-md-12
+  #results_box style="display:none;"
+    h2.page-header  Results
+    #output

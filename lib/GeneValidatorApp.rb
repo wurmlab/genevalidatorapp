@@ -2,8 +2,6 @@ require 'GeneValidatorApp/version'
 require 'GeneValidatorApp/PreRunValidation.rb'
 require 'fileutils'
 
-
-
 # A helper module for the GVApp
 module GeneValidatorApp
   # Creates a Unique name using the time (in nanoseconds) + the IP address
@@ -74,22 +72,10 @@ module GeneValidatorApp
   def extract_table_html(index_file, unique_name)
     plots_dir  = File.join('Genevalidator', unique_name, 'input_file.fa.html',
                            'input_file.fa_')
-
     full_html = IO.binread(index_file)
     full_html.scan(/<div id="report">.*<\/script>/m) do |table|
       # tYW instead modify GeneValidator.
-      @table = table.gsub(/input_file.fa_/, plots_dir)
+      return table.gsub(/input_file.fa_/, plots_dir)
     end
-    results = create_results(@table)
-    return results
-  end
-
-  # Edits the results so that they are embedded in a nice box
-  ### TODO: PUT this into the template with display:none and then use javascript
-  def create_results(insides)
-    puts 'creating results'
-    results = '<div id="results_box"><h2 class="page-header">Results</h2>' +
-              insides + '</div>'
-    return results
   end
 end

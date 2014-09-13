@@ -4,18 +4,22 @@ $(document).ready(function() {
   jQuery.validator.addMethod("checkInputType", function(value, element) {
     types = []
     if (value.charAt(0) === '>') {
-      lines = value.split('\n')
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].match(/^>/)) {
-        } else {
-          var type = checkType(lines[i], 0.9)
-          types.push(type)
-          if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
-            return false
+      seqs_array = value.split('>')
+      for (var i = 1; i < seqs_array.length; i++) {
+        lines = seqs_array[i].split('\n')
+        if (lines.length !== 0) {
+          clean_lines = jQuery.grep(lines,function(n){ return(n) });
+          if (clean_lines.length !== 0){
+            clean_lines.shift()
+            seq = clean_lines.join('')
+            var type = checkType(seq, 0.9)
+            types.push(type)
+            if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
+              return false
+            }
           }
-        }
+        } 
       }
-      console.log(types)
       var firstType = types[0]
       for (var i = 0; i < types.length; i++) {
         if (types[i] !== firstType){
@@ -25,89 +29,71 @@ $(document).ready(function() {
       return true
     } else {
       var type = checkType(value, 0.9)
-        if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
-          return false
-        } else {
-          return true
-        }
+      if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
+        return false
+      } else {
+        return true
+      }
     }
-
   }, "* The Input must be either genetic or protein Sequence(s).");
 
-    $('#input').validate({
-      rules: {
-          seq: {
-              minlength: 5,
-              required: true,
-              checkInputType: true
+  $('#input').validate({
+    rules: {
+        seq: {
+            minlength: 5,
+            required: true,
+            checkInputType: true
 
-          },
-          'validations[]': {
-             required: true,
+        },
+        'validations[]': {
+           required: true,
+        }
+    },
+    highlight: function(element) {
+        $(element).closest('.form-group').addClass('has-error');
+    },
+    unhighlight: function(element) {
+        $(element).closest('.form-group').removeClass('has-error');
+    },
+    errorElement: 'span',
+    errorClass: 'help-block',
+    errorPlacement: function(error, element) {
+        if (element.parent().parent().attr('id') === 'validations_group') {
+          var helpText = document.getElementById('lastValidation')
+          error.insertAfter(helpText);
+        } else{
+          if (element.parent('.input-group').length) {
+              error.insertAfter(element.parent());
+          } else {
+              error.insertAfter(element);
           }
-      },
-      highlight: function(element) {
-          $(element).closest('.form-group').addClass('has-error');
-      },
-      unhighlight: function(element) {
-          $(element).closest('.form-group').removeClass('has-error');
-      },
-      errorElement: 'span',
-      errorClass: 'help-block',
-      errorPlacement: function(error, element) {
-        console.log()
-        //  if (element.parent().parent(_.hasClass("input-append")) {
-        //   console.log('cwcwdwdc')
-        // }
-        //   console.log(element.parent().child())
-        //   // error.insertAfter()
-        // } else {
-          if (element.parent().parent().attr('id') === 'validations_group') {
-            var helpText = document.getElementById('lastValidation')
-            error.insertAfter(helpText);
-          } else{
-            if (element.parent('.input-group').length) {
-                error.insertAfter(element.parent());
-            } else {
-                error.insertAfter(element);
-            }
-          }
+        }
+    },
 
+    submitHandler: function(form) {
+      $('#spinner').modal({
+        backdrop: 'static',
+        keyboard: 'false'
+      })
 
-
-        // }
-      },
-
-      submitHandler: function(form) {
-
-        $('#spinner').modal({
-          backdrop: 'static',
-          keyboard: 'false'
-        })
-
-        $.ajax({
-          type: 'POST',
-          url: '/input',
-          data: $('#input').serialize(),
-          success: function(response){
-            console.log('2hey')
-            $('#output').html(response)
-            // initiate the table sorter
-            initTableSorter()
-            // Initiate the tooltips
-            $("[data-toggle='tooltip']").tooltip()
-            // Remove Unwanted Columns
-            removeEmptyColumns(); 
-            // remove progress notification
-            $('#spinner').modal('hide')
-          },
-          failure: function(){
-            return
-          }
-        })
-
-      }
-    })
+      $.ajax({
+        type: 'POST',
+        url: '/input',
+        data: $('#input').serialize(),
+        success: function(response){
+          $('#results_box').show();
+          $('#output').html(response)
+          initTableSorter() // initiate the table sorter
+          $("[data-toggle='tooltip']").tooltip() // Initiate the tooltips
+          removeEmptyColumns(); // Remove Unwanted Columns
+          $('#spinner').modal('hide') // remove progress notification
+        },
+        failure: function(){
+          return
+        }
+      })
+    }
+  })
 
   $(document).bind("keydown", function (e) {
     if (e.ctrlKey && e.keyCode === 13 ) {
