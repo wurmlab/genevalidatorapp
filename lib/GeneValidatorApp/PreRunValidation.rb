@@ -59,23 +59,27 @@ def scan_blast_database_directory(db_root)
   db = {}
   db_list.each_line do |line|
     next if line.empty?  # required for BLAST+ 2.2.22
-    type, name, *title =  line.split(' ')
+    type, path, *title =  line.split(' ')
     type  = type.downcase.intern
-    name  = name.freeze
+    path  = path.freeze
     title = title.join(' ').freeze
     # # skip past all but alias file of a NCBI multi-part BLAST database
-    # if multipart_database_name?(name)
-    #   puts "Found a multi-part database volume at #{name} - ignoring it."
-    #   # logger.info(%|Found a multi-part database volume at #{name} - ignoring it.|)
-    #   next
-    # end
+    if multipart_database_name?(path)
+      puts "Found a multi-part database volume at #{path} - ignoring it."
+      # logger.info(%|Found a multi-part database volume at #{path} - ignoring it.|)
+      next
+    end
 
-    db[title] = [name: name, type:type]
+    db[title] = [path: path, type:type]
 
-    puts "Found #{type} database: #{title} at #{name}"
-    # logger.info("Found #{type} database: #{title} at #{name}")
+    puts "Found #{type} database: #{title} at #{path}"
+    # logger.info("Found #{type} database: #{title} at #{path}")
   end
   db
+end
+
+def multipart_database_name?(db_name)
+  !(db_name.match(/.+\/\S+\d{2}$/).nil?)
 end
 
 ### Ensures that GV is installed and is of the correct version...
