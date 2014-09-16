@@ -1,4 +1,14 @@
 require 'fileutils'
+require 'logger'
+
+
+LOG = Logger.new(STDOUT)
+LOG.formatter = proc do |severity, datetime, progname, msg|
+  "#{datetime}: #{msg}\n"
+end
+LOG.level = Logger::INFO
+
+
 
 ### Runs GeneValidator with a small test case... If GeneValidator exits with the
 #   the right exit code, it is assumed that it works perfectly. This also tests
@@ -108,37 +118,28 @@ end
 
 def choose_default(databases)
   default_db      = {}
-
-  db_titles = []
-  databases.each do |title, hash|
-    db_titles.push(title)
-  end
-
+  db_titles = databases.keys
   puts # a blank line
   puts "#{databases.length} databases found."
-  puts # a blank line
-
-  db_number = 0
-  while db_number < db_titles.length
-    puts "[#{db_number + 1}]:  #{db_titles[db_number]}"
-    db_number += 1
-  end
-
+  db_titles.each_with_index { |db, idx| puts "#{idx + 1}: #{db}" }
   puts # a blank line
   puts "Please choose your default database. (Pick a number between 1 and #{db_titles.length}) "
   print '> '
   inp = $stdin.gets.chomp
-  until (inp <= db_titles.length && inp >= 1) 
+  input = inp.to_i
+  until (input <= db_titles.length && input >= 1) 
     puts # a blank line
-    puts "The input: '#{inp}' is not recognised - please type in the number corresponding"
-    puts " the chosen database."
-    puts 'Please try again.'
+    puts "The input: '#{inp}' is not recognised - please try again."
+    puts # a blank line
+    db_titles.each_with_index { |db, idx| puts "#{idx + 1}: #{db}" }
+    puts # a blank line
+    puts "Please choose your default database. (Pick a number between 1 and #{db_titles.length}) "
     print '> '
     inp = $stdin.gets.chomp
   end
-  if inp <= db_titles.length && inp >= 1
-    i = inp.to_i
-    default_db_name = db_titles[i]
+  if input <= db_titles.length && input >= 1
+    db_number = input - 1
+    default_db_name = db_titles[db_number]
   end
   puts "You have chosen #{default_db_name} as your default database."
   puts # a blank line
@@ -146,16 +147,7 @@ def choose_default(databases)
   #Create a separate HASH for the default database
   default_db[default_db_name] = databases[default_db_name]
 
+  # raise IOError,  if databases.include?(default_db_name)
   return default_db
-end
-
-def try_again(input)
-
-  puts # a blank line
-  puts "Please choose your default database. (Pick a number between 1 and #{db_titles.length}) "
-  print '> '
-  inp = $stdin.gets.chomp
-  return inp
-
 end
 
