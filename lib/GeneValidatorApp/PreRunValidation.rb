@@ -114,10 +114,8 @@ def choose_default(databases)
     db_titles.push(title)
   end
 
-  raise IOError, ':( Something went wrong ' if databases.length != db_titles.length
-
   puts # a blank line
-  puts "#{databases.length} databases have found."
+  puts "#{databases.length} databases found."
   puts # a blank line
 
   db_number = 0
@@ -130,8 +128,18 @@ def choose_default(databases)
   puts "Please choose your default database. (Pick a number between 1 and #{db_titles.length}) "
   print '> '
   inp = $stdin.gets.chomp
-  i = inp.to_i - 1
-  default_db_name = db_titles[i]
+  until (inp <= db_titles.length && inp >= 1) 
+    puts # a blank line
+    puts "The input: '#{inp}' is not recognised - please type in the number corresponding"
+    puts " the chosen database."
+    puts 'Please try again.'
+    print '> '
+    inp = $stdin.gets.chomp
+  end
+  if inp <= db_titles.length && inp >= 1
+    i = inp.to_i
+    default_db_name = db_titles[i]
+  end
   puts "You have chosen #{default_db_name} as your default database."
   puts # a blank line
 
@@ -140,3 +148,14 @@ def choose_default(databases)
 
   return default_db
 end
+
+def try_again(input)
+
+  puts # a blank line
+  puts "Please choose your default database. (Pick a number between 1 and #{db_titles.length}) "
+  print '> '
+  inp = $stdin.gets.chomp
+  return inp
+
+end
+
