@@ -102,23 +102,37 @@ $(document).ready(function() {
   })
 })
 
-checkType = function (sequence, threshold) {
-  var total = sequence.length
-  var acgMatch = ((sequence.match(/[ACG]/gi) || []).length) / total
-  var tMatch = ((sequence.match(/[T]/gi) || []).length) / total
-  var uMatch = ((sequence.match(/[U]/gi) || []).length) / total
-  var proteinMatch = ((sequence.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / total
 
-  if (((acgMatch + tMatch) > threshold) || ((acgMatch + uMatch) > threshold)) {
-    if (tMatch > uMatch) {
+checkType = function (sequence, threshold, length, index) {
+  if (threshold === undefined) {
+    threshold = 0.9
+  }
+  if (length === undefined) {
+    length = 10000
+  }
+  if (index === undefined) {
+    index = 1
+  }
+  var seq = sequence.slice(index - 1, length)
+  var total = seq.length
+  var acgMatch = ((seq.match(/[ACG]/gi) || []).length) / total
+  var tMatch = ((seq.match(/[T]/gi) || []).length) / total
+  var uMatch = ((seq.match(/[U]/gi) || []).length) / total
+  var proteinMatch = ((seq.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / total
+
+  if (((acgMatch + tMatch) >= threshold) || ((acgMatch + uMatch) >= threshold)) {
+    if (tMatch >= uMatch) {
       return 'dna'
-    } else if (uMatch > tMatch) {
+    } else if (uMatch >= tMatch) {
       return 'rna'
-    };
-  } else if (proteinMatch > threshold) {
+    } else {
+      return 'dna'
+    }
+  } else if (proteinMatch >= threshold) {
     return 'protein'
   }
 }
+
 
 
 function checkEmptyValidation() {

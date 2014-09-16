@@ -21,7 +21,6 @@ class GVapp < Sinatra::Base
   Slim::Engine.default_options[:pretty] = true
 
   before do
-    puts "\nStarting..."
     @root_dir        = settings.root_dir
     @tempdir         = settings.tempdir
 
@@ -54,7 +53,7 @@ class GVapp < Sinatra::Base
     db_name   = params[:database]
 
 
-    # puts @default_db 
+    # puts @default_db
     db = @dbs[db_name][0][:path]
 
     FileUtils.mkdir_p @working_dir
@@ -65,17 +64,17 @@ class GVapp < Sinatra::Base
   end
 end
 
-#### BELOW is only run once - i.e. with the 
+#### BELOW is only run once - i.e. with the
 ### App Arguments = TODO...
 # First Argument - location of te DB_Root
 db_root =  File.join(Dir.home, 'blastdb') # ARGV[0]
 # Second Argument, the name of the default db ???
- 
+
 tempdir = Dir.mktmpdir('GeneValidator_')
 
 
 
-## Run TESTS 
+## Run TESTS
 
 puts # a blank line.
 puts "Looking for Databases in #{db_root}..."
