@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-
+require 'optparse'
 require 'GeneValidatorApp'
-require 'fileutils'
+require 'GeneValidatorApp/PreRunValidation.rb'
 require 'sinatra'
 require 'slim'
 require 'sinatra/base'
@@ -10,9 +10,52 @@ require 'sinatra/config_file'
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
 
+opt = {}
+optparse = OptionParser.new do |opts|
+  opts.banner = <<Banner
+
+* Usage: genevalidatorapp [options]
+
+* Available Options
+
+Banner
+
+  opts.on('-p', '--port PORT', 'Port to run GeneValidatprApp on') do |port|
+    options['port'] = port
+  end
+
+  opts.on('-c', '--config CONFIG_FILE', 'Use the given configuration file') do |config_file|
+    options['config_file'] = config_file
+  end
+
+  opt[:verbose] = false
+  opts.on('-v', '--verbose', 'Provides more information on each step taken in',
+          ' this program') do
+    opt[:verbose] = true
+  end
+
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+
+  opts.on('--version', 'Shows version') do
+    puts GeneValidatorApp.VERSION
+    exit
+  end
+end
+optparse.parse!
+
+
+# Puts these options in a config file...
+db_root = File.join(Dir.home, 'blastdb')
+# Default DB
+tempdir = Dir.mktmpdir('GeneValidator_')
+
+
 # The Actual App...
 class GVapp < Sinatra::Base
-  helpers GeneValidatorApp
+  helpers GeneValidatorAppHelper
   set :root, "#{File.dirname(__FILE__)}/../"
   register Sinatra::ConfigFile
   config_file "#{File.dirname(__FILE__)}/../config.yml"
@@ -48,13 +91,10 @@ class GVapp < Sinatra::Base
   end
 
   post '/input' do
-    seqs = params[:seq]
-    vals = params[:validations].to_s.gsub(/[\[\]\"]/, '')
-    db_name   = params[:database]
-
-
-    # puts @default_db
-    db = @dbs[db_name][0][:path]
+    seqs    = params[:seq]
+    vals    = params[:validations].to_s.gsub(/[\[\]\"]/, '')
+    db_name = params[:database]
+    db      = @dbs[db_name][0][:path]
 
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
@@ -64,40 +104,16 @@ class GVapp < Sinatra::Base
   end
 end
 
-#### BELOW is only run once - i.e. with the
-### App Arguments = TODO...
-# First Argument - location of te DB_Root
-db_root =  File.join(Dir.home, 'blastdb') # ARGV[0]
-# Second Argument, the name of the default db ???
 
-tempdir = Dir.mktmpdir('GeneValidator_')
-
-
-
-## Run TESTS
-
-puts # a blank line.
-puts "Looking for Databases in #{db_root}..."
-puts # a blank line.
-
-dbs             = scan_blast_database_directory(db_root)
-default_db      = choose_default(dbs)
-default_db_name = default_db.keys[0]
-# Create a one Hash for the the default and one for everything else...
-#   This is so that I can easily set the default in the advanced parameters field on the web app.
-# Remove the default db from the dbs hash.
-non_default_dbs = dbs.clone
-non_default_dbs.delete(default_db_name)
-
-puts 'Testing if Genevalidator (and all it\'s dependencies) are working.'
-check_genevalidator_works(tempdir, default_db_name)
-puts # a blank line
-puts 'All pre-run tests have passed.'
-puts # a blank line
+dbs = GeneValidatorApp::Prerun.prerun(db_root,tempdir)
 
 GVapp.set :root_dir, "#{File.dirname(__FILE__)}"
-GVapp.set :dbs, dbs
-GVapp.set :non_default, non_default_dbs
-GVapp.set :default_db, default_db
+GVapp.set :dbs, dbs[:dbs]
+GVapp.set :non_default, dbs[:non_default_dbs]
+GVapp.set :default_db, dbs[:default_db]
 GVapp.set :tempdir, tempdir
 GVapp.run!
+
+
+
+

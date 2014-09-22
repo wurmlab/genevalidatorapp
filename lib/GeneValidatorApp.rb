@@ -1,9 +1,14 @@
 require 'GeneValidatorApp/version'
 require 'GeneValidatorApp/PreRunValidation.rb'
 require 'fileutils'
+require 'logger'
+
+
+
+
 
 # A helper module for the GVApp
-module GeneValidatorApp
+module GeneValidatorAppHelper
   # Creates a Unique name using the time (in nanoseconds) + the IP address
   def create_unique_name
     puts 'creating a unique name'
@@ -23,7 +28,7 @@ module GeneValidatorApp
     return unique_name
   end
 
-  # Adds a ID (based on the submission time) to sequences that are not in fasta
+  # Adds a ID (based on the time when submitted) to sequences that are not in fasta
   #   format. Adapted from SequenceServer.
   def to_fasta(sequence)
     sequence = sequence.lstrip
@@ -54,7 +59,7 @@ module GeneValidatorApp
   # Runs GeneValidator from the command line and return just the table html...
   def run_genevalidator(validations, db, working_dir, unique_name)
     index_file = File.join(working_dir, 'input_file.fa.html', 'index.html')
-    command    = 'Genevalidator -v "' + validations + '" -d "' + db + '" "' +
+    command    = 'time Genevalidator -v "' + validations + '" -d "' + db + '" "' +
                   File.join(working_dir, 'input_file.fa') + '"'
     exit       = system(command)
     unless exit
