@@ -12,12 +12,11 @@ module GeneValidatorApp
   class Prerun
 
     def self.prerun(db_root, tempdir)
-      dbs      = {}
+      dbs                   = {}
       dbs[:dbs]             = scan_blast_database_directory(db_root)
       dbs[:non_default_dbs] = dbs[:dbs].clone
-
       dbs[:default_db]      = choose_default(dbs[:dbs])
-      default_db_name      = dbs[:default_db].keys[0]
+      default_db_name       = dbs[:default_db].keys[0]
       dbs[:non_default_dbs].delete(default_db_name)
       puts # a blank line
       puts 'Testing if Genevalidator (and all it\'s dependencies) are working.'

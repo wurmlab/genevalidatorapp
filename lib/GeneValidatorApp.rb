@@ -1,11 +1,6 @@
 require 'GeneValidatorApp/version'
-require 'GeneValidatorApp/PreRunValidation.rb'
 require 'fileutils'
 require 'logger'
-
-
-
-
 
 # A helper module for the GVApp
 module GeneValidatorAppHelper

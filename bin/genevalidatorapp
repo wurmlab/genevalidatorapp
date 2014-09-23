@@ -113,7 +113,3 @@ GVapp.set :non_default, dbs[:non_default_dbs]
 GVapp.set :default_db, dbs[:default_db]
 GVapp.set :tempdir, tempdir
 GVapp.run!
-
-
-
-
