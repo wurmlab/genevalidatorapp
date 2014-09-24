@@ -53,29 +53,21 @@ module GeneValidatorAppHelper
 
   # Runs GeneValidator from the command line and return just the table html...
   def run_genevalidator(validations, db, working_dir, unique_name)
-    index_file = File.join(working_dir, 'input_file.fa.html', 'index.html')
+    table_file = File.join(working_dir, 'input_file.fa.html', 'files', 'table.html')
+
+    plots_dir  = File.join('Genevalidator', unique_name, 'input_file.fa.html',
+                           'files', 'json', 'input_file.fa_')
+    current_plots_dir = File.join('files', 'json', 'input_file.fa_')
     command    = 'time Genevalidator -v "' + validations + '" -d "' + db + '" "' +
                   File.join(working_dir, 'input_file.fa') + '"'
     exit       = system(command)
     unless exit
       raise IOError, "Genevalidator exited with the command code: #{exit}."
     end
-    unless File.exist?(index_file)
+    unless File.exist?(table_file)
       raise IOError, 'GeneValidator has not created any results files...'
     end
-    html_table = extract_table_html(index_file, unique_name)
-    return html_table
-  end
-
-  # Extracts the HTML table from the output index file. And then edits it
-  #   slighly to embeded into the app...
-  def extract_table_html(index_file, unique_name)
-    plots_dir  = File.join('Genevalidator', unique_name, 'input_file.fa.html',
-                           'input_file.fa_')
-    full_html = IO.binread(index_file)
-    full_html.scan(/<div id="report">.*<\/script>/m) do |table|
-      # tYW instead modify GeneValidator.
-      return table.gsub(/input_file.fa_/, plots_dir)
-    end
+    full_html = IO.binread(table_file)
+    return full_html.gsub(/#{current_plots_dir}/, plots_dir)
   end
 end

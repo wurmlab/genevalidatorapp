@@ -130,7 +130,6 @@ module GeneValidatorApp
       system("which #{command} > /dev/null 2>&1")
     end
 
-
     def self.choose_default(databases)
       default_db      = {}
       db_titles = databases.keys
@@ -170,7 +169,3 @@ module GeneValidatorApp
     end
   end
 end
-
-
-
-

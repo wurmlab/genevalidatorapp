@@ -6,6 +6,7 @@ require 'sinatra'
 require 'slim'
 require 'sinatra/base'
 require 'sinatra/config_file'
+require 'yaml'
 
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
@@ -24,9 +25,10 @@ Banner
     options['port'] = port
   end
 
-  opts.on('-c', '--config CONFIG_FILE', 'Use the given configuration file') do |config_file|
-    options['config_file'] = config_file
-  end
+  # options['config_file'] = File.join(Dir.home, '.genevalidator_config.yml')
+  # opts.on('-c', '--config CONFIG_FILE', 'Use the given configuration file') do |config_file|
+  #   options['config_file'] = config_file
+  # end
 
   opt[:verbose] = false
   opts.on('-v', '--verbose', 'Provides more information on each step taken in',
@@ -46,6 +48,9 @@ Banner
 end
 optparse.parse!
 
+# raise IOError, 'Config file not found...' unless file.exist? options['config_file']
+
+# Config = Yaml.load_file(options['config_file'])
 
 # Puts these options in a config file...
 db_root = File.join(Dir.home, 'blastdb')
@@ -105,7 +110,7 @@ class GVapp < Sinatra::Base
 end
 
 
-dbs = GeneValidatorApp::Prerun.prerun(db_root,tempdir)
+dbs = GeneValidatorApp::Prerun.prerun(db_root, tempdir)
 
 GVapp.set :root_dir, "#{File.dirname(__FILE__)}"
 GVapp.set :dbs, dbs[:dbs]
