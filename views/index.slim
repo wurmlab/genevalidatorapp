@@ -1,6 +1,6 @@
 .col-md-12
-  form#input action="/input" method="POST" 
-    h2.page-header  
+  form#input action="/input" method="POST"
+    h2.page-header
       span  Genes Validator 
       span.small  Identify problems with Gene Predictions
     .form-group#input_seq_group
@@ -17,38 +17,38 @@
         label.control-label for="advanced"  Advanced Parameters: Validations Types
         br/
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#lenc.check type="checkbox" name="validations[]" checked="" value="lenc" 
+          input#lenc.check type="checkbox" name="validations[]" checked="" value="lenc"
             | Length Validation (via clusterization)
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#lenr.check type="checkbox" name="validations[]" checked="" value="lenr" 
+          input#lenr.check type="checkbox" name="validations[]" checked="" value="lenr"
             | Length Validation (via ranking)
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#dup.check type="checkbox" name="validations[]" checked="" value="dup" 
+          input#dup.check type="checkbox" name="validations[]" checked="" value="dup"
             | Duplication Check
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#merge.check type="checkbox" name="validations[]" checked="" value="merge" 
+          input#merge.check type="checkbox" name="validations[]" checked="" value="merge"
             | Gene Merge Validation
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#align.check type="checkbox" name="validations[]" checked="" value="align" 
+          input#align.check type="checkbox" name="validations[]" checked="" value="align"
             | Multiple Alignment Validation (proteins)
         label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#frame.check type="checkbox" name="validations[]" checked="" value="frame" 
+          input#frame.check type="checkbox" name="validations[]" checked="" value="frame"
             | Blast Reading Frame Validation (nucleotides)
         label#lastValidation.checkbox-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-          input#orf.check type="checkbox" name="validations[]" checked="" value="orf" 
+          input#orf.check type="checkbox" name="validations[]" checked="" value="orf"
             | Open Reading Frame Validation (nucleotides)
       .clearfix
       br/
       .form-group.form-inline
         label.control-label for="database"  Advanced Parameters: Database
         br/
-        - @default_db.each do |title, hash|
+        - @default_db.each do |path, hash|
           label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-            input#sp type="radio" name="database" value="#{title}" checked="" #{title}
+            input#sp type="radio" name="database" value="#{hash[0][:title]}" checked="" #{hash[0][:title]}
         - unless @non_default_dbs.empty?
-          - @non_default_dbs.each do |title, hash|
+          - @non_default_dbs.each do |path, hash|
             label.radio-inline.no_indent.col-lg-3.col-md-5.col-xs-12
-              input#sp type="radio" name="database" value="#{title}" #{title}
+              input#sp type="radio" name="database" value="#{hash[0][:title]}" #{hash[0][:title]}
       .clearfix
     .form-group
       button#input_btn.btn.btn-lg.btn-primary.pull-right type="submit" value="input"
