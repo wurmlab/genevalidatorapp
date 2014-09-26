@@ -12,6 +12,7 @@ module GeneValidatorApp
   class Prerun
 
     def self.validate(config_file, tempdir)
+      assert_config_file_exists(config_file)
       config                = YAML.load_file(config_file)
       dbs                   = {}
       dbs[:dbs]             = scan_blast_database_directory(config['database'])
@@ -23,7 +24,18 @@ module GeneValidatorApp
     end
 
     def assert_config_file_exists(config_file)
-      #### TODO...
+      if File.exist?(config) == false
+        puts # a blank line
+        puts "Error: The config file cannot be found at #{config_file}"
+        puts "Please refer to the installation guide at:"
+        puts " https://github.com/IsmailM/GeneValidatorApp "
+        puts # a blank line
+        puts "Alternatively, copy an examplar config into your home directory:"
+        puts # a blank line
+        puts "   $ cp #{File.join(File.dirname(__FILE__), '../../.genevalidatorapp.conf')} ~/.genevalidatorapp.conf"
+        puts # a blank line
+        exit
+      end
     end
 
     ### Obtain a array of dbs (Adapted from SequenceServer)
