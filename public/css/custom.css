@@ -1,5 +1,5 @@
 
-/* Main Structure 
+/* Main Structure
 -------------------------------------------------- */
 html {
 	/* This is required in order to make the footer stick to the bottom..*/
@@ -12,8 +12,13 @@ body {
 	margin-top: 50px;
 	/*This should be the same as the footer*/
 	margin-bottom: 70px;
-	background-color: #282B36; 
+	background-color: #282B36;
 	/* 282B36 or 80838D */
+}
+
+.navbar-nav > li > a.nav_github_icon {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 /* Footer

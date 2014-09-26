@@ -1,6 +1,7 @@
 require 'logger'
 require 'fileutils'
 require 'yaml'
+require 'pathname'
 
 LOG = Logger.new(STDOUT)
 LOG.formatter = proc do |severity, datetime, progname, msg|
@@ -11,28 +12,29 @@ LOG.level = Logger::INFO
 module GeneValidatorApp
   class Prerun
 
-    def self.validate(config_file, tempdir)
-      assert_config_file_exists(config_file)
+    def self.validate(config_file, tempdir, root)
+      assert_config_file_exists(config_file, root)
       config                = YAML.load_file(config_file)
       dbs                   = {}
       dbs[:dbs]             = scan_blast_database_directory(config['database'])
       dbs[:default_db]      = defaultdb(dbs[:dbs], config['default-database'])
       dbs[:non_default_dbs] = dbs[:dbs].clone
       dbs[:non_default_dbs].delete(config['default-database'])
-      check_genevalidator_works(tempdir, config['default-database'])
+      check_genevalidator_works(root, tempdir, config['default-database'])
       return dbs
     end
 
-    def assert_config_file_exists(config_file)
-      if File.exist?(config) == false
+    def self.assert_config_file_exists(config_file, root)
+      if File.exist?(config_file) == false
         puts # a blank line
         puts "Error: The config file cannot be found at #{config_file}"
-        puts "Please refer to the installation guide at:"
-        puts " https://github.com/IsmailM/GeneValidatorApp "
+        puts "Please refer to the installation guide at: https://github.com/" \
+             "IsmailM/GeneValidatorApp"
         puts # a blank line
-        puts "Alternatively, copy an examplar config into your home directory:"
+        puts "Alternatively, you can copy an examplar config file into your" \
+             "home directory:"
         puts # a blank line
-        puts "   $ cp #{File.join(File.dirname(__FILE__), '../../.genevalidatorapp.conf')} ~/.genevalidatorapp.conf"
+        puts "$ cp #{root + '.genevalidatorapp.conf'} ~/.genevalidatorapp.conf"
         puts # a blank line
         exit
       end
@@ -79,9 +81,10 @@ module GeneValidatorApp
         next unless type == 'protein' # to ensure we only have protein dbs
         path  = path.freeze
         title = title.join(' ').freeze
-        # # skip past all but alias file of a NCBI multi-part BLAST database
+        # skip past all but alias file of a NCBI multi-part BLAST database
         if multipart_database_name?(path)
-          LOG.info { "Found a multi-part database volume at #{path} - ignoring it." }
+          LOG.info { "Found a multi-part database volume at #{path} - " \
+                     "ignoring it." }
           next
         end
         db[path] = [title: title, type:type]
@@ -100,40 +103,41 @@ module GeneValidatorApp
       if databases.include?(default_database)
         default_db[default_database] = databases[default_database]
       end
-      # TODO: If not found, look for the db ensure that the db exists by checking the path...
+      # TODO: If not found, look for the db ensure that the db exists by
+      #   checking the path...
       return default_db
     end
 
-    ### Runs GeneValidator with a small test case... If GeneValidator exits with the
-    #   the right exit code, it is assumed that it works perfectly. This also tests
-    #   the Tempdir is writable....
-    def self.check_genevalidator_works(tempdir, default_db)
-      puts # a blank line
-      LOG.info { 'Testing if Genevalidator (and all it\'s dependencies) are working.' }
+    ### Runs GeneValidator with a small test case... If GeneValidator exits
+    #   with the right exit code, it is assumed that it works perfectly. This
+    #   also tests the Tempdir is writable....
+    def self.check_genevalidator_works(root, tempdir, default_db)
+      LOG.info { 'Testing if Genevalidator (and all it\'s dependencies) are' \
+                 ' working.' }
+      test_dir  = tempdir + 'initial_tests'
+      test_file = root + 'public/GeneValidator/initial_tests/initial_test.fa'
+
       assert_gv_installed_and_compatible
-      initial_tests = File.join(tempdir, 'initial_tests')
-      test_file     = File.join("#{File.dirname(__FILE__)}", '..', '..', 'public',
-                                'GeneValidator', 'initial_tests', 'initial_test.fa')
-      FileUtils.mkdir_p(initial_tests)
-      FileUtils.cp(test_file, initial_tests)
-      command    = 'genevalidator -d ' + default_db + ' ' + File.join(initial_tests,
-                   'initial_test.fa')
-      %x(#{command})
+
+      FileUtils.mkdir_p(test_dir)
+      FileUtils.cp(test_file, test_dir)
+      cmd = "genevalidator -d #{default_db} #{test_dir + 'initial_test.fa'}"
+      %x(#{cmd})
       unless $?.exitstatus == 0
-        raise IOError, "Genevalidator exited with the command code: #{exit}." \
-                       " It is possible that GeneValidator has not properly been "
-                       "installed."
+        raise IOError, "Genevalidator exited with the command code:" \
+                       " #{$?.exitstatus}. It is possible that GeneValidator" \
+                       " has not properly been installed."
       end
       LOG.info { 'All pre-run tests have passed.' }
       puts # a blank line
     end
 
-    ### Ensures that GV is installed and is of the correct version (Adapted from
-    #     SequenceServer)...
+    ### Ensures that GV is installed and is of the correct version (Adapted
+    #     from SequenceServer)...
     def self.assert_gv_installed_and_compatible
       unless command?('genevalidator --version')
-        puts "*** Could not find the of GeneValidator. Please confirm that you have "
-        puts "    GeneValidator installed and try again. "
+        puts "*** Could not find GeneValidator. Please confirm that"
+        puts "    GeneValidator installed is installed and try again."
         puts "    Please refer to ...Link... for more information."
         exit
       end

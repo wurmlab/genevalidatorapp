@@ -6,6 +6,7 @@ require 'sinatra'
 require 'slim'
 require 'sinatra/base'
 require 'sinatra/config_file'
+require 'pathname' # Required to work with older ruby Versions
 
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
@@ -50,27 +51,26 @@ optparse.parse!
 # The Actual App...
 class GVapp < Sinatra::Base
   helpers GeneValidatorAppHelper
-  set :root, "#{File.dirname(__FILE__)}/../"
+  set :root, Pathname.new(__FILE__).dirname.parent
   register Sinatra::ConfigFile
-  config_file "#{File.dirname(__FILE__)}/../config.yml"
+  config_file "#{Pathname.new(__FILE__).dirname.parent + 'config.yml'}"
 
-    # Remove before Release When false, it compresses the rendered HTML.
+  # Remove before Release When false, it compresses the rendered HTML.
   Slim::Engine.default_options[:pretty] = true
 
   before do
-    @root_dir        = settings.root_dir
+    root_dir         = settings.root_dir
     @tempdir         = settings.tempdir
-
     @default_db      = settings.default_db
     @non_default_dbs = settings.non_default
     @dbs             = settings.dbs
 
     @unique_name     = create_unique_name
-    @working_dir     = File.join(@tempdir, @unique_name)
+    @working_dir     = @tempdir + @unique_name
     if File.exist?(@working_dir)
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
-    @public_dir      = File.join(@root_dir, '..', 'public', 'GeneValidator', @unique_name)
+    @public_dir      = root_dir + 'public/GeneValidator' + @unique_name
 
     if File.exist?(@working_dir)
       halt 400, 'A unique name cannot be created for this session.'
@@ -89,26 +89,24 @@ class GVapp < Sinatra::Base
     vals     = params[:validations].to_s.gsub(/[\[\]\"]/, '')
     db_title = params[:database]
     db_path  = @dbs.select { |_,v| v[0][:title] == db_title }.keys[0]
-
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
 
     sequences = clean_sequences(seqs)
-    sequence_type = guess_input_type(sequences)
     seqs      = to_fasta(sequences)
     create_fasta_file(@working_dir, seqs)
     puts Time.now
-    run_genevalidator(vals, db_path, sequence_type, @working_dir, @unique_name)
+    run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name)
   end
 end
+tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
+root = Pathname.new(__FILE__).dirname.parent
 
-tempdir = Dir.mktmpdir('GeneValidator_')
+dbs = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir, root)
 
-dbs = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir)
-
-GVapp.set :root_dir, "#{File.dirname(__FILE__)}"
+GVapp.set :tempdir, tempdir
+GVapp.set :root_dir, root
 GVapp.set :dbs, dbs[:dbs]
 GVapp.set :non_default, dbs[:non_default_dbs]
 GVapp.set :default_db, dbs[:default_db]
-GVapp.set :tempdir, tempdir
 GVapp.run!

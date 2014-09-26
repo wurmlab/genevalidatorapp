@@ -1,16 +1,14 @@
 require 'GeneValidatorApp/version'
-require 'fileutils'
-require 'logger'
 require 'bio'
+require 'pathname'
 
 # A helper module for the GVApp
 module GeneValidatorAppHelper
   # Creates a Unique name using the time (in nanoseconds) + the IP address
   def create_unique_name
     LOG.info { 'Creating the Unique Name' }
-    puts 'creating a unique name'
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' +
-                  request.ip.gsub('.', '-')
+                  request.ip.gsub(/[.:]/, '-')
     return unique_name
   end
 
@@ -20,13 +18,13 @@ module GeneValidatorAppHelper
     LOG.info { 'Ensuring the run has a unique name' }
     while File.exist?(working_dir)
       unique_name    = create_unique_name
-      working_dir = File.join(tempdir, unique_name)
+      working_dir = tempdir + unique_name
     end
     return unique_name
   end
 
-  # Adds a ID (based on the time when submitted) to sequences that are not in fasta
-  #   format. Adapted from SequenceServer.
+  # Adds a ID (based on the time when submitted) to sequences that are not in
+  #  fasta format. Adapted from SequenceServer.
   def to_fasta(sequence)
     sequence = sequence.lstrip
     unique_queries = {}
@@ -47,8 +45,8 @@ module GeneValidatorAppHelper
 
   # Writes the input sequences to a fasta file.
   def clean_sequences(seqs)
-    sequences = ''
     if seqs[0] == '>'
+      sequences = ''
       data = Bio::FlatFile.open(StringIO.new(seqs))
       data.each_entry do |entry|
         sequences << ">#{entry.entry_id}"
@@ -65,68 +63,69 @@ module GeneValidatorAppHelper
   #   of the same method.
   def guess_input_type(sequences)
     sequence = Bio::FastaFormat.new(sequences)
-    type = Bio::Sequence.new(sequence.seq).guess(0.9)
-
-    if type == Bio::Sequence::NA
-      seq_type = 'genetic'
-    elsif type == Bio::Sequence::AA
-      seq_type = 'protein'
-    end
+    seq_type = Bio::Sequence.new(sequence.seq).guess(0.9)
     return seq_type
   end
 
   # Writes the input sequences to a fasta file.
   def create_fasta_file(working_dir, sequences)
     LOG.info { 'Writing the input sequences into a fasta file.' }
-    File.open(File.join(working_dir, 'input_file.fa'), 'w+') do |f|
+    output_file = working_dir + 'input_file.fa'
+    File.open(output_file, 'w+') do |f|
       f.write sequences
+    end
+    unless File.exist?(output_file)
+      raise IOError, "The Input Sequences was not written to file"
     end
   end
 
   # Runs GeneValidator from the command line and return just the table html...
-  def run_genevalidator(validations, db, type, working_dir, unique_name)
-    table_file = File.join(working_dir, 'input_file.fa.html/files/table.html')
+  def run_genevalidator(validations, db, sequences, working_dir, unique_name)
+    table_file      = working_dir + "input_file.fa.html/files/table.html"
+    local_plots_dir = Pathname.new('Genevalidator') + unique_name +
+                      'input_file.fa.html/files/json/input_file.fa_'
+    public_json_dir = 'files/json/input_file.fa_'
 
-    plots_dir  = File.join('Genevalidator', unique_name, 'input_file.fa.html',
-                           'files/json/input_file.fa_')
-    current_plots_dir = 'files/json/input_file.fa_'
+    type = guess_input_type(sequences)
+    blasttype  = 'blastp' if type == Bio::Sequence::AA
+    blasttype  = 'blastx' if type == Bio::Sequence::NA
 
-    # Set up Variables
-    blasttype  = 'blastp' if type == 'protein'
-    blasttype  = 'blastx' if type == 'genetic'
-    input_file = File.join(working_dir,'input_file.fa')
-    xml_file   = File.join(working_dir, 'output.xml')
-    raw_seq    = File.join(working_dir, 'output.xml.raw_seq')
+    input_file = working_dir + 'input_file.fa'
+    xml_file   = working_dir + 'output.xml'
+    raw_seq    = working_dir + 'output.xml.raw_seq'
 
-    # command    = 'time Genevalidator -v "' + validations + '" -d "' + db + '" "' +
-    #               File.join(working_dir, 'input_file.fa') + '"'
-    # exit       = system(command)
+    blast      = "#{blasttype} -db #{db} -evalue 1e-5 -outfmt 5" \
+                 " -max_target_seqs 200 -gapopen 11 -gapextend 1 -query" \
+                 " #{input_file} -out #{xml_file}"
+    raw_seqs   = "get_raw_sequences -d #{db} -o #{raw_seq} #{xml_file}"
+    gv_command = "genevalidator -x #{xml_file} #{input_file} -r #{raw_seq}"
 
-    blast_command = ["#{blasttype} -db #{db} ",
-                                  "-evalue 1e-5",
-                                  " -outfmt 5 -max_target_seqs 200 -gapopen 11 ",
-                                  "-gapextend 1 -query #{input_file} -out #{xml_file}" ].join(' ')
-    raw_sequences_command = "get_raw_sequences -d #{db} -o #{raw_seq} #{xml_file} "
-    genevalidator_command = "genevalidator -x #{xml_file} #{input_file} -r #{raw_seq}"
-
-    exit  = system(blast_command)
-    exit2 = system(raw_sequences_command)
-    exit3 = system(genevalidator_command)
-
-    unless exit
-      raise IOError, "BLAST exited with the command code: #{exit}."
-    end
-    unless exit2
-      # raise IOError, "The GeneValidator command failed (get_raw_sequences exited with exit code: #{exit2})."
-      puts "get_raw_sequences command is exiting with exit code: #{exit2}"
-    end
-    unless exit3
-      raise IOError, "The Genevalidator command failed (genevalidator exited with the eixt code: #{exit3}) "
-    end
+    run_gv(blast, raw_seqs, gv_command)
     unless File.exist?(table_file)
       raise IOError, 'GeneValidator has not created any results files...'
     end
     full_html = IO.binread(table_file)
-    return full_html.gsub(/#{current_plots_dir}/, plots_dir)
+    return full_html.gsub(/#{public_json_dir}/, local_plots_dir.to_s)
+  end
+
+  def run_gv(blast, raw_seqs, gv_command)
+    exit  = %x(#{blast})
+    unless $?.exitstatus == 0
+      raise IOError, "BLAST exited with the command code: #{$?.exitstatus}."
+    end
+
+    exit2 = %x(#{raw_seqs})
+    unless $?.exitstatus == 0
+      # raise IOError, "The GeneValidator command failed (get_raw_sequences" \
+      #                "  exited with exit code: #{$?.exitstatus})."
+      puts "get_raw_sequences command is exiting with exit code:" \
+           " #{$?.exitstatus}"
+    end
+
+    exit3 = system(gv_command)
+    unless exit3
+      raise IOError, "The Genevalidator command failed (genevalidator exited" \
+                     " with the eixt code: #{exit3}) "
+    end
   end
 end
