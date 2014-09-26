@@ -13,13 +13,12 @@ html lang="en"
     script type="text/javascript" src="js/jquery.tablesorter.min.js"
     script type="text/javascript" src="js/d3.v3.min.js"
     script type="text/javascript" src="js/plots.js"
-    script type="text/javascript" src="js/genevalidator.js" 
+    script type="text/javascript" src="js/genevalidator.js"
     script type="text/javascript" src="js/jquery.cookie.js"
     script type="text/javascript" src="js/bionode-seq.min.js"
     script type="text/javascript" src="js/jquery.validate.min.js"
 
-
-    /! Bootstrap core CSS 
+    /! Bootstrap core CSS
     link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"
     link href="css/font-awesome.min.css" rel="stylesheet" type="text/css"
     link href="css/custom.css" rel="stylesheet" type="text/css"
@@ -30,11 +29,11 @@ html lang="en"
       script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"
 
   body
-    .navbar.navbar-inverse.navbar-fixed-top role="navigation" 
+    .navbar.navbar-inverse.navbar-fixed-top role="navigation"
       .container
         span.navbar-brand
-          img height="25px" src="img/gene.png"  Gene Validator
-        button.navbar-toggle data-target=".navbar-collapse" data-toggle="collapse" type="button" 
+          img height="25px" src="img/gene.png"  GeneValidator
+        button.navbar-toggle data-target=".navbar-collapse" data-toggle="collapse" type="button"
           span.sr-only Toggle navigation
           span.icon-bar
           span.icon-bar
@@ -42,24 +41,25 @@ html lang="en"
         .navbar-collapse.collapse
           ul.nav.navbar-nav
             li
-              a href="#"  home
+              a href="#"  Documentation
             li
-              a href="#"  web app
+              a href="#"  Support
             li
-              a href="#"  documentation
+              a href="https://github.com/IsmailM/GeneValidatorApp"  Source Code
             li
-              a href="#"  contact
+              a href="http://yannick.poulet.org"  Wurm Lab
           ul.nav.navbar-nav.navbar-right
             li
-              span.i.fa.fa-2x.fa-github
+              a href="https://github.com/IsmailM/GeneValidatorApp"
+                span.i.fa.fa-2x.fa-github
     .container
       ==yield
-    #spinner.modal aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" 
+    #spinner.modal aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1"
       .modal-dialog
         .modal-content
           .modal-body.text-center
             h2  Calculating...
-            p.results_link  This may take some time. Please leave this page open.  
+            p.results_link  This may take some time. Please leave this page open.
             i.fa.fa-spinner.fa-5x.fa-spin
     br/
     #footer

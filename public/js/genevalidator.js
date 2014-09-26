@@ -35,7 +35,7 @@ $(document).ready(function() {
         return true
       }
     }
-  }, "* The Input must be either genetic or protein Sequence(s).");
+  }, "* The Input must be either genetic or protein Sequence(s). Please ensure that your sequences do not contains any non-letter character(s). If there are multiple sequences, ensure that they are all of one type. ");
 
   $('#input').validate({
     rules: {

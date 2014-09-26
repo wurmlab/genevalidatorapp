@@ -11,22 +11,22 @@ LOG.level = Logger::INFO
 module GeneValidatorApp
   class Prerun
 
-    def self.prerun(config_file, tempdir)
+    def self.validate(config_file, tempdir)
       config                = YAML.load_file(config_file)
       dbs                   = {}
       dbs[:dbs]             = scan_blast_database_directory(config['database'])
       dbs[:default_db]      = defaultdb(dbs[:dbs], config['default-database'])
       dbs[:non_default_dbs] = dbs[:dbs].clone
       dbs[:non_default_dbs].delete(config['default-database'])
-
-      assert_gv_installed_and_compatible
       check_genevalidator_works(tempdir, config['default-database'])
-
       return dbs
     end
 
-    ##### The below has been adapted from SequenceServer
-    ### Obtain a array of dbs
+    def assert_config_file_exists(config_file)
+      #### TODO...
+    end
+
+    ### Obtain a array of dbs (Adapted from SequenceServer)
     # Scan the given directory (including subdirectory) for blast databases.
     # ---
     # Arguments:
@@ -69,16 +69,16 @@ module GeneValidatorApp
         title = title.join(' ').freeze
         # # skip past all but alias file of a NCBI multi-part BLAST database
         if multipart_database_name?(path)
-          puts "Found a multi-part database volume at #{path} - ignoring it."
-          # logger.info(%|Found a multi-part database volume at #{path} - ignoring it.|)
+          LOG.info { "Found a multi-part database volume at #{path} - ignoring it." }
           next
         end
         db[path] = [title: title, type:type]
-        puts "Found #{type} database: #{title} at #{path}"
+        LOG.info { "Found #{type} database: #{title} at #{path}" }
       end
       db
     end
 
+    # Adapted from SequenceServer)
     def self.multipart_database_name?(db_name)
       !(db_name.match(/.+\/\S+\d{2}$/).nil?)
     end
@@ -92,18 +92,39 @@ module GeneValidatorApp
       return default_db
     end
 
-    ### Ensures that GV is installed and is of the correct version...
-    def self.assert_gv_installed_and_compatible
+    ### Runs GeneValidator with a small test case... If GeneValidator exits with the
+    #   the right exit code, it is assumed that it works perfectly. This also tests
+    #   the Tempdir is writable....
+    def self.check_genevalidator_works(tempdir, default_db)
       puts # a blank line
-      puts "Testing whether GeneValidator is installed."
+      LOG.info { 'Testing if Genevalidator (and all it\'s dependencies) are working.' }
+      assert_gv_installed_and_compatible
+      initial_tests = File.join(tempdir, 'initial_tests')
+      test_file     = File.join("#{File.dirname(__FILE__)}", '..', '..', 'public',
+                                'GeneValidator', 'initial_tests', 'initial_test.fa')
+      FileUtils.mkdir_p(initial_tests)
+      FileUtils.cp(test_file, initial_tests)
+      command    = 'genevalidator -d ' + default_db + ' ' + File.join(initial_tests,
+                   'initial_test.fa')
+      %x(#{command})
+      unless $?.exitstatus == 0
+        raise IOError, "Genevalidator exited with the command code: #{exit}." \
+                       " It is possible that GeneValidator has not properly been "
+                       "installed."
+      end
+      LOG.info { 'All pre-run tests have passed.' }
+      puts # a blank line
+    end
+
+    ### Ensures that GV is installed and is of the correct version (Adapted from
+    #     SequenceServer)...
+    def self.assert_gv_installed_and_compatible
       unless command?('genevalidator --version')
         puts "*** Could not find the of GeneValidator. Please confirm that you have "
         puts "    GeneValidator installed and try again. "
         puts "    Please refer to ...Link... for more information."
         exit
       end
-      ### TODO: Add the --version argument to GeneValidator
-      puts "Ensuring that the right version of GeneValidator is installed."
       version = %x|genevalidator --version|
       unless version.to_f >= 0.1
         puts "*** Your GeneValidator (version #{version}) is outdated."
@@ -113,36 +134,10 @@ module GeneValidatorApp
     end
 
     # check if the given command exists and is executable
-    # returns True if all is good.
+    # returns True if all is good. Adapted from SequenceServer
     def self.command?(command)
       %x|which #{command}|
       return true if $?.exitstatus != 0
-    end
-
-    ### Runs GeneValidator with a small test case... If GeneValidator exits with the
-    #   the right exit code, it is assumed that it works perfectly. This also tests
-    #   the Tempdir is writable....
-    def self.check_genevalidator_works(tempdir, default_db)
-      puts 'Testing if Genevalidator (and all it\'s dependencies) are working.'
-
-      initial_tests = File.join(tempdir, 'initial_tests')
-      test_file     = File.join("#{File.dirname(__FILE__)}", '..', '..', 'public',
-                                'GeneValidator', 'initial_tests', 'initial_test.fa')
-
-      FileUtils.mkdir_p(initial_tests)
-      FileUtils.cp(test_file, initial_tests)
-
-      command    = 'Genevalidator -d ' + default_db + ' ' + File.join(initial_tests,
-                   'initial_test.fa')
-      %x(#{command})
-      unless $?.exitstatus == 0
-        raise IOError, "Genevalidator exited with the command code: #{exit}." \
-                       " It is possible that GeneValidator has not properly been "
-                       "installed."
-      end
-      puts # a blank line
-      puts 'All pre-run tests have passed.'
-      puts # a blank line
     end
   end
 end

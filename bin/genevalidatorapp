@@ -88,19 +88,23 @@ class GVapp < Sinatra::Base
     seqs     = params[:seq]
     vals     = params[:validations].to_s.gsub(/[\[\]\"]/, '')
     db_title = params[:database]
-    db       = @dbs.select { |_,v| v[0][:title] == db_title }.keys[0]
+    db_path  = @dbs.select { |_,v| v[0][:title] == db_title }.keys[0]
 
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
-    seqs = to_fasta(seqs)
+
+    sequences = clean_sequences(seqs)
+    sequence_type = guess_input_type(sequences)
+    seqs      = to_fasta(sequences)
     create_fasta_file(@working_dir, seqs)
-    run_genevalidator(vals, db, @working_dir, @unique_name)
+    puts Time.now
+    run_genevalidator(vals, db_path, sequence_type, @working_dir, @unique_name)
   end
 end
 
 tempdir = Dir.mktmpdir('GeneValidator_')
 
-dbs = GeneValidatorApp::Prerun.prerun(opt['config_file'], tempdir)
+dbs = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir)
 
 GVapp.set :root_dir, "#{File.dirname(__FILE__)}"
 GVapp.set :dbs, dbs[:dbs]
