@@ -10,6 +10,7 @@ require 'pathname' # Required to work with older ruby Versions
 
 # AnuragPriyam:
 # * check the manner in which temp files are stored and served.
+# * Is the form secure - what happens if a weird character is entered (like a end of document character) - GeneValidator reads the input file multiple times...
 
 opt = {}
 optparse = OptionParser.new do |opts|

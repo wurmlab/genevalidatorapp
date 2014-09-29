@@ -5,7 +5,7 @@ require 'pathname'
 
 LOG = Logger.new(STDOUT)
 LOG.formatter = proc do |severity, datetime, progname, msg|
-  "#{datetime}: #{msg}\n"
+  "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity}  #{msg}\n"
 end
 LOG.level = Logger::INFO
 
@@ -112,7 +112,7 @@ module GeneValidatorApp
     #   with the right exit code, it is assumed that it works perfectly. This
     #   also tests the Tempdir is writable....
     def self.check_genevalidator_works(root, tempdir, default_db)
-      LOG.info { 'Testing if Genevalidator (and all it\'s dependencies) are' \
+      LOG.info { 'Testing if Genevalidator (and it\'s dependencies) are' \
                  ' working.' }
       test_dir  = tempdir + 'initial_tests'
       test_file = root + 'public/GeneValidator/initial_tests/initial_test.fa'

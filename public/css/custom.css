@@ -11,7 +11,7 @@ body {
 	/* Necessary due to the fixed navbar...*/
 	margin-top: 50px;
 	/*This should be the same as the footer*/
-	margin-bottom: 70px;
+	margin-bottom: 80px;
 	background-color: #282B36;
 	/* 282B36 or 80838D */
 }
@@ -28,7 +28,7 @@ body {
   bottom: 0;
   width: 100%;
   /* Fixed height of the footer here(Must be same as the margin bottom in html ) */
-  height: 70px;
+  height: 80px;
   background-color: #222;
 }
 
