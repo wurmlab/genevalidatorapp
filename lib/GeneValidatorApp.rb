@@ -116,10 +116,8 @@ module GeneValidatorAppHelper
 
     exit2 = %x(#{raw_seqs})
     unless $?.exitstatus == 0
-      # raise IOError, "The GeneValidator command failed (get_raw_sequences" \
-      #                "  exited with exit code: #{$?.exitstatus})."
-      puts "get_raw_sequences command is exiting with exit code:" \
-           " #{$?.exitstatus}"
+      raise IOError, "The GeneValidator command failed (get_raw_sequences" \
+                     "  exited with exit code: #{$?.exitstatus})."
     end
 
     exit3 = system(gv_command)
