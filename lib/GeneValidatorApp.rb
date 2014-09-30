@@ -49,7 +49,7 @@ module GeneValidatorAppHelper
       sequences = ''
       data = Bio::FlatFile.open(StringIO.new(seqs))
       data.each_entry do |entry|
-        sequences << ">#{entry.entry_id}"
+        sequences << ">#{entry.definition}"
         sequences << "\n#{entry.seq.gsub(/\W/, '')}\n"
       end
     else

@@ -96,10 +96,12 @@ class GVapp < Sinatra::Base
     sequences = clean_sequences(seqs)
     seqs      = to_fasta(sequences)
     create_fasta_file(@working_dir, seqs)
-    puts Time.now
     run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name)
   end
 end
+
+# START APP...
+
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root = Pathname.new(__FILE__).dirname.parent
 
