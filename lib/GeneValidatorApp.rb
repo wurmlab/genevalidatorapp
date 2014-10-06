@@ -4,8 +4,21 @@ require 'pathname'
 
 # A helper module for the GVApp
 module GeneValidatorAppHelper
+    # # To signal error in query sequence or options.
+    # #
+    # # ArgumentError is raised when BLAST+'s exit status is 1; see [1].
+    class ArgumentError < ArgumentError
+
+      # Instruct Sinatra to treat this exception object as HTTP BadRequest
+      # (400).
+      def http_status
+        500
+      end
+    end
+
   # Creates a Unique name using the time (in nanoseconds) + the IP address
   def create_unique_name
+    # raise ArgumentError.new("There is a problem...")
     LOG.info { 'Creating the Unique Name' }
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' +
                   request.ip.gsub(/[.:]/, '-')

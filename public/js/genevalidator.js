@@ -87,10 +87,21 @@ $(document).ready(function() {
           $("[data-toggle='tooltip']").tooltip() // Initiate the tooltips
           removeEmptyColumns(); // Remove Unwanted Columns
           $('#spinner').modal('hide') // remove progress notification
+          console.log(response)
         },
-        failure: function(){
-          return
+        failure: function(response){
+          console.log(response)
         }
+        // statusCode: {
+        //   500: function() {
+        //     $('#spinner').modal('hide') // remove progress notification
+        //   $('#results_box').show();
+        //   $('#output').html(response)
+
+        //     alert("Script exhausted");
+        //   }
+        // }
+
       })
     }
   })
