@@ -61,21 +61,17 @@ class GVapp < Sinatra::Base
 
      # Remove before Release When false, it compresses the rendered HTML.
      Slim::Engine.default_options[:pretty] = true
+  end
+
+  # error ArgumentError do
+  #   @error = env['sinatra.error']
+  #   slim :"500", :locals => {:error => error}
+  # end
+
   # error 400 do
   #   @error = env['sinatra.error']
-  #   slim :"500" #, :locals => {:error => error}
+  #   slim :"500", :locals => {:error => error}
   # end
-  end
-
-  error ArgumentError do
-    @error = env['sinatra.error']
-    slim :"500", :locals => {:error => error}
-  end
-
-  error 400 do
-    @error = env['sinatra.error']
-    slim :"500", :locals => {:error => error}
-  end
 
   before do
     root_dir         = settings.root_dir
@@ -90,7 +86,8 @@ class GVapp < Sinatra::Base
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
     @public_dir      = root_dir + 'public/GeneValidator' + @unique_name
-
+    halt 400, slim :"500" 
+    # 'A unique name cannot be created for this session.'
     if File.exist?(@working_dir)
       halt 400, 'A unique name cannot be created for this session.'
     end
@@ -121,9 +118,9 @@ end
 # START APP...
 
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
-root = Pathname.new(__FILE__).dirname.parent
+root    = Pathname.new(__FILE__).dirname.parent
 
-dbs = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir, root)
+dbs     = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir, root)
 
 GVapp.set :tempdir, tempdir
 GVapp.set :root_dir, root

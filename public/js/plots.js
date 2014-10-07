@@ -126,6 +126,18 @@ function showDiv(source, target){
         source.status="pressed"
 }
 
+function LengthClusterAddExplanation(results, target) {
+  var maincluster1 = "50"
+  var maincluster2 = "89"
+  var queryHit = "108"
+  var comparison = "outside"
+  
+  var explain = "<b>Explanation:</b> The majority of the BLAST hits have a sequence lenght between " + maincluster1 + " and " + maincluster2 + ". The query has a sequence length of " + queryHit + ". Thus, the query sequence length is " + comparison + " the most dense cluster. Please see below for a graphical representation of this."
+  // var explanation = "This is a brief explanation of the results..."
+  var target_id = '#' + target
+  $(target_id).html(explain)
+}
+
 function addPlot(target, filename, type, title, footer, xtitle, ytitle, aux1, aux2){
     if (footer == '')
         var legend = []
