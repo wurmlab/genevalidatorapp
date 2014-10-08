@@ -45,7 +45,6 @@ module GeneValidatorAppHelper
 
   # Writes the input sequences to a fasta file.
   def clean_sequences(seqs)
-    raise IOError, "Cannot Clean Sequences."
     if seqs[0] == '>'
       sequences = ''
       data = Bio::FlatFile.open(StringIO.new(seqs))
