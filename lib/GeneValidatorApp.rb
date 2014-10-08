@@ -4,18 +4,6 @@ require 'pathname'
 
 # A helper module for the GVApp
 module GeneValidatorAppHelper
-    # # # To signal error in query sequence or options.
-    # # #
-    # # # ArgumentError is raised when BLAST+'s exit status is 1; see [1].
-    # class ArgumentError < ArgumentError
-
-    #   # Instruct Sinatra to treat this exception object as HTTP BadRequest
-    #   # (400).
-    #   def http_status
-    #     500
-    #   end
-    # end
-
   # Creates a Unique name using the time (in nanoseconds) + the IP address
   def create_unique_name
     LOG.info { 'Creating the Unique Name' }
@@ -57,6 +45,7 @@ module GeneValidatorAppHelper
 
   # Writes the input sequences to a fasta file.
   def clean_sequences(seqs)
+    raise IOError, "Cannot Clean Sequences."
     if seqs[0] == '>'
       sequences = ''
       data = Bio::FlatFile.open(StringIO.new(seqs))
@@ -87,7 +76,7 @@ module GeneValidatorAppHelper
       f.write sequences
     end
     unless File.exist?(output_file)
-      raise IOError, "The Input Sequences was not written to file"
+      raise IOError, "There was an error writing the input sequences to file"
     end
   end
 
@@ -114,7 +103,7 @@ module GeneValidatorAppHelper
 
     run_gv(blast, raw_seqs, gv_command)
     unless File.exist?(table_file)
-      raise IOError, 'GeneValidator has not created any results files...'
+      raise IOError, 'GeneValidator did not produce the requested results.'
     end
     full_html = IO.binread(table_file)
     return full_html.gsub(/#{public_json_dir}/, local_plots_dir.to_s)
@@ -135,7 +124,7 @@ module GeneValidatorAppHelper
     exit3 = system(gv_command)
     unless exit3
       raise IOError, "The Genevalidator command failed (genevalidator exited" \
-                     " with the eixt code: #{exit3}) "
+                     " with the exit code: #{exit3}) "
     end
   end
 end

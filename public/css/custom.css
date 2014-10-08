@@ -21,6 +21,9 @@ body {
   padding-bottom: 0;
 }
 
+.error_header {
+  margin-top: 10px;
+}
 /* Footer
 -------------------------------------------------- */
 #footer {

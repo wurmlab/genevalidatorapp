@@ -89,18 +89,14 @@ $(document).ready(function() {
           $('#spinner').modal('hide') // remove progress notification
           console.log(response)
         },
-        failure: function(response){
-          console.log(response)
+        error: function (e, status) {
+          if (e.status == 500) {
+            var errorMessage = e.responseText
+            $('#results_box').show();
+            $('#output').html(errorMessage)
+            $('#spinner').modal('hide') // remove progress notification
+          }
         }
-        // statusCode: {
-        //   500: function() {
-        //     $('#spinner').modal('hide') // remove progress notification
-        //   $('#results_box').show();
-        //   $('#output').html(response)
-
-        //     alert("Script exhausted");
-        //   }
-        // }
 
       })
     }

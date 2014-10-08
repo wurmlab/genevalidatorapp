@@ -52,26 +52,15 @@ optparse.parse!
 # The Actual App...
 class GVapp < Sinatra::Base
   helpers GeneValidatorAppHelper
+
   configure do 
     set :root, Pathname.new(__FILE__).dirname.parent
     register Sinatra::ConfigFile
     config_file "#{Pathname.new(__FILE__).dirname.parent + 'config.yml'}"
-    set :raise_errors, false
-    set :show_exceptions, true 
-
+    set :show_exceptions, false 
      # Remove before Release When false, it compresses the rendered HTML.
      Slim::Engine.default_options[:pretty] = true
   end
-
-  # error ArgumentError do
-  #   @error = env['sinatra.error']
-  #   slim :"500", :locals => {:error => error}
-  # end
-
-  # error 400 do
-  #   @error = env['sinatra.error']
-  #   slim :"500", :locals => {:error => error}
-  # end
 
   before do
     root_dir         = settings.root_dir
@@ -86,8 +75,7 @@ class GVapp < Sinatra::Base
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
     @public_dir      = root_dir + 'public/GeneValidator' + @unique_name
-    halt 400, slim :"500" 
-    # 'A unique name cannot be created for this session.'
+
     if File.exist?(@working_dir)
       halt 400, 'A unique name cannot be created for this session.'
     end
@@ -96,6 +84,10 @@ class GVapp < Sinatra::Base
     end
   end
 
+  error do 
+    slim :"500", layout: false
+  end
+  
   get '/' do
     slim :index
   end
