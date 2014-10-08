@@ -117,7 +117,8 @@ module GeneValidatorApp
       test_dir  = tempdir + 'initial_tests'
       test_file = root + 'public/GeneValidator/initial_tests/initial_test.fa'
 
-      assert_gv_installed_and_compatible
+      assert_gv_installed
+      assert_gv_version_compatible
 
       FileUtils.mkdir_p(test_dir)
       FileUtils.cp(test_file, test_dir)
@@ -134,14 +135,22 @@ module GeneValidatorApp
 
     ### Ensures that GV is installed and is of the correct version (Adapted
     #     from SequenceServer)...
-    def self.assert_gv_installed_and_compatible
+    def self.assert_gv_installed
       unless command?('genevalidator --version')
         puts "*** Could not find GeneValidator. Please confirm that"
         puts "    GeneValidator installed is installed and try again."
         puts "    Please refer to ...Link... for more information."
         exit
       end
+    end
+
+    def self.current_gv_version
       version = %x|genevalidator --version|
+      version
+    end
+
+    def self.assert_gv_version_compatible
+      version = current_gv_version
       unless version.to_f >= 0.1
         puts "*** Your GeneValidator (version #{version}) is outdated."
         puts "    This App require GeneValidator version 0.1 or higher."

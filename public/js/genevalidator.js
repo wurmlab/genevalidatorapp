@@ -1,5 +1,6 @@
 $(document).ready(function() {
   checkCollapseState()
+  keepFooterFixedToBottom()
   
   jQuery.validator.addMethod("checkInputType", function(value, element) {
     types = []
@@ -140,6 +141,13 @@ checkType = function (sequence, threshold, length, index) {
   }
 }
 
+
+function keepFooterFixedToBottom() {
+  $('#mainbody').css({'margin-bottom': (($('#footer').height()) + 15)+'px'})
+  $(window).resize(function(){
+      $('#mainbody').css({'margin-bottom': (($('#footer').height()) + 15)+'px'})
+  })
+}
 
 
 function checkEmptyValidation() {

@@ -43,7 +43,7 @@ Banner
   end
 
   opts.on('--version', 'Shows version') do
-    puts GeneValidatorApp.VERSION
+    puts GeneValidatorApp::VERSION
     exit
   end
 end
@@ -65,6 +65,7 @@ class GVapp < Sinatra::Base
   before do
     root_dir         = settings.root_dir
     @tempdir         = settings.tempdir
+    @GVversion       = settings.GVversion
     @default_db      = settings.default_db
     @non_default_dbs = settings.non_default
     @dbs             = settings.dbs
@@ -75,6 +76,7 @@ class GVapp < Sinatra::Base
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
     @public_dir      = root_dir + 'public/GeneValidator' + @unique_name
+
 
     if File.exist?(@working_dir)
       halt 400, 'A unique name cannot be created for this session.'
@@ -87,7 +89,7 @@ class GVapp < Sinatra::Base
   error do 
     slim :"500", layout: false
   end
-  
+
   get '/' do
     slim :index
   end
@@ -109,11 +111,14 @@ end
 
 # START APP...
 
-tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
-root    = Pathname.new(__FILE__).dirname.parent
+tempdir   = Pathname.new(Dir.mktmpdir('GeneValidator_'))
+root      = Pathname.new(__FILE__).dirname.parent
 
-dbs     = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir, root)
+dbs       = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir, root)
 
+GVversion = GeneValidatorApp::Prerun.current_gv_version
+
+GVapp.set :GVversion, GVversion
 GVapp.set :tempdir, tempdir
 GVapp.set :root_dir, root
 GVapp.set :dbs, dbs[:dbs]
