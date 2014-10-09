@@ -103,12 +103,14 @@ function getElementByAttributeValue(attribute, value) {
 }
 
 function showDiv(source, target){
+    var explainAlertId = '#' + target + 'Explanation'
     var button = document.getElementById(target)
     if(source.status == "pressed"){
         button.style.display = "none";
         $(button).parent().parent().hide();
     }
     else {
+        $(explainAlertId).hide()
         d3.select("#".concat(target)).selectAll("svg").remove();    
         button.style.display = "block";
         $(button).parent().parent().show()
@@ -126,15 +128,90 @@ function showDiv(source, target){
         source.status="pressed"
 }
 
-function LengthClusterAddExplanation(results, target) {
-  var maincluster1 = "50"
-  var maincluster2 = "89"
-  var queryHit = "108"
-  var comparison = "outside"
-  
-  var explain = "<b>Explanation:</b> The majority of the BLAST hits have a sequence lenght between " + maincluster1 + " and " + maincluster2 + ". The query has a sequence length of " + queryHit + ". Thus, the query sequence length is " + comparison + " the most dense cluster. Please see below for a graphical representation of this."
-  // var explanation = "This is a brief explanation of the results..."
+
+function LengthClusterAddExplanation(results, target){
+  var data = results.split(',')
+  var maincluster1 = data[0]
+  var maincluster2 = data[1]
+  var queryHit = data[2]
+  var comparison = ''
+  if (data[3] = 'no'){
+    comparison = 'outside'
+  } else {
+    comparison = 'inside'
+  }
+
   var target_id = '#' + target
+  var explain = "<b>Explanation:</b> The majority of the BLAST hits have a sequence length between " + maincluster1 + " and " + maincluster2 + ". The query has a sequence length of " + queryHit + ". Thus, the query sequence length is <em>" + comparison + "</em> the most dense cluster. Please see below for a graphical representation of this."
+  $(target_id).show()
+  $(target_id).html(explain)
+}
+
+function LengthRankAddExplanation(results, target){
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> This explanation will be made with the following info  " + results + "."
+  $(target_id).show()
+  $(target_id).html(explain)
+}
+
+function Gene_MergeAddExplanation(results, target){
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> This explanation will be made with the following info  " + results + "."
+  $(target_id).show()
+  $(target_id).html(explain)
+}
+
+function DuplicationAddExplanation(results, target){
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> This explanation will be made with the following info  " + results + "."
+  $(target_id).show()
+  $(target_id).html(explain)
+}
+
+function FrameAddExplanation(results, target){
+  var data = results.split(';')
+  data.pop()
+  var totalHSPs = 0
+  var explanation = ''
+  var conclusion = ''
+
+  for (var i=0; i<data.length; i++) {
+    var dataPart = data[i].split(',')
+    totalHSPs = totalHSPs + parseInt(dataPart[1])
+    if (i == (data.length - 1)) {
+      explanation = explanation + dataPart[1] + " HSPs were in frame " + dataPart[0]
+    } else {
+      explanation = explanation + dataPart[1] + " HSPs were in frame " + dataPart[0] + '; '
+    }
+  }
+  
+  if (data.length == 1) {
+    conclusion = "Since all of the HSPs are in a single open reading frame, we can be relatively confident about the query... "
+  } else {
+    conclusion = "Since all of the HSPs are not all in a single open reading frame, we are not as confident about the query... This may suggest a frame shift in the query. "
+  }
+  
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> BLAST Analysis of the query sequence produced " + totalHSPs + " High-scoring Segment Pairs (HSPs). Further analysis of the main Open Reading Frame of these HSPs showed that: " + explanation + "." + conclusion
+  $(target_id).show()
+  $(target_id).html(explain)  
+}
+
+
+FrameAddExplanation('1,129;', 'toggle1Explanation')
+
+
+function ORFAddExplanation(results, target){
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> This explanation will be made with the following info  " + results + "."
+  $(target_id).show()
+  $(target_id).html(explain)
+}
+
+function MAAddExplanation(results, target){
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> This explanation will be made with the following info  " + results + "."
+  $(target_id).show()
   $(target_id).html(explain)
 }
 
@@ -555,7 +632,6 @@ function plot_scatter(filename, target, title, footer, xTitle, yTitle, yLine, sl
 // line plot
 // maximum 80 lines
 function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, yValues){
-
     var margin = {top: 50, right: 50, bottom: 75, left: 50},
         width = 600 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;      
@@ -568,10 +644,17 @@ function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, y
 
     var color = d3.scale.category10();
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(5);
+    if (title === 'Open reading frame with STOP codon') {  
+      var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom")
+          .ticks(0); 
+    } else {
+      var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient("bottom")
+          .ticks(5);
+    }
 
     var yAxis = d3.svg.axis()
         .scale(y)
@@ -813,5 +896,3 @@ function plot_align(filename, target, title, footer, xTitle, yTitle, no_lines, y
     }
 
 }
-
-
