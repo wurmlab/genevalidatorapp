@@ -7,12 +7,17 @@ LOG = Logger.new(STDOUT)
 LOG.formatter = proc do |severity, datetime, progname, msg|
   "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity}  #{msg}\n"
 end
-LOG.level = Logger::INFO
 
 module GeneValidatorApp
   class Prerun
 
-    def self.validate(config_file, tempdir, root)
+    def self.validate(debug, config_file, tempdir, root)
+      if debug 
+        LOG.level =  Logger::DEBUG
+      else
+        LOG.level = Logger::INFO
+      end 
+      LOG.info { 'Set up and running pre-run tests.' }
       assert_config_file_exists(config_file, root)
       config                = YAML.load_file(config_file)
       dbs                   = {}
@@ -25,7 +30,9 @@ module GeneValidatorApp
     end
 
     def self.assert_config_file_exists(config_file, root)
+      LOG.debug { 'Checking if the config file exists' }
       if File.exist?(config_file) == false
+        LOG.debug { "No config file found at #{config_file}" }
         puts # a blank line
         puts "Error: The config file cannot be found at #{config_file}"
         puts "Please refer to the installation guide at: https://github.com/" \
@@ -49,14 +56,20 @@ module GeneValidatorApp
     # Returns:
     # * a hash of sorted blast databases indexed by their id.
     def self.scan_blast_database_directory(db_root)
+      LOG.debug { "Looking for databases in #{db_root}" }
       find_dbs_command = %|blastdbcmd -recursive -list #{db_root} -list_outfmt "%p %f %t" 2>&1|
+      LOG.debug { "Running: #{find_dbs_command}" }
 
       db_list = %x|#{find_dbs_command}|
       if db_list.empty?
+        LOG.debug { "No databases found in #{db_root}" }
         puts "*** No formatted blast databases found in '#{db_root}'."
         puts "    Please ensure that there are BLAST database in the #{db_root}."
         exit
       elsif db_list.match(/BLAST Database error/)
+        LOG.debug { "There was a BLAST database error" }
+        LOG.debug { 'see below for output recieved from BLAST:'}
+        LOG.debug { "#{db_list}"}
         puts "*** Error parsing one of the BLAST databases."
         puts "    Mostly likely some of your BLAST databases were created by an "
         puts "    old version of 'makeblastdb'."
@@ -83,7 +96,7 @@ module GeneValidatorApp
         title = title.join(' ').freeze
         # skip past all but alias file of a NCBI multi-part BLAST database
         if multipart_database_name?(path)
-          LOG.info { "Found a multi-part database volume at #{path} - " \
+          LOG.debug { "Found a multi-part database volume at #{path} - " \
                      "ignoring it." }
           next
         end
@@ -112,7 +125,7 @@ module GeneValidatorApp
     #   with the right exit code, it is assumed that it works perfectly. This
     #   also tests the Tempdir is writable....
     def self.check_genevalidator_works(root, tempdir, default_db)
-      LOG.info { 'Testing if Genevalidator (and it\'s dependencies) are' \
+      LOG.debug { 'Testing if Genevalidator (and it\'s dependencies) are' \
                  ' working.' }
       test_dir  = tempdir + 'initial_tests'
       test_file = root + 'public/GeneValidator/initial_tests/initial_test.fa'

@@ -22,19 +22,15 @@ optparse = OptionParser.new do |opts|
 
 Banner
 
-  opts.on('-p', '--port PORT', 'Port to run GeneValidatprApp on') do |port|
-    opt['port'] = port
-  end
-
   opt['config_file'] = File.join(Dir.home, '.genevalidatorapp.conf')
   opts.on('-c', '--config CONFIG_FILE', 'Use the given configuration file') do |config_file|
     opt['config_file'] = config_file
   end
 
-  opt[:verbose] = false
-  opts.on('-v', '--verbose', 'Provides more information on each step taken in',
+  opt[:debug] = false
+  opts.on('-d', '--debug', 'Provides more information on each step taken in',
           ' this program') do
-    opt[:verbose] = true
+    opt[:debug] = true
   end
 
   opts.on('-h', '--help', 'Display this screen') do
@@ -42,7 +38,7 @@ Banner
     exit
   end
 
-  opts.on('--version', 'Shows version') do
+  opts.on('-v', '--version', 'Shows version') do
     puts GeneValidatorApp::VERSION
     exit
   end
@@ -114,7 +110,7 @@ end
 tempdir   = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root      = Pathname.new(__FILE__).dirname.parent
 
-dbs       = GeneValidatorApp::Prerun.validate(opt['config_file'], tempdir, root)
+dbs       = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'], tempdir, root)
 
 GVversion = GeneValidatorApp::Prerun.current_gv_version
 

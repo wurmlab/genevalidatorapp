@@ -6,7 +6,7 @@ require 'pathname'
 module GeneValidatorAppHelper
   # Creates a Unique name using the time (in nanoseconds) + the IP address
   def create_unique_name
-    LOG.info { 'Creating the Unique Name' }
+    LOG.debug { 'Creating the Unique Name' }
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' +
                   request.ip.gsub(/[.:]/, '-')
     return unique_name
@@ -15,7 +15,7 @@ module GeneValidatorAppHelper
   # If the unique name isn't unique, this loop is run until, a unique name is
   #   found.
   def ensure_unique_name(working_dir, tempdir)
-    LOG.info { 'Ensuring the run has a unique name' }
+    LOG.debug { 'Ensuring the run has a unique name' }
     while File.exist?(working_dir)
       unique_name    = create_unique_name
       working_dir = tempdir + unique_name
@@ -26,6 +26,7 @@ module GeneValidatorAppHelper
   # Adds a ID (based on the time when submitted) to sequences that are not in
   #  fasta format. Adapted from SequenceServer.
   def to_fasta(sequence)
+    LOG.debug { 'Adding an ID to sequences that are not in fasta format.' }
     sequence = sequence.lstrip
     unique_queries = {}
     if sequence[0] != '>'
@@ -45,6 +46,7 @@ module GeneValidatorAppHelper
 
   # Writes the input sequences to a fasta file.
   def clean_sequences(seqs)
+    LOG.debug { 'Cleaning input sequences to ensure that there are non letter character in the sequences.' }
     if seqs[0] == '>'
       sequences = ''
       data = Bio::FlatFile.open(StringIO.new(seqs))
@@ -69,7 +71,7 @@ module GeneValidatorAppHelper
 
   # Writes the input sequences to a fasta file.
   def create_fasta_file(working_dir, sequences)
-    LOG.info { 'Writing the input sequences into a fasta file.' }
+    LOG.debug { 'Writing the input sequences into a fasta file.' }
     output_file = working_dir + 'input_file.fa'
     File.open(output_file, 'w+') do |f|
       f.write sequences
@@ -113,17 +115,23 @@ module GeneValidatorAppHelper
     unless $?.exitstatus == 0
       raise IOError, "BLAST exited with the command code: #{$?.exitstatus}."
     end
+    LOG.debug { "Running BLAST (exit Status: #{$?.exitstatus}" }
+    LOG.debug { "#{blast}" }
 
     exit2 = %x(#{raw_seqs})
     unless $?.exitstatus == 0
       raise IOError, "The GeneValidator command failed (get_raw_sequences" \
                      "  exited with exit code: #{$?.exitstatus})."
     end
+    LOG.debug { "Running get_raw_sequences (exit Status: #{$?.exitstatus}" }
+    LOG.debug { "#{raw_seqs}" }
 
     exit3 = system(gv_command)
     unless exit3
       raise IOError, "The Genevalidator command failed (genevalidator exited" \
                      " with the exit code: #{exit3}) "
     end
+    LOG.debug { "Running genevalidator (exit Status: #{$?.exitstatus}" }
+    LOG.debug { "#{gv_command}" }
   end
 end

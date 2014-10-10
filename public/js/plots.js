@@ -1,24 +1,3 @@
-/*
-var previous_scroll = $(window).scrollTop();
-
-window.onscroll = function (event) {
-
-        var scroll = $(window).scrollTop();
-        scroll_change = scroll - previous_scroll;
-    previous_scroll = scroll;
-
-        if(scroll_change > 0)
-        console.log("down");
-        else
-        console.log("up");
-
-        var button =  document.getElementById("show_all_plots");
-
-        if(button.status == "pressed"){
-        show_all_plots(button);
-        }
-}*/
-
 function show_all_plots(button){
 
     var expand_children = document.getElementsByName('plot_row');
@@ -55,9 +34,10 @@ function show_all_plots(button){
 }
 
 function show_plot(pressedButton, expand_child_div){
-    //expand_child_div.innerHTML = "";
     if(pressedButton.status != "pressed"){
-        eval(pressedButton.onclick.toString().replace("function onclick(event) {","").replace("}",""));
+        var eachPlotBtn = pressedButton.getAttribute('onclick')
+        var tmpFunc = new Function(eachPlotBtn)
+        tmpFunc()
         pressedButton.status="pressed";
         $(expand_child_div).parent().parent().show()
         expand_child_div.style.display = "block";
@@ -103,14 +83,19 @@ function getElementByAttributeValue(attribute, value) {
 }
 
 function showDiv(source, target){
-    var explainAlertId = '#' + target + 'Explanation'
+    var explanationId = '#' + target + 'explanation'
+
+    if( $(explanationId).length) {
+      $(explanationId).remove()
+      console.log('hi')
+    }
+
     var button = document.getElementById(target)
     if(source.status == "pressed"){
         button.style.display = "none";
         $(button).parent().parent().hide();
     }
     else {
-        $(explainAlertId).hide()
         d3.select("#".concat(target)).selectAll("svg").remove();    
         button.style.display = "block";
         $(button).parent().parent().show()
@@ -124,8 +109,25 @@ function showDiv(source, target){
 
     if(source.status=="pressed")
         source.status="released"
-    else
+    else {
         source.status="pressed"
+    }
+}
+
+function AddExplanation(source, explanation, target){
+  var row = '#' + target +'row'
+  console.log(row)
+  var explain = $('<div id="' + target + 'explanation" class="alert alert-info explanation_alert" role="alert"><b>Explanation:</b> ' + explanation + '</div>')
+  if (source.status == "pressed") {
+    $(row).prepend(explain)
+  }
+}
+
+function AddExplanationold(explanation, target){
+  var target_id = '#' + target
+  var explain = "<b>Explanation:</b> " + explanation
+  $(target_id).show()
+  $(target_id).html(explain)
 }
 
 
