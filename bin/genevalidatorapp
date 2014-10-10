@@ -8,10 +8,6 @@ require 'sinatra/base'
 require 'sinatra/config_file'
 require 'pathname'
 
-# AnuragPriyam:
-# * check the manner in which temp files are stored and served.
-# * Is the form secure - what happens if a weird character is entered (like a end of document character) - GeneValidator reads the input file multiple times...
-
 opt = {}
 optparse = OptionParser.new do |opts|
   opts.banner = <<Banner
@@ -23,7 +19,7 @@ optparse = OptionParser.new do |opts|
 Banner
 
   opt['config_file'] = File.join(Dir.home, '.genevalidatorapp.conf')
-  opts.on('-c', '--config CONFIG_FILE', 'Use the given configuration file') do |config_file|
+  opts.on('-c', '--config CONFIG_FILE', 'Use the given configurationfile') do |config_file|
     opt['config_file'] = config_file
   end
 
@@ -33,13 +29,13 @@ Banner
     opt[:debug] = true
   end
 
-  opts.on('-h', '--help', 'Display this screen') do
-    puts opts
+  opts.on('-v', '--version', 'Shows version') do
+    puts GeneValidatorApp::VERSION
     exit
   end
 
-  opts.on('-v', '--version', 'Shows version') do
-    puts GeneValidatorApp::VERSION
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
     exit
   end
 end
@@ -49,13 +45,11 @@ optparse.parse!
 class GVapp < Sinatra::Base
   helpers GeneValidatorAppHelper
 
-  configure do 
+  configure do
+    set :environment, :production
     set :root, Pathname.new(__FILE__).dirname.parent
     register Sinatra::ConfigFile
     config_file "#{Pathname.new(__FILE__).dirname.parent + 'config.yml'}"
-    set :show_exceptions, false 
-     # Remove before Release When false, it compresses the rendered HTML.
-     Slim::Engine.default_options[:pretty] = true
   end
 
   before do
@@ -67,22 +61,22 @@ class GVapp < Sinatra::Base
     @dbs             = settings.dbs
 
     @unique_name     = create_unique_name
+    # The Working directory is within the tempdir..
     @working_dir     = @tempdir + @unique_name
     if File.exist?(@working_dir)
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
     @public_dir      = root_dir + 'public/GeneValidator' + @unique_name
 
-
     if File.exist?(@working_dir)
-      halt 400, 'A unique name cannot be created for this session.'
+      fail IOError, 'A unique name cannot be created for this session.'
     end
     unless File.exist?(@tempdir)
-      halt 400, 'The Temporary folder cannot be found.'
+      fail IOError, 'The Temporary folder cannot be found.'
     end
   end
 
-  error do 
+  error do
     slim :"500", layout: false
   end
 
@@ -91,10 +85,12 @@ class GVapp < Sinatra::Base
   end
 
   post '/input' do
-    seqs     = params[:seq]
-    vals     = params[:validations].to_s.gsub(/[\[\]\"]/, '')
-    db_title = params[:database]
-    db_path  = @dbs.select { |_,v| v[0][:title] == db_title }.keys[0]
+    seqs      = params[:seq]
+    vals      = params[:validations].to_s.gsub(/[\[\]\"]/, '')
+    db_title  = params[:database]
+    # Extracts the db path using the db title
+    db_path   = @dbs.select { |_, v| v[0][:title] == db_title }.keys[0]
+
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
 
@@ -105,12 +101,13 @@ class GVapp < Sinatra::Base
   end
 end
 
-# START APP...
+# SET UP & START APP...
 
 tempdir   = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root      = Pathname.new(__FILE__).dirname.parent
 
-dbs       = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'], tempdir, root)
+dbs       = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'],
+                                              tempdir, root)
 
 GVversion = GeneValidatorApp::Prerun.current_gv_version
 
@@ -118,6 +115,6 @@ GVapp.set :GVversion, GVversion
 GVapp.set :tempdir, tempdir
 GVapp.set :root_dir, root
 GVapp.set :dbs, dbs[:dbs]
-GVapp.set :non_default, dbs[:non_default_dbs]
+GVapp.set :non_default, dbs[:rest_dbs]
 GVapp.set :default_db, dbs[:default_db]
 GVapp.run!

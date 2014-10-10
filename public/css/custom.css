@@ -215,6 +215,25 @@ tbody > tr:nth-child(4n+1), tbody > tr:nth-child(4n+2) {
   cursor: pointer !important;
 }
 
+/* Tooltips
+___________________________*/
+
+.tooltip > .tooltip-inner {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #CCCCCC;
+  max-width:275px;
+}
+
+.tooltip.top > .tooltip-arrow {
+    bottom:0;
+    left:50%;
+    margin-left:-5px;
+    border-left:5px solid transparent;
+    border-right:5px solid transparent;
+    border-top:5px solid #CCC
+}
+  
 /* D3Js & Axis
 ___________________________*/
 .axis path,
@@ -241,7 +260,7 @@ svg:not(:root) {
 }
 
 svg {
-  margin-top:20px;
+  margin:15px;
 }
 
 /* Ratings...
