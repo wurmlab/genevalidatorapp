@@ -1,24 +1,21 @@
 # GeneValidatorApp
 
-TODO: Write a gem description
+This is a sinatra based web wrapper for GeneValidator [https://github.com/monicadragan/GeneValidator]. GeneValidator is a program that validates gene predictions.
 
 ## Installation
+	1. Clone the repository
+	$ git clone https://github.com/IsmailM/GeneValidatorApp.git
 
-Add this line to your application's Gemfile:
-
-    gem 'GeneValidatorApp'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
+	2. Install the latest gem
     $ gem install GeneValidatorApp
 
 ## Usage
 
-TODO: Write usage instructions here
+After instaling simply type in:
+
+	$ genevalidatorapp
+
+and then go to localhost:4567 (if on a local server using the default port: 4567)
 
 ## Contributing
 

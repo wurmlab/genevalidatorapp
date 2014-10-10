@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = GeneValidatorApp::VERSION
   spec.authors       = ["Ismail Moghul"]
   spec.email         = ["Ismail.Moghul@gmail.com"]
-  spec.summary       = %q{A Sinatra based Web Wrapper.}
-  spec.description   = %q{Currently under development... :) }
+  spec.summary       = %q{A Web App wrapper for GeneValidator.}
+  spec.description   = %q{A Web App wrapper for GeneValidator, a program for validating gene predictions.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -21,5 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake", "~>10.3"
   spec.add_dependency "sinatra", "~>1.4"
-  # spec.add_dependency "GeneValidator"
+  spec.add_dependency "bio", "~>1.4"
+  spec.add_dependency "slim", "~>2.0"
 end
