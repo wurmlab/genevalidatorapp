@@ -182,7 +182,6 @@ tbody > tr:nth-child(4n+1), tbody > tr:nth-child(4n+2) {
 .table tbody td.warning {
   padding-left:30px !important; 
   position:relative;
-  cursor: pointer !important;
 }
 
 .table tbody td.success:before,
@@ -209,6 +208,11 @@ tbody > tr:nth-child(4n+1), tbody > tr:nth-child(4n+2) {
 .table tbody td.warning:before{
   content: "\f06a";
   color:#FCB83F;
+}
+
+.table tbody td.success,
+.table tbody td.danger {
+  cursor: pointer !important;
 }
 
 /* D3Js & Axis
