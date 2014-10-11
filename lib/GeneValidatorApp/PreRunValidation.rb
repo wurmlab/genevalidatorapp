@@ -23,7 +23,7 @@ module GeneValidatorApp
       LOG.info { 'Set up and running pre-run tests.' }
       LOG.debug { 'Initalised debugging mode.' }
       assert_config_file_exists(config_file, root)
-      config           = load_config(config_file)
+      config           = load_config(config_file, root)
       dbs              = {}
       dbs[:dbs]        = scan_blast_database_directory(config['database-dir'])
       dbs[:default_db] = defaultdb(dbs[:dbs], config['default-database'],
@@ -40,7 +40,7 @@ module GeneValidatorApp
     #   to their home directory.
     def self.assert_config_file_exists(config_file, root)
       LOG.debug { 'Checking if the config file exists' }
-      if File.exist?(config_file) == false
+      unless File.exist?(config_file)
         LOG.debug { "No config file found at #{config_file}" }
         puts # a blank line
         puts "Error: The config file cannot be found at #{config_file}"
@@ -58,7 +58,7 @@ module GeneValidatorApp
 
     # This method loads that config file and ensures that the script can access
     #   the necessary variables.
-    def self.load_config(config_file)
+    def self.load_config(config_file, root)
       config = YAML.load_file(config_file)
       unless config['database-dir'] && config['default-database']
         LOG.debug { "Unable to read config file found at #{config_file}" }
