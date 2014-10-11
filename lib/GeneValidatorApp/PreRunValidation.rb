@@ -87,6 +87,11 @@ module GeneValidatorApp
     # Returns:
     # * a hash of sorted blast databases indexed by their id.
     def self.scan_blast_database_directory(db_root)
+      unless File.exist?(db_root)
+        LOG.info { "The Blast Database Directory (#{db_root}) does not exist." \
+                   " Please correct your config file." }
+        exit
+      end
       LOG.info { "Looking for databases in #{db_root}" }
       find_dbs_command = %(blastdbcmd -recursive -list #{db_root} -list_outfmt "%p %f %t" 2>&1)
       LOG.debug { "Running: #{find_dbs_command}" }
