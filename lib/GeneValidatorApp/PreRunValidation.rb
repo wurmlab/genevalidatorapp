@@ -48,7 +48,7 @@ module GeneValidatorApp
              'IsmailM/GeneValidatorApp'
         puts # a blank line
         puts 'Alternatively, you can copy an examplar config file into your' \
-             'home directory:'
+             ' home directory:'
         puts # a blank line
         puts "$ cp #{root + '.genevalidatorapp.conf'} ~/.genevalidatorapp.conf"
         puts # a blank line
