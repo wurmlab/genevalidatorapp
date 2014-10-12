@@ -47,7 +47,6 @@ module GeneValidatorAppHelper
 
   # Writes the input sequences to a fasta file.
   def clean_sequences(seqs)
-    fail IOError, "There was kinda a problem...."
     LOG.debug { 'Cleaning the input sequences to ensure that there are no non' \
                 ' letter character in the sequences.' }
     if seqs[0] == '>'
