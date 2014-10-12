@@ -7,20 +7,20 @@ This is a sinatra based web wrapper for [GeneValidator](https://github.com/monic
 1. Install all GeneValidator Prerequisites (mafft, BLAST+). You would also require a BLAST database.
 
 2. Install my fork of GeneValidator (In the next major version, this step will be automated)
-
+```
 	$ git clone https://github.com/IsmailM/GeneValidator.git
 	$ cd GeneValidator
 	$ rake
-
+```
 3. Install GeneValidatorApp
-
+```
     $ gem install GeneValidatorApp
-
+```
 4. Copy the examplar config file to your home directory.
   * Run GeneValidatorApp
-
+```
     $ genevalidatorapp 
-    
+```
   * Run the command shown to copy the examplar config file to your home directory.
 
 5. Set up variables in your config file.
