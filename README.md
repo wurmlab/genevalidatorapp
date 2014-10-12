@@ -1,6 +1,6 @@
 # GeneValidatorApp
 
-This is a sinatra based web wrapper for GeneValidator [https://github.com/monicadragan/GeneValidator]. GeneValidator is a program that validates gene predictions.
+This is a sinatra based web wrapper for [GeneValidator](https://github.com/monicadragan/GeneValidator). GeneValidator is a program that validates gene predictions.
 
 ## Installation
 
@@ -15,13 +15,13 @@ This is a sinatra based web wrapper for GeneValidator [https://github.com/monica
     $ gem install GeneValidatorApp
 
 4. Copy the examplar config file to your home directory.
-- Run GeneValidatorApp
+  * Run GeneValidatorApp
     $ genevalidatorapp 
-- run the command shown to copy the examplar config file to your home directory.
+  * Run the command shown to copy the examplar config file to your home directory.
 
 5. Set up variables in your config file.
-- Set the `database-dir` variables to the full path to the directory containing your BLAST databases. 
-- Set the `default-database` variable to the full path to the BLAST database that you would like to be your default database. 
+  * Set the `database-dir` variables to the full path to the directory containing your BLAST databases. 
+  * Set the `default-database` variable to the full path to the BLAST database that you would like to be your default database. 
 
 ## Usage
 
@@ -29,7 +29,7 @@ After instaling simply type in:
 
 	$ genevalidatorapp
 
-and then go to localhost:4567 (if on a local server using the default port: 4567)
+and then go to localhost:4567 (if on a local server and using the default port: 4567)
 
 ## Debugging (or simply to see more info. on what's happening)
 
