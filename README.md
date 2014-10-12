@@ -3,24 +3,25 @@
 This is a sinatra based web wrapper for GeneValidator [https://github.com/monicadragan/GeneValidator]. GeneValidator is a program that validates gene predictions.
 
 ## Installation
-	1. Install all GeneValidator Prerequisites (mafft, BLAST+). You would also require a BLAST database.
 
-	2. Install my fork of GeneValidator (In the next major version, this step will be automated)
+1. Install all GeneValidator Prerequisites (mafft, BLAST+). You would also require a BLAST database.
+
+2. Install my fork of GeneValidator (In the next major version, this step will be automated)
 	$ git clone https://github.com/IsmailM/GeneValidator.git
 	$ cd GeneValidator
 	$ rake
 
-	3. Install GeneValidatorApp
+3. Install GeneValidatorApp
     $ gem install GeneValidatorApp
 
-    4. Copy the examplar config file to your home directory.
-    - Run GeneValidatorApp
+4. Copy the examplar config file to your home directory.
+- Run GeneValidatorApp
     $ genevalidatorapp 
-    - run the command shown to copy the examplar config file to your home directory.
+- run the command shown to copy the examplar config file to your home directory.
 
-    5. Set up variables in your config file.
-    - Set the `database-dir` variables to the full path to the directory containing your BLAST databases. 
-    - Set the `default-database` variable to the full path to the BLAST database that you would like to be your default database. 
+5. Set up variables in your config file.
+- Set the `database-dir` variables to the full path to the directory containing your BLAST databases. 
+- Set the `default-database` variable to the full path to the BLAST database that you would like to be your default database. 
 
 ## Usage
 
