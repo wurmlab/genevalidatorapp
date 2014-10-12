@@ -11,7 +11,6 @@ This is a sinatra based web wrapper for [GeneValidator](https://github.com/monic
 	`$ git clone https://github.com/IsmailM/GeneValidator.git`<br>
 	`$ cd GeneValidator`<br>
 	`$ rake`<br>
-<br>
 3. Install GeneValidatorApp
 <br>
     `$ gem install GeneValidatorApp`<br>
@@ -20,7 +19,6 @@ This is a sinatra based web wrapper for [GeneValidator](https://github.com/monic
   * Run GeneValidatorApp
 <br>
     `$ genevalidatorapp `<br>
-<br>
   * Run the command shown to copy the examplar config file to your home directory.
 <br>
 5. Set up variables in your config file.
