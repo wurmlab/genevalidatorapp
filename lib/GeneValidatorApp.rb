@@ -117,27 +117,27 @@ module GeneValidatorAppHelper
   # Method run from run_genevalidator(). Simply runs BLAST, get_raw_sequences
   #  and genevalidator.
   def run_gv(blast, raw_seqs, gv_command)
+    LOG.debug { "Running: #{blast}" }
     exit = %x(#{blast})
     unless $?.exitstatus == 0
       fail IOError, "BLAST exited with the command code: #{$?.exitstatus}."
     end
-    LOG.debug { "Running BLAST (exit Status: #{$?.exitstatus}" }
-    LOG.debug { "#{blast}" }
+    LOG.debug { "BLAST exit Status: #{$?.exitstatus}" }
 
+    LOG.debug { "Running: #{raw_seqs}" }
     exit2 = %x(#{raw_seqs})
     unless $?.exitstatus == 0
       fail IOError, "The GeneValidator command failed (get_raw_sequences" \
                      "  exited with exit code: #{$?.exitstatus})."
     end
-    LOG.debug { 'Running get_raw_sequences (exit Status: #{$?.exitstatus}' }
-    LOG.debug { "#{raw_seqs}" }
+    LOG.debug { "get_raw_sequences exit Status: #{$?.exitstatus}" }
 
+    LOG.debug { "Running: #{gv_command}" }
     exit3 = system(gv_command)
     unless exit3
       fail IOError, "The Genevalidator command failed (genevalidator exited" \
                      " with the exit code: #{exit3}) "
     end
-    LOG.debug { "Running genevalidator (exit Status: #{$?.exitstatus}" }
-    LOG.debug { "#{gv_command}" }
+    LOG.debug { "genevalidator exit Status: #{$?.exitstatus}" }
   end
 end
