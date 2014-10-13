@@ -3,9 +3,6 @@ require 'optparse'
 require 'GeneValidatorApp'
 require 'GeneValidatorApp/PreRunValidation.rb'
 require 'sinatra'
-require 'slim'
-require 'sinatra/base'
-require 'sinatra/config_file'
 require 'pathname'
 
 opt = {}
@@ -29,6 +26,11 @@ Banner
     opt[:debug] = true
   end
 
+  opt[:port] = 4567
+  opts.on('-p', '--port PORT', 'Run the app at a port of your choice.') do |port|
+    opt[:port] = port
+  end
+
   opts.on('-v', '--version', 'Shows version') do
     puts GeneValidatorApp::VERSION
     exit
@@ -41,66 +43,6 @@ Banner
 end
 optparse.parse!
 
-# The Actual App...
-class GVapp < Sinatra::Base
-  helpers GeneValidatorAppHelper
-
-  configure do
-    set :environment, :production
-    set :root, Pathname.new(__FILE__).dirname.parent
-    register Sinatra::ConfigFile
-    config_file "#{Pathname.new(__FILE__).dirname.parent + 'config.yml'}"
-  end
-
-  before do
-    root_dir         = settings.root_dir
-    @tempdir         = settings.tempdir
-    @GVversion       = settings.GVversion
-    @default_db      = settings.default_db
-    @non_default_dbs = settings.non_default
-    @dbs             = settings.dbs
-
-    @unique_name     = create_unique_name
-    # The Working directory is within the tempdir..
-    @working_dir     = @tempdir + @unique_name
-    if File.exist?(@working_dir)
-      @unique_name   = ensure_unique_name(@working_dir, @tempdir)
-    end
-    @public_dir      = root_dir + 'public/GeneValidator' + @unique_name
-
-    if File.exist?(@working_dir)
-      fail IOError, 'A unique name cannot be created for this session.'
-    end
-    unless File.exist?(@tempdir)
-      fail IOError, 'The Temporary folder cannot be found.'
-    end
-  end
-
-  error do
-    slim :"500", layout: false
-  end
-
-  get '/' do
-    slim :index
-  end
-
-  post '/input' do
-    seqs      = params[:seq]
-    vals      = params[:validations].to_s.gsub(/[\[\]\"]/, '')
-    db_title  = params[:database]
-    # Extracts the db path using the db title
-    db_path   = @dbs.select { |_, v| v[0][:title] == db_title }.keys[0]
-
-    FileUtils.mkdir_p @working_dir
-    FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
-
-    sequences = clean_sequences(seqs)
-    seqs      = to_fasta(sequences)
-    create_fasta_file(@working_dir, seqs)
-    run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name)
-  end
-end
-
 # SET UP & START APP...
 
 tempdir   = Pathname.new(Dir.mktmpdir('GeneValidator_'))
@@ -111,9 +53,11 @@ dbs       = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'],
 
 GVversion = GeneValidatorApp::Prerun.current_gv_version
 
+GVapp.set :environment, :production
+GVapp.set :root, Pathname.new(__FILE__).dirname.parent
+GVapp.set :port, opt[:port].to_i
 GVapp.set :GVversion, GVversion
 GVapp.set :tempdir, tempdir
-GVapp.set :root_dir, root
 GVapp.set :dbs, dbs[:dbs]
 GVapp.set :non_default, dbs[:rest_dbs]
 GVapp.set :default_db, dbs[:default_db]

@@ -1,7 +1,6 @@
 require 'logger'
 require 'fileutils'
 require 'yaml'
-require 'pathname'
 
 LOG = Logger.new(STDOUT)
 LOG.formatter = proc do |severity, datetime, _progname, msg|
