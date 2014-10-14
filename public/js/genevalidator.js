@@ -227,7 +227,8 @@ function removeEmptyColumns() {
     var tds = $(this).parents('table') // Select all tds in column
     .find('tr td:nth-child(' + (i + 1) + ')')
     // Check if all cells in the column are empty
-    if(tds.length == tds.filter(':empty').length) { 
+    if ($(this).hasClass( "chart-column" )) {
+    } else {
       $(this).hide() // Hide header
       tds.hide() // Hide cells
     }
