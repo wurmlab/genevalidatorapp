@@ -17,7 +17,7 @@ module GeneValidatorApp
     #   => dbs[:dbs]: A hash of all BLAST dbs found within the db root dir
     #   => dbs[:default_db]: A hash of only the default db
     #   => dbs[:rest_dbs]: A hash of the rest of the dbs.
-    def self.validate(debug, config_file, tempdir, root)
+    def self.validate(debug, config_file, tempdir, root, mafft_path, blast_path)
       LOG.level = (debug) ? Logger::DEBUG : Logger::INFO
       LOG.info { 'Set up and running pre-run tests.' }
       LOG.debug { 'Initalised debugging mode.' }
@@ -29,7 +29,7 @@ module GeneValidatorApp
                                        config['database-dir'])
       dbs[:rest_dbs]   = dbs[:dbs].clone
       dbs[:rest_dbs].delete(config['default-database'])
-      check_genevalidator_works(root, tempdir, config['default-database'])
+      check_genevalidator_works(root, tempdir, config['default-database'], mafft_path, blast_path)
       dbs
     end
 
@@ -173,7 +173,7 @@ module GeneValidatorApp
     #   with the right exit code, it is assumed that it works perfectly (this
     #   ensures that mafft and all genevalidator dependencies are installed and
     #   working. This also tests whether the Tempdir is writable.
-    def self.check_genevalidator_works(root, tempdir, default_db)
+    def self.check_genevalidator_works(root, tempdir, default_db, mafft_path, blast_path)
       LOG.info { 'Testing if Genevalidator (and it\'s dependencies) are' \
                  ' working.' }
       test_dir  = tempdir + 'initial_tests'
@@ -186,7 +186,16 @@ module GeneValidatorApp
       FileUtils.cp(test_file, test_dir)
       LOG.debug { "Created test directory at #{test_dir}" }
 
-      cmd = "genevalidator -d #{default_db} #{test_dir + 'initial_test.fa'}"
+      options = "-d #{default_db}"
+      if mafft_path != nil
+        options += " -m #{mafft_path}"
+      end
+      if blast_path != nil
+        options += " -b #{blast_path}"
+      end
+
+      cmd = "genevalidator #{options} #{test_dir + 'initial_test.fa'}"
+
       LOG.debug { "Running: #{cmd}" }
       %x(#{cmd})
       LOG.debug { "GeneValidator exited with exit status: #{$?.exitstatus}" }

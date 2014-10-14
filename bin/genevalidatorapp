@@ -31,6 +31,17 @@ Banner
     opt[:port] = port
   end
 
+  opt[:mafft] = nil
+  opts.on('-m', '--mafft [MAFFT_PATH]', 
+         'Path to MAFFT program installation') do |mafft|
+    opt[:mafft] = mafft
+  end
+
+  opt[:blast] = nil
+  opts.on('-b', '--blast [BLAST_PATH]', 'Path to BLAST+ bin folder') do |blast|
+    opt[:blast] = blast
+  end
+
   opts.on('-v', '--version', 'Shows version') do
     puts GeneValidatorApp::VERSION
     exit
@@ -45,20 +56,21 @@ optparse.parse!
 
 # SET UP & START APP...
 
-tempdir   = Pathname.new(Dir.mktmpdir('GeneValidator_'))
-root      = Pathname.new(__FILE__).dirname.parent
+tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
+root    = Pathname.new(__FILE__).dirname.parent
 
-dbs       = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'],
-                                              tempdir, root)
-
-GVversion = GeneValidatorApp::Prerun.current_gv_version
+dbs     = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'],
+                                            tempdir, root, opt[:mafft], opt[:blast])
 
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent
 GVapp.set :port, opt[:port].to_i
-GVapp.set :GVversion, GVversion
+GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
 GVapp.set :tempdir, tempdir
 GVapp.set :dbs, dbs[:dbs]
 GVapp.set :non_default, dbs[:rest_dbs]
 GVapp.set :default_db, dbs[:default_db]
+GVapp.set :mafft_path, opt[:mafft]
+GVapp.set :blast_path, opt[:blast]
+
 GVapp.run!

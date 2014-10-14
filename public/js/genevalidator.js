@@ -229,8 +229,12 @@ function removeEmptyColumns() {
     // Check if all cells in the column are empty
     if ($(this).hasClass( "chart-column" )) {
     } else {
-      $(this).hide() // Hide header
-      tds.hide() // Hide cells
+      if ($(this).text().trim() == '') { 
+        //hide header
+        $(this).hide();
+        //hide cells
+        tds.hide();
+      }
     }
   })
 }

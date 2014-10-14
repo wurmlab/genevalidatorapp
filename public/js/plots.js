@@ -1,7 +1,8 @@
-function show_all_plots(button){
 
+function show_all_plots(button){
     var expand_children = document.getElementsByName('plot_row');
     if(expand_children.length < 30){
+
         // show activity spinner
         $('#spinner1').modal({
             backdrop: 'static',
@@ -27,6 +28,7 @@ function show_all_plots(button){
         }
         // remove progress notification
         $('#spinner1').modal('hide');
+
     }
     else{
         $('#alert').modal();
@@ -87,7 +89,6 @@ function showDiv(source, target){
 
     if( $(explanationId).length) {
       $(explanationId).remove()
-      console.log('hi')
     }
 
     var button = document.getElementById(target)
@@ -116,7 +117,6 @@ function showDiv(source, target){
 
 function AddExplanation(source, explanation, target){
   var row = '#' + target +'row'
-  console.log(row)
   var explain = $('<div id="' + target + 'explanation" class="alert alert-info explanation_alert" role="alert"><b>Explanation:</b> ' + explanation + '</div>')
   if (source.status == "pressed") {
     $(row).prepend(explain)
@@ -638,8 +638,18 @@ function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, y
                   .attr("x2", function(d) { return x(d.stop); })
                   .attr("x2", function(d) { return x(d.stop); })
                   .attr("y2", function(d) { return y(d.y); })                 
-                  .attr("stroke-width", function(d) { if(d.dotted == undefined) return height/no_lines; return height/no_lines/5;})
-                      .style("stroke-dasharray", function(d) { if(d.dotted == undefined) return ("0, 0"); return ("2, 6");}) 
+                  .attr("stroke-width", function(d) {
+                    if (d.dotted == undefined) {
+                        if (d.color == "red" ) {
+                          return height/no_lines/2.5
+                        } else {
+                          return height/no_lines
+                        }
+                    } else {
+                      return height/no_lines/5
+                    }
+                  })
+                  .style("stroke-dasharray", function(d) { if(d.dotted == undefined) return ("0, 0"); return ("2, 6");}) 
                   .attr("stroke", function(d) { return color_beautification(d.color); })
     });
 
@@ -676,7 +686,6 @@ function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, y
             h += 1
         }
     }
-
 }
 
 // line plot
@@ -800,7 +809,5 @@ function plot_align(filename, target, title, footer, xTitle, yTitle, no_lines, y
           .attr("y", -20)
           .text(array[0]);
         offset = offset + array[0].length*8 + 15
-
     }
-
 }
