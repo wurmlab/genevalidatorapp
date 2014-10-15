@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['Ismail.Moghul@gmail.com']
   spec.summary       = 'A Web App wrapper for GeneValidator.'
   spec.description   = 'A Web App wrapper for GeneValidator, a program for validating gene predictions.'
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/IsmailM/GeneValidatorApp'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'bio', '~>1.4'
   spec.add_dependency 'slim', '~>2.0'
+  spec.add_dependency 'GeneValidator', '~>1.0'
 end

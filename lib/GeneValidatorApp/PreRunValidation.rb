@@ -28,8 +28,8 @@ module GeneValidatorApp
       dbs[:default_db] = defaultdb(dbs[:dbs], config['default-database'],
                                        config['database-dir'])
       dbs[:rest_dbs]   = dbs[:dbs].clone
-      dbs[:rest_dbs].delete(config['default-database'])
-      check_genevalidator_works(root, tempdir, config['default-database'], mafft_path, blast_path)
+      dbs[:rest_dbs].delete(dbs[:default_db].keys[0])
+      check_genevalidator_works(root, tempdir, dbs[:default_db].keys[0], mafft_path, blast_path)
       dbs
     end
 
@@ -49,7 +49,11 @@ module GeneValidatorApp
         puts 'Alternatively, you can copy an examplar config file into your' \
              ' home directory:'
         puts # a blank line
-        puts "$ cp #{root + '.genevalidatorapp.conf'} ~/.genevalidatorapp.conf"
+        puts "$ cp #{root + 'examplar_genevalidatorapp.conf'} ~/.genevalidatorapp.conf"
+        puts # a blank line
+        puts "And then edit your config file"
+        puts # a blank line
+        puts "$ nano ~/.genevalidatorapp.conf"
         puts # a blank line
         exit
       end
@@ -59,7 +63,7 @@ module GeneValidatorApp
     #   the necessary variables.
     def self.load_config(config_file, root)
       config = YAML.load_file(config_file)
-      unless config['database-dir'] && config['default-database']
+      unless config['database-dir']
         LOG.debug { "Unable to read config file found at #{config_file}" }
         puts # a blank line
         puts "Error: The config file could not be read at #{config_file}"
@@ -70,7 +74,11 @@ module GeneValidatorApp
         puts '  Alternatively, you can copy an examplar config file into your' \
              '  home directory:'
         puts # a blank line
-        puts "$ cp #{root + '.genevalidatorapp.conf'} ~/.genevalidatorapp.conf"
+        puts "$ cp #{root + 'examplar_genevalidatorapp.conf'} ~/.genevalidatorapp.conf"
+        puts # a blank line
+        puts "And then edit your config file"
+        puts # a blank line
+        puts "$ nano ~/.genevalidatorapp.conf"
         puts # a blank line
         exit
       end
@@ -150,21 +158,26 @@ module GeneValidatorApp
     #   original database and creates a new hash with this info.
     def self.defaultdb(databases, default_database, database_dir)
       default_db = {}
-      if databases.include?(default_database)
-        default_db[default_database] = databases[default_database]
+      if default_database == nil
+        # Creates a new hash using just the first key, value...
+        default_db = Hash[*databases.first]
       else
-        LOG.debug { "The default database, '#{default_database}' (set in the" \
-                    " config file) cannot be found in the the database" \
-                    " directory, '#{database_dir}'." }
-        puts # a blank line
-        puts "Error: The default database: '#{default_database}' could not be" \
-             " found in the database directory."
-        puts 'The default database can only be one of the following:'
-        databases.each_key { |db| puts '> ' + db }
-        puts # a blank line
-        puts 'Ensure that the default-database variable in the config file ' \
-             ' is one of the above paths and then try again.'
-        exit
+        if databases.include?(default_database)
+          default_db[default_database] = databases[default_database]
+        else
+          LOG.debug { "The default database, '#{default_database}' (set in the" \
+                      " config file) cannot be found in the the database" \
+                      " directory, '#{database_dir}'." }
+          puts # a blank line
+          puts "Error: The default database: '#{default_database}' could not be" \
+               " found in the database directory."
+          puts 'The default database can only be one of the following:'
+          databases.each_key { |db| puts '> ' + db }
+          puts # a blank line
+          puts 'Ensure that the default-database variable in the config file ' \
+               ' is one of the above paths and then try again.'
+          exit
+        end
       end
       default_db
     end
