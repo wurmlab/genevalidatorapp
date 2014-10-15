@@ -16,8 +16,8 @@ This is a sinatra based web wrapper for [GeneValidator](https://github.com/monic
     `$ genevalidatorapp `<br>
   * Run the command shown to copy the examplar config file to your home directory.
 <br>
-4. Set up variables in your config file.
-    `$ nano ~/genevalidatorapp.cong`
+4. Set up variables in your config file.<br>
+    `$ nano ~/genevalidatorapp.conf`
   * Set the `database-dir` variables to the full path to the directory containing your BLAST databases. 
   * Set the `default-database` variable to the full path to the BLAST database that you would like to be your default database. 
 
