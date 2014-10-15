@@ -24,6 +24,7 @@ class GVapp < Sinatra::Base
 
     # The Working directory is within the tempdir..
     @working_dir     = @tempdir + @unique_name
+    puts @working_dir
     if File.exist?(@working_dir)
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
@@ -52,7 +53,8 @@ class GVapp < Sinatra::Base
     db_title  = params[:database]
     # Extracts the db path using the db title
     db_path   = @dbs.select { |_, v| v[0][:title] == db_title }.keys[0]
-
+    puts "Creating #{@working_dir}"
+    
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
 
