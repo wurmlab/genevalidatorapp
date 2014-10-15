@@ -5,19 +5,17 @@ This is a sinatra based web wrapper for [GeneValidator](https://github.com/monic
 ## Installation
 
 1. Install all GeneValidator Prerequisites (ruby <=1.9.3, Mafft, BLAST+). You would also require a BLAST database. Please see [here](https://gist.github.com/IsmailM/b783e8a06565197084e6/edit) for more information.
-<br><br>
-
+<br>
 2. Install GeneValidatorApp
 <br>
-    `$ gem install GeneValidatorApp`<br>
+    `$ gem install GeneValidatorApp`
 <br>
 3. Copy the examplar config file to your home directory.
   * Run GeneValidatorApp
 <br>
     `$ genevalidatorapp `<br>
   * Run the command shown to copy the examplar config file to your home directory.
-<br><br>
-
+<br>
 4. Set up variables in your config file.
     `$ nano ~/genevalidatorapp.cong`
   * Set the `database-dir` variables to the full path to the directory containing your BLAST databases. 
