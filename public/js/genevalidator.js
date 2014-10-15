@@ -76,10 +76,9 @@ $(document).ready(function() {
         backdrop: 'static',
         keyboard: 'false'
       })
-
       $.ajax({
         type: 'POST',
-        url: '/input',
+        url: 'input',
         data: $('#input').serialize(),
         success: function(response){
           $('#results_box').show();
@@ -88,10 +87,14 @@ $(document).ready(function() {
           $("[data-toggle='tooltip']").tooltip() // Initiate the tooltips
           removeEmptyColumns(); // Remove Unwanted Columns
           $('#spinner').modal('hide') // remove progress notification
-          console.log(response)
         },
         error: function (e, status) {
           if (e.status == 500) {
+            var errorMessage = e.responseText
+            $('#results_box').show();
+            $('#output').html(errorMessage)
+            $('#spinner').modal('hide') // remove progress notification
+          } else {
             var errorMessage = e.responseText
             $('#results_box').show();
             $('#output').html(errorMessage)
