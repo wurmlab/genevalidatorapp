@@ -17,7 +17,8 @@ module GeneValidatorApp
     #   => dbs[:dbs]: A hash of all BLAST dbs found within the db root dir
     #   => dbs[:default_db]: A hash of only the default db
     #   => dbs[:rest_dbs]: A hash of the rest of the dbs.
-    def self.validate(debug, config_file, tempdir, root, mafft_path, blast_path)
+    def self.validate(debug, config_file, tempdir, root, mafft_path,
+                      blast_path, web_dir)
       LOG.level = (debug) ? Logger::DEBUG : Logger::INFO
       LOG.info { 'Set up and running pre-run tests.' }
       LOG.debug { 'Initalised debugging mode.' }
@@ -26,10 +27,12 @@ module GeneValidatorApp
       dbs              = {}
       dbs[:dbs]        = scan_blast_database_directory(config['database-dir'])
       dbs[:default_db] = defaultdb(dbs[:dbs], config['default-database'],
-                                       config['database-dir'])
+                                   config['database-dir'])
       dbs[:rest_dbs]   = dbs[:dbs].clone
       dbs[:rest_dbs].delete(dbs[:default_db].keys[0])
-      check_genevalidator_works(root, tempdir, dbs[:default_db].keys[0], mafft_path, blast_path)
+      set_up_public_dir(web_dir, root)
+      check_genevalidator_works(root, tempdir, dbs[:default_db].keys[0],
+                                mafft_path, blast_path)
       dbs
     end
 
@@ -228,7 +231,9 @@ module GeneValidatorApp
     ### Ensures that GV is installed and is of the correct version (Adapted
     #     from SequenceServer)...
     def self.assert_gv_installed
-      unless command?('genevalidator --version')
+      cmd = "which GeneValidator"
+      LOG.debug { "Running #{cmd}" }
+      unless command?(cmd)
         puts 'Error: Could not find GeneValidator. Please confirm that'
         puts '  GeneValidator installed is installed and try again.'
         puts '  Please refer to ...Link... for more information.'
@@ -260,6 +265,12 @@ module GeneValidatorApp
     def self.command?(command)
       %x(which #{command})
       return true if $?.exitstatus != 0
+    end
+
+    # Create thew
+    def self.set_up_public_dir(web_dir, root)
+      public_dir = root + 'public'
+      FileUtils.cp_r(public_dir, web_dir)
     end
   end
 end

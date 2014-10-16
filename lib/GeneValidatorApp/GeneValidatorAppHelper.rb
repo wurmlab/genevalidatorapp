@@ -22,42 +22,27 @@ module GeneValidatorAppHelper
     unique_name
   end
 
-  # Adds a ID (based on the time when submitted) to sequences that are not in
-  #  fasta format. Adapted from SequenceServer.
-  def to_fasta(sequence)
-    LOG.debug { 'Adding an ID to sequences that are not in fasta format.' }
-    unique_queries = {}
-    sequence       = sequence.lstrip
-    if sequence[0] != '>'
-      sequence.insert(0, ">Submitted:#{Time.now.strftime('%H:%M-%B_%d_%Y')}\n")
-    end
-    sequence.gsub!(/^\>(\S+)/) do |s|
-      if unique_queries.key?(s)
-        unique_queries[s] += 1
-        s + '_' + (unique_queries[s] - 1).to_s
-      else
-        unique_queries[s] = 1
-        s
-      end
-    end
-    sequence
-  end
-
   # Writes the input sequences to a fasta file.
-  def clean_sequences(seqs)
-    LOG.debug { 'Cleaning the input sequences to ensure that there are no non' \
-                ' letter character in the sequences.' }
-    if seqs[0] == '>'
-      sequences = ''
-      data = Bio::FlatFile.open(StringIO.new(seqs))
-      data.each_entry do |entry|
-        sequences << ">#{entry.definition}"
-        sequences << "\n#{entry.seq.gsub(/\W/, '')}\n"
+  def clean_sequences(seqs, working_dir)
+    LOG.debug { "Converting to clean fasta (no non-letter character)" \
+                " and writing to file." }
+    seqs = seqs.to_fasta
+    output_file = working_dir + 'input_file.fa'
+    begin
+      file = File.open(output_file, "w+")
+      Bio::FlatFile.foreach(StringIO.new(seqs)) do |entry|
+        file.write(">#{entry.definition}")
+        file.write("\n#{entry.seq.gsub(/\W/, '')}\n")
       end
-    else
-      sequences = seqs.gsub(/[\d\W]/, '')
+    rescue IOError => e
+      #some error occur, dir not writable etc.
+    ensure
+      file.close unless file == nil
     end
-    sequences
+    unless File.exist?(output_file)
+      fail IOError, 'There was an error writing the input sequences to file'
+    end
+    LOG.debug { "Sequences have been written to: #{output_file}" }
   end
 
   # Guesses the type of data based on the first sequence - (The app has
@@ -67,19 +52,6 @@ module GeneValidatorAppHelper
     sequence = Bio::FastaFormat.new(sequences)
     seq_type = Bio::Sequence.new(sequence.seq).guess(0.9)
     seq_type
-  end
-
-  # Writes the input sequences to a fasta file.
-  def create_fasta_file(working_dir, sequences)
-    LOG.debug { 'Writing the input sequences into a fasta file.' }
-    output_file = working_dir + 'input_file.fa'
-    File.open(output_file, 'w+') do |f|
-      f.write sequences
-    end
-    unless File.exist?(output_file)
-      fail IOError, 'There was an error writing the input sequences to file'
-    end
-    LOG.debug { "Sequences have been written to: #{output_file}" }
   end
 
   # Runs GeneValidator from the command line and return just the table html.
@@ -145,5 +117,28 @@ module GeneValidatorAppHelper
                      " with the exit code: #{exit3}) "
     end
     LOG.debug { "genevalidator exit Status: #{$?.exitstatus}" }
+  end
+end
+
+class String
+  # Adds a ID (based on the time when submitted) to sequences that are not in
+  #  fasta format. Adapted from SequenceServer.
+  def to_fasta
+    LOG.debug { 'Adding an ID to sequences that are not in fasta format.' }
+    unique_queries = {}
+    sequence       = self.lstrip
+    if sequence[0] != '>'
+      sequence.insert(0, ">Submitted:#{Time.now.strftime('%H:%M-%B_%d_%Y')}\n")
+    end
+    sequence.gsub!(/^\>(\S+)/) do |s|
+      if unique_queries.key?(s)
+        unique_queries[s] += 1
+        s + '_' + (unique_queries[s] - 1).to_s
+      else
+        unique_queries[s] = 1
+        s
+      end
+    end
+    sequence
   end
 end

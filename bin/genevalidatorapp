@@ -15,9 +15,9 @@ optparse = OptionParser.new do |opts|
 
 Banner
 
-  opt['config_file'] = File.join(Dir.home, '.genevalidatorapp.conf')
+  opt[:config_file] = Pathname.new(Dir.home) + '.genevalidatorapp.conf'
   opts.on('-c', '--config CONFIG_FILE', 'Use the given configurationfile') do |config_file|
-    opt['config_file'] = config_file
+    opt[:config_file] = config_file
   end
 
   opt[:debug] = false
@@ -35,6 +35,12 @@ Banner
   opts.on('-m', '--mafft [MAFFT_PATH]', 
          'Path to MAFFT program installation') do |mafft|
     opt[:mafft] = mafft
+  end
+
+  opt[:public] = Pathname.pwd + 'GeneValidator_'
+  opts.on('--public [Directory]', 'Path to the folder to serve to the web app.',
+          'By default this is your current working directory.') do |publicDir|
+    opt[:public] = publicDir
   end
 
   opt[:blast] = nil
@@ -59,11 +65,14 @@ optparse.parse!
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root    = Pathname.new(__FILE__).dirname.parent
 
-dbs     = GeneValidatorApp::Prerun.validate(opt[:debug], opt['config_file'],
-                                            tempdir, root, opt[:mafft], opt[:blast])
+dbs     = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
+                                            tempdir, root, opt[:mafft], 
+                                            opt[:blast], opt[:public])
+
 
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent
+GVapp.set :public, opt[:public]
 GVapp.set :port, opt[:port].to_i
 GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
 GVapp.set :tempdir, tempdir

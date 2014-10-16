@@ -56,7 +56,6 @@ class GVapp < Sinatra::Base
     FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
 
     sequences = clean_sequences(seqs)
-    seqs      = to_fasta(sequences)
     create_fasta_file(@working_dir, seqs)
     run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name,
                       settings.mafft_path, settings.blast_path)
