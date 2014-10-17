@@ -41,12 +41,8 @@ class GVapp < Sinatra::Base
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
 
-    if File.exist?(@working_dir)
-      fail IOError, 'A unique name cannot be created for this session.'
-    end
-    unless File.exist?(@tempdir)
-      fail IOError, 'The Temporary folder cannot be found.'
-    end
+    FileUtils.mkdir_p @working_dir
+    FileUtils.ln_s "#{@working_dir}", "#{@public_folder}"
   end
 
   post '/input' do
@@ -55,9 +51,6 @@ class GVapp < Sinatra::Base
     db_title  = params[:database]
     # Extracts the db path using the db title
     db_path   = @dbs.select { |_, v| v[0][:title] == db_title }.keys[0]
-
-    FileUtils.mkdir_p @working_dir
-    FileUtils.ln_s "#{@working_dir}", "#{@public_folder}"
 
     sequences = clean_sequences(seqs, @working_dir)
     run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name,
