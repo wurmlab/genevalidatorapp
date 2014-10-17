@@ -4,6 +4,7 @@ require 'GeneValidatorApp/version'
 module GeneValidatorAppHelper
   # Creates a Unique name using the time (even including nanoseconds) and the
   #  the user's IP address
+
   def create_unique_name
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' +
                   request.ip.gsub(/[.:]/, '-')
@@ -28,6 +29,7 @@ module GeneValidatorAppHelper
                 " and writing to file." }
     seqs = seqs.to_fasta
     output_file = working_dir + 'input_file.fa'
+    puts output_file
     begin
       file = File.open(output_file, "w+")
       Bio::FlatFile.foreach(StringIO.new(seqs)) do |entry|
@@ -49,15 +51,16 @@ module GeneValidatorAppHelper
   #   a javascript method that ensures that the all input sequences are
   #   of the same method). This method is run from 'run_genevalidator'
   def guess_input_type(sequences)
-    sequence = Bio::FastaFormat.new(sequences)
-    seq_type = Bio::Sequence.new(sequence.seq).guess(0.9)
+    first_entry = Bio::FastaFormat.new(sequences.gsub(/\W/, ''))
+    seq_type    = Bio::Sequence.new(first_entry.seq).guess(0.9)
     seq_type
   end
 
   # Runs GeneValidator from the command line and return just the table html.
   #  This method also gsubs the links for the json file (for plots) so that they
   #  with GeneValidator setup.
-  def run_genevalidator(validations, db, sequences, working_dir, unique_name, mafft_path, blast_path)
+  def run_genevalidator(validations, db, sequences, working_dir, unique_name,
+                        mafft_path, blast_path)
     table_file      = working_dir + 'input_file.fa.html/files/table.html'
     orig_plots_dir  = 'files/json/input_file.fa_'
     local_plots_dir = Pathname.new('Genevalidator') + unique_name +

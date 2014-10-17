@@ -22,13 +22,14 @@ class GVapp < Sinatra::Base
     @dbs             = settings.dbs
     @unique_name     = create_unique_name
 
+    @public_folder   = settings.public_folder + 'GeneValidator' + @unique_name
+
     # The Working directory is within the tempdir..
     @working_dir     = @tempdir + @unique_name
     if File.exist?(@working_dir)
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
-    # The Public directory is written to the gem's public folder...
-    @public_dir      = settings.root + 'public/GeneValidator' + @unique_name
+
     if File.exist?(@working_dir)
       fail IOError, 'A unique name cannot be created for this session.'
     end
@@ -53,10 +54,9 @@ class GVapp < Sinatra::Base
     db_path   = @dbs.select { |_, v| v[0][:title] == db_title }.keys[0]
 
     FileUtils.mkdir_p @working_dir
-    FileUtils.ln_s "#{@working_dir}", "#{@public_dir}"
+    FileUtils.ln_s "#{@working_dir}", "#{@public_folder}"
 
-    sequences = clean_sequences(seqs)
-    create_fasta_file(@working_dir, seqs)
+    sequences = clean_sequences(seqs, @working_dir)
     run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name,
                       settings.mafft_path, settings.blast_path)
   end

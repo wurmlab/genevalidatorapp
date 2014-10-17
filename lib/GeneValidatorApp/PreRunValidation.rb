@@ -231,7 +231,7 @@ module GeneValidatorApp
     ### Ensures that GV is installed and is of the correct version (Adapted
     #     from SequenceServer)...
     def self.assert_gv_installed
-      cmd = "which GeneValidator"
+      cmd = "GeneValidator"
       LOG.debug { "Running #{cmd}" }
       unless command?(cmd)
         puts 'Error: Could not find GeneValidator. Please confirm that'
@@ -264,7 +264,8 @@ module GeneValidatorApp
     # returns True if all is good. Adapted from SequenceServer
     def self.command?(command)
       %x(which #{command})
-      return true if $?.exitstatus != 0
+      status = ($?.exitstatus == 0) ? true : false
+      return status
     end
 
     # Create thew

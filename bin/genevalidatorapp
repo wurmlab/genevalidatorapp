@@ -37,10 +37,10 @@ Banner
     opt[:mafft] = mafft
   end
 
-  opt[:public] = Pathname.pwd + 'GeneValidator_' + Time.now.strftime('%Y%m%d-%H%M%S')
-  opts.on('--public [Directory]', 'Path to the folder to serve to the web app.',
-          'By default this is your current working directory.') do |publicDir|
-    opt[:public] = publicDir
+  opt[:web_dir] = Pathname.pwd + "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
+  opts.on('-w', '--web_dir [Directory]', 'Path to the folder to serve to the web app.',
+          'By default this is your current working directory.') do |web_dir|
+    opt[:web_dir] = web_dir
   end
 
   opt[:blast] = nil
@@ -64,15 +64,14 @@ optparse.parse!
 
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root    = Pathname.new(__FILE__).dirname.parent
-
 dbs     = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
                                             tempdir, root, opt[:mafft], 
-                                            opt[:blast], opt[:public])
+                                            opt[:blast], opt[:web_dir])
 
 
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent
-GVapp.set :public, opt[:public]
+GVapp.set :public_folder, opt[:web_dir]
 GVapp.set :port, opt[:port].to_i
 GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
 GVapp.set :tempdir, tempdir
