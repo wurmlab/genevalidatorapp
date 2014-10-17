@@ -51,7 +51,7 @@ module GeneValidatorAppHelper
   #   a javascript method that ensures that the all input sequences are
   #   of the same method). This method is run from 'run_genevalidator'
   def guess_input_type(sequences)
-    first_entry = Bio::FastaFormat.new(sequences.gsub(/\W/, ''))
+    first_entry = Bio::FastaFormat.new(sequences)
     seq_type    = Bio::Sequence.new(first_entry.seq).guess(0.9)
     seq_type
   end
