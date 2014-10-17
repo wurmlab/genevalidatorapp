@@ -37,7 +37,7 @@ Banner
     opt[:mafft] = mafft
   end
 
-  opt[:public] = Pathname.pwd + 'GeneValidator_'
+  opt[:public] = Pathname.pwd + 'GeneValidator_' + Time.now.strftime('%Y%m%d-%H%M%S')
   opts.on('--public [Directory]', 'Path to the folder to serve to the web app.',
           'By default this is your current working directory.') do |publicDir|
     opt[:public] = publicDir
