@@ -14,11 +14,22 @@ class GVapp < Sinatra::Base
     config_file "#{Pathname.new(__FILE__).dirname.parent + 'config.yml'}"
   end
 
-  before do
-    @tempdir         = settings.tempdir
-    @GVversion       = settings.GVversion
+  error do
+    slim :"500", layout: false
+  end
+
+  before '/' do 
     @default_db      = settings.default_db
     @non_default_dbs = settings.non_default
+  end
+
+  get '/' do
+    slim :index
+  end
+
+  before '/input' do
+    @tempdir         = settings.tempdir
+    @GVversion       = settings.GVversion
     @dbs             = settings.dbs
     @unique_name     = create_unique_name
 
@@ -36,14 +47,6 @@ class GVapp < Sinatra::Base
     unless File.exist?(@tempdir)
       fail IOError, 'The Temporary folder cannot be found.'
     end
-  end
-
-  error do
-    slim :"500", layout: false
-  end
-
-  get '/' do
-    slim :index
   end
 
   post '/input' do
