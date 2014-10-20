@@ -18,29 +18,33 @@ class GVapp < Sinatra::Base
     slim :"500", layout: false
   end
 
+  # Sert up variables for the templates
   before '/' do 
     @default_db      = settings.default_db
     @non_default_dbs = settings.non_default
+    @GVversion       = settings.GVversion
   end
 
   get '/' do
     slim :index
   end
 
+  # Run only when submitting a job to the server.
   before '/input' do
     @tempdir         = settings.tempdir
-    @GVversion       = settings.GVversion
     @dbs             = settings.dbs
     @unique_name     = create_unique_name
 
+    # Public Folder = folder that is served to the web app
+    # By default, the folder is created in the Current Working Directory...
     @public_folder   = settings.public_folder + 'GeneValidator' + @unique_name
 
-    # The Working directory is within the tempdir..
+    # The Working directory created within the tempdir..
     @working_dir     = @tempdir + @unique_name
     if File.exist?(@working_dir)
       @unique_name   = ensure_unique_name(@working_dir, @tempdir)
     end
-
+    
     FileUtils.mkdir_p @working_dir
     FileUtils.ln_s "#{@working_dir}", "#{@public_folder}"
   end
