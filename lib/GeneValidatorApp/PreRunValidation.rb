@@ -185,6 +185,12 @@ module GeneValidatorApp
       default_db
     end
 
+    # Create the public dir in the home directory...
+    def self.set_up_public_dir(web_dir, root)
+      public_dir = root + 'public'
+      FileUtils.cp_r(public_dir, web_dir)
+    end
+
     ### Runs GeneValidator with a small test case... If GeneValidator exits
     #   with the right exit code, it is assumed that it works perfectly (this
     #   ensures that mafft and all genevalidator dependencies are installed and
@@ -266,12 +272,6 @@ module GeneValidatorApp
       %x(which #{command})
       status = ($?.exitstatus == 0) ? true : false
       return status
-    end
-
-    # Create thew
-    def self.set_up_public_dir(web_dir, root)
-      public_dir = root + 'public'
-      FileUtils.cp_r(public_dir, web_dir)
     end
   end
 end
