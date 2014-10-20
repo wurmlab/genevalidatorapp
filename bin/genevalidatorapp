@@ -68,7 +68,6 @@ dbs     = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
                                             tempdir, root, opt[:mafft], 
                                             opt[:blast], opt[:web_dir])
 
-
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent
 GVapp.set :public_folder, opt[:web_dir]

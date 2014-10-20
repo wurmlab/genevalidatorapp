@@ -1,10 +1,10 @@
 require 'GeneValidatorApp/version'
+require 'bio'
 
 # A helper module for the GVApp
 module GeneValidatorAppHelper
   # Creates a Unique name using the time (even including nanoseconds) and the
   #  the user's IP address
-
   def create_unique_name
     unique_name = Time.new.strftime('%Y-%m-%d_%H-%M-%S-%L-%N') + '_' +
                   request.ip.gsub(/[.:]/, '-')

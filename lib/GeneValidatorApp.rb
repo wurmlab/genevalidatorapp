@@ -1,5 +1,4 @@
 require 'GeneValidatorApp/GeneValidatorAppHelper.rb'
-require 'bio'
 require 'pathname'
 require 'slim'
 require 'sinatra/base'
