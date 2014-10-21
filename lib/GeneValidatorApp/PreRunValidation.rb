@@ -17,23 +17,30 @@ module GeneValidatorApp
     #   => vars[:dbs]: A hash of all BLAST dbs found within the db root dir
     #   => vars[:default_db]: A hash of only the default db
     #   => vars[:rest_dbs]: A hash of the rest of the dbs.
-    def self.validate(debug, config_file, tempdir, root, mafft_path,
-                      blast_path, web_dir)
+    def self.validate(debug, config_file, tempdir, root)
       LOG.level = (debug) ? Logger::DEBUG : Logger::INFO
       LOG.info { 'Set up and running pre-run tests.' }
       LOG.debug { 'Initalised debugging mode.' }
       assert_config_file_exists(config_file, root)
       config            = load_config(config_file, root)
       vars              = {}
+
+      vars[:mafft_path] = config['mafft-path']
+      vars[:blast_path] = config['blast-bin-path']
       vars[:maxChars]   = set_maxChars_variables(config)
+      vars[:web_dir]    = set_web_dir_variable(config)
+
+      # Find all BLAST dbs and sort them out into separate hashes...
       vars[:dbs]        = scan_blast_database_directory(config['database-dir'])
       vars[:default_db] = defaultdb(vars[:dbs], config['default-database'],
                                    config['database-dir'])
       vars[:rest_dbs]   = vars[:dbs].clone
       vars[:rest_dbs].delete(vars[:default_db].keys[0])
-      set_up_public_dir(web_dir, root)
+
+      # Set up the Public Dir and check GV works 
+      set_up_public_dir(vars[:web_dir], root)
       check_genevalidator_works(root, tempdir, vars[:default_db].keys[0],
-                                mafft_path, blast_path)
+                                vars[:mafft_path], vars[:blast_path])
       vars
     end
 
@@ -92,6 +99,15 @@ module GeneValidatorApp
     def self.set_maxChars_variables(config)
       maxChars = (config['MaxCharacters'] == nil) ? 'undefined' : config['MaxCharacters']
       return maxChars
+    end
+
+    def self.set_web_dir_variable(config)
+      if config['web-dir'] == nil
+        web_dir = Pathname.pwd + "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
+      else 
+        web_dir = config['web-dir']
+      end
+      return web_dir
     end
 
     ### Obtain a array of dbs (Adapted from SequenceServer)
@@ -166,6 +182,7 @@ module GeneValidatorApp
     # Extracts the values associated with the default database from the
     #   original database and creates a new hash with this info.
     def self.defaultdb(databases, default_database, database_dir)
+      LOG.debug { "Separating the databases hashes into separate hashes" }
       default_db = {}
       if default_database == nil
         # Creates a new hash using just the first key, value...
