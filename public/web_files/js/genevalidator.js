@@ -79,7 +79,6 @@ function addSeqValidation() {
 // A function that validates the input - Utilises Jquery.Validator.js
 function inputValidation() {
   var maxCharacters = $('#seq').attr("data-maxCharacters")
-  console.log(maxCharacters)
   $('#input').validate({
     rules: {
         seq: {
@@ -124,7 +123,7 @@ function inputValidation() {
 
 // Sends the data within the form to the Server
 function ajaxFunction() {
-    $.ajax({
+  $.ajax({
     type: 'POST',
     url: 'input',
     data: $('#input').serialize(),

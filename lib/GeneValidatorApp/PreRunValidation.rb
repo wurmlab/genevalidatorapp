@@ -105,7 +105,7 @@ module GeneValidatorApp
       if config['web-dir'] == nil
         web_dir = Pathname.pwd + "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
       else 
-        web_dir = config['web-dir']
+        web_dir = Pathname.new(config['web-dir']) + "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
       end
       return web_dir
     end
