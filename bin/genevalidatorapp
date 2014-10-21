@@ -64,7 +64,7 @@ optparse.parse!
 
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root    = Pathname.new(__FILE__).dirname.parent
-dbs     = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
+vars    = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
                                             tempdir, root, opt[:mafft], 
                                             opt[:blast], opt[:web_dir])
 
@@ -74,10 +74,11 @@ GVapp.set :public_folder, opt[:web_dir]
 GVapp.set :port, opt[:port].to_i
 GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
 GVapp.set :tempdir, tempdir
-GVapp.set :dbs, dbs[:dbs]
-GVapp.set :non_default, dbs[:rest_dbs]
-GVapp.set :default_db, dbs[:default_db]
+GVapp.set :dbs, vars[:dbs]
+GVapp.set :non_default, vars[:rest_dbs]
+GVapp.set :default_db, vars[:default_db]
 GVapp.set :mafft_path, opt[:mafft]
 GVapp.set :blast_path, opt[:blast]
+GVapp.set :maxCharacters, vars[:maxChars]
 
 GVapp.run!

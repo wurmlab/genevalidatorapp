@@ -22,6 +22,7 @@ class GVapp < Sinatra::Base
     @default_db      = settings.default_db
     @non_default_dbs = settings.non_default
     @GVversion       = settings.GVversion
+    @maxCharacters   = settings.maxCharacters
   end
 
   get '/' do

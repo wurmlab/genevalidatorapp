@@ -5,9 +5,13 @@
       span.small  Identify problems with gene predictions
     .form-group#input_seq_group
       label.control-label for="seq"  Input Sequences:
-      textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false"
+      - if @maxCharacters != 'undefined'
+        textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false" data-maxCharacters="#{@maxCharacters}"
+      - else
+        textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false" 
+
     .clearfix
-    button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="ChangeAdvParamsBtnText()"
+    button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="changeAdvParamsBtnText()"
       i.fa.fa-pencil-square-o
       | &nbsp;&nbsp;Show Advanced Parameters
     .clearfix
@@ -55,6 +59,15 @@
         i.fa.fa-search
         | &nbsp;&nbsp;Analyse Sequences
       .clearfix
+    span 
+      a#protein_example href="/response"  
+        | Show a protien example
+    span
+      | &nbsp;&#124;&nbsp;
+    span
+      a#genetic_example href="/time" 
+        | Show a genetic example
+
 .col-md-12
   #results_box style="display:none;"
     h2#output_header.page-header  Results

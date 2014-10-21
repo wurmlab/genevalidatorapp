@@ -9,31 +9,32 @@ end
 
 module GeneValidatorApp
   class Prerun
-    # This method runs all the validations and returns a hash ('dbs') of all
+    # This method runs all the validations and returns a hash ('vars') of all
     #   required information.
-    # A dbs hash is created (so that all be returned from a single method).
+    # A vars hash is created (so that all be returned from a single method).
     #   This dbs hash of hashes contains the following hashes, which
     #   are created so that they can easily be used in the slim template.
-    #   => dbs[:dbs]: A hash of all BLAST dbs found within the db root dir
-    #   => dbs[:default_db]: A hash of only the default db
-    #   => dbs[:rest_dbs]: A hash of the rest of the dbs.
+    #   => vars[:dbs]: A hash of all BLAST dbs found within the db root dir
+    #   => vars[:default_db]: A hash of only the default db
+    #   => vars[:rest_dbs]: A hash of the rest of the dbs.
     def self.validate(debug, config_file, tempdir, root, mafft_path,
                       blast_path, web_dir)
       LOG.level = (debug) ? Logger::DEBUG : Logger::INFO
       LOG.info { 'Set up and running pre-run tests.' }
       LOG.debug { 'Initalised debugging mode.' }
       assert_config_file_exists(config_file, root)
-      config           = load_config(config_file, root)
-      dbs              = {}
-      dbs[:dbs]        = scan_blast_database_directory(config['database-dir'])
-      dbs[:default_db] = defaultdb(dbs[:dbs], config['default-database'],
+      config            = load_config(config_file, root)
+      vars              = {}
+      vars[:maxChars]   = set_maxChars_variables(config)
+      vars[:dbs]        = scan_blast_database_directory(config['database-dir'])
+      vars[:default_db] = defaultdb(vars[:dbs], config['default-database'],
                                    config['database-dir'])
-      dbs[:rest_dbs]   = dbs[:dbs].clone
-      dbs[:rest_dbs].delete(dbs[:default_db].keys[0])
+      vars[:rest_dbs]   = vars[:dbs].clone
+      vars[:rest_dbs].delete(vars[:default_db].keys[0])
       set_up_public_dir(web_dir, root)
-      check_genevalidator_works(root, tempdir, dbs[:default_db].keys[0],
+      check_genevalidator_works(root, tempdir, vars[:default_db].keys[0],
                                 mafft_path, blast_path)
-      dbs
+      vars
     end
 
     # Ensures that the config file exists in either the home directory or the
@@ -86,6 +87,11 @@ module GeneValidatorApp
         exit
       end
       config
+    end
+
+    def self.set_maxChars_variables(config)
+      maxChars = (config['MaxCharacters'] == nil) ? 'undefined' : config['MaxCharacters']
+      return maxChars
     end
 
     ### Obtain a array of dbs (Adapted from SequenceServer)
