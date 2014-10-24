@@ -35,8 +35,6 @@ When run, GeneValidatorApp will look for the configuration file and if one is no
 
 There are a number of compulsory variables (that is required for GeneValidatorApp to run), and a few optional variables that allow the end-user to customise the installation to their requirements.
 
-Note: The examples 
-
 ### Compulsory Variables
 
 ##### BLAST database directory 
