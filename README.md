@@ -16,7 +16,7 @@ This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http
 2. Install GeneValidatorApp
 
     $ gem install GeneValidatorApp
-    
+
 3. Set up your configuration file (see the next section).
 
 ## Configuration File
@@ -25,51 +25,57 @@ A configuration file needs to set up in order for GeneValidatorApp to run. The d
 
 ### Obtain an exemplar configuration file. 
 
-When run, GeneValidatorApp will look for the configuration file, if one is not found, the program will provide you with a personalised command to run in order to copy the exemplar configuration file to your home directory.
+When run, GeneValidatorApp will look for the configuration file and if one is not found, the program will provide you with a personalised command to run in order to copy the exemplar configuration file to your home directory.
 
 1. Run GeneValidatorApp
 
-    `$ genevalidatorapp`
+    $ genevalidatorapp
 
 2. Run the command shown.
 
-There are a number of compulsory variables, options that GeneValidatorApp requires in order to run, and a few optional variables to allow the end-user to customise the installation to their requirements.
+There are a number of compulsory variables (that is required for GeneValidatorApp to run), and a few optional variables that allow the end-user to customise the installation to their requirements.
+
+Note: The examples 
 
 ### Compulsory Variables
 
 ##### BLAST database directory 
-This is the full path to the directory containing your BLAST database. GeneValidatorApp then analyses this directory for any BLAST databases. This variable is to be set as follows:
+This is the full path to the directory containing your BLAST database. GeneValidatorApp then analyses this directory for any BLAST databases. This variable is to be set as follows (please edit this example):
 
     database-dir: /Users/ismailm/blastdb
 
 ##### BLAST bin Path (Compulsory if BLAST is not in the $PATH)
 This is a compulsory variable only if BLAST is not in your $PATH (you can find out if 'BLAST' is your $PATH through the following command `$ which blastp`).
-This is the full path to the bin folder of your BLAST installation. This variable is to be set as follows:
+
+This is the full path to the bin folder of your BLAST installation. This variable is to be set as follows (please edit this example):
 
     blast-bin-path: /Users/ismailm/blast/bin
 
 ##### Mafft Path (Compulsory if Mafft is not in the $PATH)
 This is a compulsory variable only if Mafft is not in your $PATH (you can find out if 'Mafft' is your $PATH through the following command `$ which mafft`).
-This is the full path to your mafft installation. This variable is to be set as follows:
+
+This is the full path to your mafft installation. This variable is to be set as follows (please edit this example):
 
     mafft-path: /Users/ismailm/mafft/bin/mafft
 
 ### Optional Variables 
 
 ##### Default BLAST database
-This is the full path to your default database (don't include any file endings). If this is not set, a single database is choosen at random. This is set as follows:
+This is the full path to your default database (don't include any file endings). If this is not set, a single database is choosen at random. This is set as follows (please edit this example):
 
     default-database: /Users/ismailm/blastdb/SwissProt
 
 ##### Website Directory
-This is the directory that GeneValidator serves to the web application. This folder contains all the files that the web application requires as well as files produced when analysing sequences. This variable is set as follows:
+This is the directory that GeneValidator serves to the web application.
+
+By default, this is  This folder contains all the files that the web application requires as well as any files produced when analysing sequences. This variable is set as follows (please edit this example):
 
     web-dir: /Users/ismailm/GV/
 
 ##### Maximum input length
 If you wish to limit the input size (for example, for server load reasons), you can use the following option to limit the length of the input sequences. The example shown below limits the input size to 100,000 characters.
 
-    max-characters: 100000`
+    max-characters: 100000
 
 ## Usage
 
