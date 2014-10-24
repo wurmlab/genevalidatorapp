@@ -97,7 +97,7 @@ module GeneValidatorApp
     end
 
     def self.set_maxChars_variables(config)
-      maxChars = (config['MaxCharacters'] == nil) ? 'undefined' : config['MaxCharacters']
+      maxChars = (config['max-characters'] == nil) ? 'undefined' : config['max-characters']
       return maxChars
     end
 
