@@ -10,16 +10,14 @@ This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http
 
 ## Installation
 
-1. Install all GeneValidator Prerequisites (ruby <=1.9.3, Mafft, BLAST+). You would also require a BLAST database. 
+1) Install all GeneValidator Prerequisites (ruby <=1.9.3, Mafft, BLAST+). You would also require a BLAST database. 
   * Please see [here](https://gist.github.com/IsmailM/b783e8a06565197084e6) for more information.
 
-2. Install GeneValidatorApp
+2) Install GeneValidatorApp
 
-    
     $ gem install GeneValidatorApp
 
-
-3. Set up your configuration file (see the next section).
+3) Set up your configuration file (see the next section).
 
 ## Configuration File
 
@@ -29,13 +27,11 @@ A configuration file needs to set up in order for GeneValidatorApp to run. The d
 
 When run, GeneValidatorApp will look for the configuration file and if one is not found, the program will provide you with a personalised command to run in order to copy the exemplar configuration file to your home directory.
 
-1. Run GeneValidatorApp
-
+1) Run GeneValidatorApp
 
     $ genevalidatorapp
 
-
-2. Run the command shown.
+2) Run the command shown.
 
 There are a number of compulsory variables (that is required for GeneValidatorApp to run), and a few optional variables that allow the end-user to customise the installation to their requirements.
 
@@ -72,7 +68,7 @@ This is the full path to your default database (don't include any file endings).
 ##### Website Directory
 This is the directory that GeneValidator serves to the web application.
 
-By default, this is  This folder contains all the files that the web application requires as well as any files produced when analysing sequences. This variable is set as follows (please edit this example):
+By default, this is This folder contains all the files that the web application requires as well as any files produced when analysing sequences. This variable is set as follows (please edit this example):
 
     web-dir: /Users/ismailm/GV/
 
