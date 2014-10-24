@@ -15,7 +15,9 @@ This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http
 
 2. Install GeneValidatorApp
 
+```
     $ gem install GeneValidatorApp
+```
 
 3. Set up your configuration file (see the next section).
 
@@ -29,7 +31,9 @@ When run, GeneValidatorApp will look for the configuration file and if one is no
 
 1. Run GeneValidatorApp
 
+```
     $ genevalidatorapp
+```
 
 2. Run the command shown.
 
