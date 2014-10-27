@@ -22,6 +22,10 @@ body {
 .error_header {
   margin-top: 10px;
 }
+
+#protein_example, #genetic_example {
+  cursor: pointer;
+}
 /* Footer
 -------------------------------------------------- */
 #footer {
