@@ -174,6 +174,7 @@ function initTableSorter() {
     headers: {
       2 : { sorter: 'star_scores' }
     },
+    sortList: [[0,0]],
   })
 }
 
