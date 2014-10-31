@@ -31,6 +31,12 @@ Banner
     opt[:port] = port
   end
 
+  opt[:cores] = 1
+  opts.on('-c', '--cores num_of_threads', 'Run the resource heavy BLAST (&',
+          ' Mafft) with more than one core.') do |core|
+    opt[:cores] = core
+  end
+
   opts.on('-v', '--version', 'Shows version') do
     puts GeneValidatorApp::VERSION
     exit
@@ -53,14 +59,17 @@ vars    = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent
 GVapp.set :public_folder, vars[:web_dir]
-GVapp.set :port, opt[:port].to_i
-GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
 GVapp.set :tempdir, tempdir
-GVapp.set :dbs, vars[:dbs]
-GVapp.set :non_default, vars[:rest_dbs]
-GVapp.set :default_db, vars[:default_db]
+
+GVapp.set :port, opt[:port].to_i
+GVapp.set :cores, opt[:cores].to_i
 GVapp.set :mafft_path, vars[:mafft_path]
 GVapp.set :blast_path, vars[:blast_path]
 GVapp.set :maxCharacters, vars[:maxChars]
+GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
+
+GVapp.set :dbs, vars[:dbs]
+GVapp.set :non_default, vars[:rest_dbs]
+GVapp.set :default_db, vars[:default_db]
 
 GVapp.run!
