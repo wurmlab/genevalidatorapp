@@ -79,14 +79,14 @@ function addSeqValidation() {
 
 // A function that validates the input - Utilises Jquery.Validator.js
 function inputValidation() {
-  var maxCharacters = $('#seq').attr("data-maxCharacters")
+  var maxCharacters = $('#seq').attr("data-maxCharacters") // returns a number or undefined
   $('#input').validate({
     rules: {
         seq: {
             minlength: 5,
             required: true,
             checkInputType: true,
-            maxlength: maxCharacters // returns a number or undefined
+            maxlength: maxCharacters // when undefined, maxlength is unlimited
         },
         'validations[]': {
            required: true,
