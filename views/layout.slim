@@ -8,19 +8,19 @@ html lang="en"
     meta content="" name="author"
     title GeneValidator | Identify problems with Gene Predictions
 
-    script type="text/javascript" src="web_files/js/jquery.min.js"
-    script type="text/javascript" src="web_files/js/bootstrap.min.js"
-    script type="text/javascript" src="web_files/js/jquery.tablesorter.min.js"
-    script type="text/javascript" src="web_files/js/d3.v3.min.js"
-    script type="text/javascript" src="web_files/js/plots.min.js"
-    script type="text/javascript" src="web_files/js/genevalidator.min.js"
-    script type="text/javascript" src="web_files/js/jquery.cookie.min.js"
-    script type="text/javascript" src="web_files/js/jquery.validate.min.js"
+    script type="text/javascript" src="#{uri('web_files/js/jquery.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/bootstrap.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/jquery.tablesorter.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/d3.v3.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/plots.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/genevalidator.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/jquery.cookie.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/jquery.validate.min.js')}"
 
     /! Bootstrap core CSS
-    link href="web_files/css/bootstrap.min.css" rel="stylesheet" type="text/css"
-    link href="web_files/css/font-awesome.min.css" rel="stylesheet" type="text/css"
-    link href="web_files/css/custom.min.css" rel="stylesheet" type="text/css"
+    link href="#{uri('web_files/css/bootstrap.min.css')}" rel="stylesheet" type="text/css"
+    link href="#{uri('web_files/css/font-awesome.min.css')}" rel="stylesheet" type="text/css"
+    link href="#{uri('web_files/css/custom.min.css')}" rel="stylesheet" type="text/css"
 
     /! HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
     /![if lt IE 9]
@@ -31,7 +31,7 @@ html lang="en"
     .navbar.navbar-inverse.navbar-fixed-top role="navigation"
       .container
         span.navbar-brand
-          img height="25px" src="web_files/img/gene.png"  GeneValidator
+          img height="25px" src="#{uri('web_files/img/gene.png')}"  GeneValidator
         button.navbar-toggle data-target=".navbar-collapse" data-toggle="collapse" type="button"
           span.sr-only Toggle navigation
           span.icon-bar

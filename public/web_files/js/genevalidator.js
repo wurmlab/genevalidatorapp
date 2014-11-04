@@ -126,7 +126,7 @@ function inputValidation() {
 function ajaxFunction() {
   $.ajax({
     type: 'POST',
-    url: 'input',
+    url: $('#input').attr('action'),
     data: $('#input').serialize(),
     success: function(response){
       $('#results_box').show();
