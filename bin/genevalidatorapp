@@ -54,7 +54,7 @@ optparse.parse!
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root    = Pathname.new(__FILE__).dirname.parent
 vars    = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
-                                            tempdir, root)
+                                            tempdir, root, opt[:cores])
 
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent

@@ -17,7 +17,7 @@ module GeneValidatorApp
     #   => vars[:dbs]: A hash of all BLAST dbs found within the db root dir
     #   => vars[:default_db]: A hash of only the default db
     #   => vars[:rest_dbs]: A hash of the rest of the dbs.
-    def self.validate(debug, config_file, tempdir, root)
+    def self.validate(debug, config_file, tempdir, root, cores)
       LOG.level = (debug) ? Logger::DEBUG : Logger::INFO
       LOG.info { 'Set up and running pre-run tests.' }
       LOG.debug { 'Initalised debugging mode.' }
@@ -40,7 +40,7 @@ module GeneValidatorApp
       # Set up the Public Dir and check GV works 
       set_up_public_dir(vars[:web_dir], root)
       check_genevalidator_works(root, tempdir, vars[:default_db].keys[0],
-                                vars[:mafft_path], vars[:blast_path])
+                                vars[:mafft_path], vars[:blast_path], cores)
       vars
     end
 
@@ -218,7 +218,7 @@ module GeneValidatorApp
     #   with the right exit code, it is assumed that it works perfectly (this
     #   ensures that mafft and all genevalidator dependencies are installed and
     #   working. This also tests whether the Tempdir is writable.
-    def self.check_genevalidator_works(root, tempdir, default_db, mafft_path, blast_path)
+    def self.check_genevalidator_works(root, tempdir, default_db, mafft_path, blast_path, cores)
       LOG.info { 'Testing if Genevalidator (and it\'s dependencies) are' \
                  ' working.' }
       test_dir  = tempdir + 'initial_tests'
@@ -231,7 +231,7 @@ module GeneValidatorApp
       FileUtils.cp(test_file, test_dir)
       LOG.debug { "Created test directory at #{test_dir}" }
 
-      options = "-d #{default_db}"
+      options = "-d #{default_db} -c #{cores}"
       if mafft_path != nil
         options += " -m #{mafft_path}"
       end

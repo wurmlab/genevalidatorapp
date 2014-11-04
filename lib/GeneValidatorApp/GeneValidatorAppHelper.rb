@@ -78,7 +78,7 @@ module GeneValidatorAppHelper
                  " #{input_file} -out #{xml_file} -num_threads #{cores}"
     raw_seqs   = "time get_raw_sequences -d #{db} -o #{raw_seq} #{xml_file}"
 
-    gv_options = "-x #{xml_file} -r #{raw_seq}"
+    gv_options = "-x #{xml_file} -r #{raw_seq} -c #{cores}"
     if mafft_path != nil
       gv_options += " -m #{mafft_path}"
     end 
