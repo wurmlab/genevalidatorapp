@@ -54,9 +54,9 @@ This is the full path to the bin folder of your BLAST installation. This variabl
 ##### Mafft Path (Compulsory if Mafft is not in the $PATH)
 This is a compulsory variable only if Mafft is not in your $PATH (you can find out if 'Mafft' is your $PATH through the following command `$ which mafft`).
 
-This is the full path to your mafft installation. This variable is to be set as follows (please edit this example):
+This is the full path to your mafft bin folder. This variable is to be set as follows (please edit this example):
 
-    mafft-path: /Users/ismailm/mafft/bin/mafft
+    mafft-bin-path: /Users/ismailm/mafft/bin/
 
 ### Optional Variables 
 
