@@ -12,7 +12,12 @@ class GVapp < Sinatra::Base
     register Sinatra::ConfigFile
     config_file "#{Pathname.new(__FILE__).dirname.parent + 'config.yml'}"
   end
-
+  
+  not_found do
+    status 404
+    slim :"500"
+  end
+  
   error do
     slim :"500", layout: false
   end

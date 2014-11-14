@@ -60,7 +60,7 @@ module GeneValidatorAppHelper
   #  This method also gsubs the links for the json file (for plots) so that they
   #  with GeneValidator setup.
   def run_genevalidator(validations, db, sequences, working_dir, unique_name,
-                        mafft_path, blast_path, cores)
+                        mafft_path, blast_path, num_threads)
     table_file      = working_dir + 'input_file.fa.html/files/table.html'
     orig_plots_dir  = 'files/json/input_file.fa_'
     local_plots_dir = Pathname.new('Genevalidator') + unique_name +
@@ -75,10 +75,10 @@ module GeneValidatorAppHelper
 
     blast      = "time #{blasttype} -db #{db} -evalue 1e-5 -outfmt 5" \
                  " -max_target_seqs 200 -gapopen 11 -gapextend 1 -query" \
-                 " #{input_file} -out #{xml_file} -num_threads #{cores}"
+                 " #{input_file} -out #{xml_file} -num_threads #{num_threads}"
     raw_seqs   = "time get_raw_sequences -d #{db} -o #{raw_seq} #{xml_file}"
 
-    gv_options = "-x #{xml_file} -r #{raw_seq} -c #{cores}"
+    gv_options = "-x #{xml_file} -r #{raw_seq} -n #{num_threads}"
     if mafft_path != nil
       gv_options += " -m #{mafft_path}"
     end 

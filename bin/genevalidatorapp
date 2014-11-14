@@ -16,7 +16,9 @@ optparse = OptionParser.new do |opts|
 Banner
 
   opt[:config_file] = Pathname.new(Dir.home) + '.genevalidatorapp.conf'
-  opts.on('-c', '--config CONFIG_FILE', 'Use the given configurationfile') do |config_file|
+  opts.on('-c', '--config CONFIG_FILE', 'custom location of the configuration file',
+          'The default location of the configuration file is at',
+          '"~/genevalidatorapp.conf"') do |config_file|
     opt[:config_file] = config_file
   end
 
@@ -31,10 +33,10 @@ Banner
     opt[:port] = port
   end
 
-  opt[:cores] = 1
-  opts.on('-c', '--cores num_of_threads', 'Run the resource heavy BLAST (&',
-          ' Mafft) with more than one core.') do |core|
-    opt[:cores] = core
+  opt[:num_threads] = 1
+  opts.on('-n', '--num_threads num_of_threads', Integer, 'Run the resource heavy BLAST (&',
+          ' Mafft) with more than one thread.') do |num_threads|
+    opt[:num_threads] = num_threads
   end
 
   opts.on('-v', '--version', 'Shows version') do
@@ -54,7 +56,7 @@ optparse.parse!
 tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
 root    = Pathname.new(__FILE__).dirname.parent
 vars    = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
-                                            tempdir, root, opt[:cores])
+                                            tempdir, root, opt[:num_threads])
 
 GVapp.set :environment, :production
 GVapp.set :root, Pathname.new(__FILE__).dirname.parent
@@ -62,7 +64,7 @@ GVapp.set :public_folder, vars[:web_dir]
 GVapp.set :tempdir, tempdir
 
 GVapp.set :port, opt[:port].to_i
-GVapp.set :cores, opt[:cores].to_i
+GVapp.set :num_threads, opt[:num_threads]
 GVapp.set :mafft_path, vars[:mafft_path]
 GVapp.set :blast_path, vars[:blast_path]
 GVapp.set :maxCharacters, vars[:maxChars]
