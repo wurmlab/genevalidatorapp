@@ -2,6 +2,8 @@
 require 'optparse'
 require 'GeneValidatorApp'
 require 'GeneValidatorApp/PreRunValidation.rb'
+require 'GeneValidatorApp/version'
+
 require 'sinatra'
 require 'pathname'
 

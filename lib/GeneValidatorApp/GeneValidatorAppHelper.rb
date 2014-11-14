@@ -1,4 +1,3 @@
-require 'GeneValidatorApp/version'
 require 'bio'
 
 # A helper module for the GVApp
