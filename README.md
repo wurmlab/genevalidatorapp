@@ -1,4 +1,6 @@
 # GeneValidatorApp
+[![Build Status](https://travis-ci.org/IsmailM/GeneValidatorApp.svg)](https://travis-ci.org/IsmailM/GeneValidatorApp)
+[![Gem Version](https://badge.fury.io/rb/GeneValidatorApp.svg)](http://badge.fury.io/rb/GeneValidatorApp)
 
 This is a Sinatra based web wrapper for [GeneValidator](https://github.com/monicadragan/GeneValidator); a program that validates gene predictions. A working example can be seen at [genevalidator.sbcs.qmul.ac.uk](http://genevalidator.sbcs.qmul.ac.uk).
 
