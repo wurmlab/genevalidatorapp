@@ -51,7 +51,7 @@ body {
 
 #input {
 	background-color: #D8D8D8;
-	border: 7.5px solid #5E5E5E;
+	border: 7px solid #5E5E5E;
   border-radius: 15px;
   padding: 10px 35px;
   margin-top: 25px;
@@ -59,7 +59,7 @@ body {
 
 #results_box {
 	background-color: #D8D8D8;
-	border: 7.5px solid #5E5E5E;
+	border: 7px solid #5E5E5E;
   border-radius: 15px;
   padding: 10px 35px;
   margin-top: 25px;
