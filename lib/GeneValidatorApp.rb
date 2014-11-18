@@ -64,6 +64,6 @@ class GVapp < Sinatra::Base
     sequences = clean_sequences(seqs, @working_dir)
     run_genevalidator(vals, db_path, seqs, @working_dir, @unique_name,
                       settings.mafft_path, settings.blast_path,
-                      settings.num_threads)
+                      settings.num_threads, params[:result_link])
   end
 end
