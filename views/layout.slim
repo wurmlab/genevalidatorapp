@@ -18,7 +18,7 @@ html lang="en"
     script type="text/javascript" src="#{uri('web_files/js/jquery.validate.min.js')}"
 
     /! Bootstrap core CSS
-    link href="#{uri('web_files/css/bootstrap.min.css')}" rel="stylesheet" type="text/css"
+    link href="#{uri('web_files/css/bootstrap1.min.css')}" rel="stylesheet" type="text/css"
     link href="#{uri('web_files/css/font-awesome.min.css')}" rel="stylesheet" type="text/css"
     link href="#{uri('web_files/css/custom.min.css')}" rel="stylesheet" type="text/css"
 
@@ -28,21 +28,22 @@ html lang="en"
       script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"
 
   body#mainbody
-    .navbar.navbar-inverse.navbar-fixed-top role="navigation"
+    .navbar.navbar-default.navbar-fixed-top role="navigation"
       .container
-        span.navbar-brand
-          img height="25px" src="#{uri('web_files/img/gene.png')}"  GeneValidator
-        button.navbar-toggle data-target=".navbar-collapse" data-toggle="collapse" type="button"
-          span.sr-only Toggle navigation
-          span.icon-bar
-          span.icon-bar
-          span.icon-bar
-        .navbar-collapse.collapse
+        .navbar-header
+          button.navbar-toggle data-target=".navbar-responsive-collapse" data-toggle="collapse" type="button" 
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          span.navbar-brand href="#" GeneValidator
+        .navbar-collapse.collapse.navbar-responsive-collapse
           ul.nav.navbar-nav
-            /!li
-            /!  a href="#"  Documentation
-            /!li
-            /!  a href="#"  Support
+            li
+              a href="#" Home
+            /! li.active
+            /!   a href="#"  Documentation
+            /! li
+            /!   a href="#"  Support
             li
               a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  Source Code
             li
@@ -51,6 +52,8 @@ html lang="en"
             li
               a.nav_github_icon href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"
                 span.i.fa.fa-2x.fa-github
+
+
     .container
       ==yield
     #spinner.modal aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1"
