@@ -18,20 +18,20 @@ optparse = OptionParser.new do |opts|
 Banner
 
   opt[:config_file] = Pathname.new(Dir.home) + '.genevalidatorapp.conf'
-  opts.on('-c', '--config CONFIG_FILE', 'custom location of the configuration file',
-          'The default location of the configuration file is at',
-          '"~/genevalidatorapp.conf"') do |config_file|
+  opts.on('-c', '--config CONFIG_FILE', 'The Path to the configuration file',
+          'By default, GeneValidatorapp searches the home directory,',
+          '("~/genevalidatorapp.conf") for the configuration file.') do |config_file|
     opt[:config_file] = config_file
   end
 
   opt[:debug] = false
   opts.on('-d', '--debug', 'Provides more information on each step taken in',
-          ' this program') do
+          ' this program (which can also help for debugging)') do
     opt[:debug] = true
   end
 
   opt[:port] = 4567
-  opts.on('-p', '--port PORT', 'Run the app at a port of your choice.') do |port|
+  opts.on('-p', '--port PORT', 'The port at whihc to run the app.') do |port|
     opt[:port] = port
   end
 
