@@ -89,6 +89,11 @@ and then go to [http://localhost:4567](http://localhost:4567) (if on a local ser
 
 See `$ genevalidator -h` for more information on how to run GeneValidatorApp.
 
+
+## API
+
+See [GeneValidatorApp-API](https://github.com/IsmailM/GeneValidatorApp-API) for more information.
+
 ## Contributing
 
 1. Fork it ( https://github.com/IsmailM/GeneValidatorApp/fork )
