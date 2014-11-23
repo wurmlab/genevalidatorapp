@@ -60,15 +60,15 @@
           i.fa.fa-search
           | &nbsp;&nbsp;Analyse Sequences
         .clearfix
-      span 
-        a#protein_example onclick="examplarSequence('protein')"
-          | Show a protein example
-      span
-        | &nbsp;&#124;&nbsp;
-      span
-        a#genetic_example onclick="examplarSequence('genetic')"
-          | Show a genetic example
-
+      .show_examples_text
+        span 
+          a#protein_example onclick="examplarSequence('protein')"
+            | Show a protein example
+        span
+          | &nbsp;&#124;&nbsp;
+        span
+          a#genetic_example onclick="examplarSequence('genetic')"
+            | Show a genetic example
 .col-md-12
   #results_box style="display:none;"
     h2#output_header.page-header

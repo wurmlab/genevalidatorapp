@@ -73,7 +73,7 @@ function addSeqValidation() {
         return true
       }
     }
-  }, "* The Input must be either genetic or protein Sequence(s). Please ensure that your sequences do not contains any non-letter character(s). If there are multiple sequences, ensure that they are all of one type. ");
+  }, "* The Input must be either genetic or protein sequence(s). Please ensure that your sequences do not contains any non-letter character(s). If there are multiple sequences, ensure that they are all of one type. ");
 }
 
 
@@ -231,7 +231,7 @@ function examplarSequence(type){
 
 // FROM BIONODE-Seq - See https://github.com/bionode/bionode-seq
 // Checks whether a sequence is a protein or genetic sequence...
-checkType = function (sequence, threshold, length, index) {
+function checkType(sequence, threshold, length, index) {
   if (threshold === undefined) {
     threshold = 0.9
   }
