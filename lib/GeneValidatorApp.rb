@@ -34,6 +34,13 @@ class GVapp < Sinatra::Base
     slim :index
   end
 
+  options '/post' do
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "POST"
+
+    halt 200
+  end
+
   # Run only when submitting a job to the server.
   before '/input' do
     @tempdir         = settings.tempdir
