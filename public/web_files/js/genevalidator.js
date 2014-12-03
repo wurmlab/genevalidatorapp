@@ -172,7 +172,7 @@ function initTableSorter() {
 
   $('table').tablesorter({
     headers: {
-      2 : { sorter: 'star_scores' }
+      1 : { sorter: 'star_scores' }
     },
     sortList: [[0,0]],
   })
