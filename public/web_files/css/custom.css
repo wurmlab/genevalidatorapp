@@ -156,15 +156,19 @@ textarea:-ms-input-placeholder {
   box-sizing: border-box;
   color: rgb(49, 112, 143);
   display: block;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  line-height: 20px;
   margin-bottom: 0px;
   padding-bottom: 15px;
   padding-left: 15px;
   padding-right: 15px;
   padding-top: 15px;
+}
+
+.explanation_alert p {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
   text-align: left;
+  font-weight: 400;
 }
 
 .plot_btn {
@@ -209,7 +213,7 @@ ___________________________*/
 .table td {
   vertical-align: middle !important;
   border-collapse: collapse;
-   background-clip: padding-box;
+  background-clip: padding-box;
   text-align: left;
 
 }
@@ -222,7 +226,7 @@ ___________________________*/
 
 tr {
   height: 39px;
-  background-color: #fff;
+  background-color: rgba(241, 248, 255, 1);
 }
 
 .expanded-child{
@@ -423,10 +427,10 @@ ___________________________*/
   #input_btn {
     margin-top: -40px;
   }
-}
+/*}
 
-/* Targets large screens - i.e. larger than 1200px wide */
-@media (min-width: 1200px){
+ Targets large screens - i.e. larger than 1200px wide 
+@media (min-width: 1200px){*/
   .container{
     width:90%;
   }
