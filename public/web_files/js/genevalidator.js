@@ -161,7 +161,7 @@ function initTableSorter() {
     is: function(s) {return false},
     format: function(s, table, cell, cellIndex) {
       var $cell = $(cell)
-      if (cellIndex === 2) {
+      if (cellIndex === 1) {
         return $cell.attr('data-score') || s
       } 
       return s
