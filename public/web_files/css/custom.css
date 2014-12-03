@@ -117,10 +117,6 @@ textarea:-ms-input-placeholder {
   color: #333;
 }
 
-.table thead {
-  border-color: rgb(78, 93, 108) !important;
-}
-
 .table thead tr {
   border-bottom: 3px solid #DDD;
 }
@@ -130,6 +126,9 @@ textarea:-ms-input-placeholder {
   border-color: rgb(221, 221, 221) !important;
 }
 
+.table-bordered {
+  border: none;
+}
 
 .danger {
   background-color: rgb(242, 222, 222) !important;
@@ -172,14 +171,41 @@ textarea:-ms-input-placeholder {
 }
 
 .plot_btn {
-  background-color: rgb(78, 93, 108);
+  background-color: rgb(217, 237, 247);
+  border-color: rgb(188, 232, 241);
+  border-style: solid;
+  border-width: 1px;
+  border-collapse: collapse;
+  box-sizing: border-box;
+  color: rgb(49, 112, 143);
+  display: block;
+  padding: 10px;
 }
 
+.plot_btn:hover {
+  background-color: #c0e3ff;
+  color: rgb(49, 112, 143);
+    border-color: rgb(188, 232, 241);
+  border-style: solid;
+  border-width: 1px;
+}
+
+.table-bordered>thead>tr>th,
+.table-bordered>tbody>tr>th,
+.table-bordered>tfoot>tr>th,
+.table-bordered>thead>tr>td,
+.table-bordered>tbody>tr>td,
+.table-bordered>tfoot>tr>td {
+  border:none;
+} 
+
+.table-bordered>tbody>tr {
+  border-bottom: 2px solid #DDD;
+} 
 
 .error_header {
   margin-top: 10px;
 }
-
 
 /* Footer
 -------------------------------------------------- */
@@ -427,10 +453,7 @@ ___________________________*/
   #input_btn {
     margin-top: -40px;
   }
-/*}
 
- Targets large screens - i.e. larger than 1200px wide 
-@media (min-width: 1200px){*/
   .container{
     width:90%;
   }
