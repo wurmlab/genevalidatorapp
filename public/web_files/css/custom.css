@@ -95,19 +95,19 @@ label.radio-inline.no_indent {
 }
 
 textarea::-webkit-input-placeholder {
-   color: black !important;
+   color: #2b3e50 !important;
 }
 
 textarea:-moz-placeholder { /* Firefox 18- */
-   color: black !important;  
+   color: #2b3e50 !important;  
 }
 
 textarea::-moz-placeholder {  /* Firefox 19+ */
-   color: black !important;  
+   color: #2b3e50 !important;  
 }
 
 textarea:-ms-input-placeholder {  
-   color: black !important;  
+   color: #2b3e50 !important;  
 }
 
 
