@@ -64,6 +64,11 @@ body {
   margin-top: 20px;
 }
 
+.control-label{
+  font-size: 15px;
+  font-weight: bold;
+}
+
 label, .radio label, .checkbox label, .help-block {
   font-size: 15px;
 }
