@@ -23,6 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'bio', '~>1.4'
-  spec.add_dependency 'slim', '~>2.0'
+  spec.add_dependency 'slim', '~>3.0'
   spec.add_dependency 'GeneValidator', '~>1.3'
 end
