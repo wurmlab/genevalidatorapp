@@ -25,4 +25,17 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bio', '~>1.4'
   spec.add_dependency 'slim', '~>3.0'
   spec.add_dependency 'GeneValidator', '~>1.3'
+  spec.post_install_message = <<INFO
+
+------------------------------------------------------------------------
+  Thank you for validating your gene predictions with GeneValidator!
+
+  To launch GeneValidatorApp execute 'genevalidatorapp' from command line.
+
+    $ genevalidatorapp [options]
+
+  Visit https://github.com/IsmailM/GeneValidatorApp for more information.
+------------------------------------------------------------------------
+
+INFO
 end
