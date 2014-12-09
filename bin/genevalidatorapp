@@ -3,9 +3,6 @@ require 'optparse'
 require 'GeneValidatorApp'
 require 'GeneValidatorApp/version'
 
-require 'sinatra'
-require 'pathname'
-
 opt = {}
 optparse = OptionParser.new do |opts|
   opts.banner = <<Banner
