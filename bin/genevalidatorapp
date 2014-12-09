@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 require 'optparse'
 require 'GeneValidatorApp'
-require 'GeneValidatorApp/PreRunValidation.rb'
 require 'GeneValidatorApp/version'
 
 require 'sinatra'
@@ -52,32 +51,6 @@ Banner
   end
 end
 optparse.parse!
-
-# SET UP & START APP...
-
-# tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
-# root    = Pathname.new(__FILE__).dirname.parent
-# vars    = GeneValidatorApp::Prerun.validate(opt[:debug], opt[:config_file],
-#                                             tempdir, root, opt[:num_threads])
-
-# GVapp.set :environment, :production
-# GVapp.set :root, Pathname.new(__FILE__).dirname.parent
-# GVapp.set :public_folder, vars[:web_dir]
-# GVapp.set :tempdir, tempdir
-
-# GVapp.set :port, opt[:port].to_i
-# GVapp.set :num_threads, opt[:num_threads]
-# GVapp.set :mafft_path, vars[:mafft_path]
-# GVapp.set :blast_path, vars[:blast_path]
-# GVapp.set :maxCharacters, vars[:maxChars]
-# GVapp.set :GVversion, GeneValidatorApp::Prerun.current_gv_version
-
-# GVapp.set :dbs, vars[:dbs]
-# GVapp.set :non_default, vars[:rest_dbs]
-# GVapp.set :default_db, vars[:default_db]
-
-# GVapp.run!
-
 
 GeneValidatorApp.init(opt)
 GeneValidatorApp.run

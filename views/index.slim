@@ -6,11 +6,10 @@
     form#input action="#{uri('/input')}" method="POST"
       .form-group#input_seq_group
         label.control-label.input_seq-label for="seq"  Input Sequences:
-        - if @maxCharacters != 'undefined'
-          textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false" data-maxCharacters="#{@maxCharacters}"
+        - if @max_characters != 'undefined'
+          textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false" data-maxCharacters="#{@max_characters}"
         - else
           textarea#seq.form-control autofocus="true" name="seq" placeholder=("Paste your sequence(s) here...") rows="10" spellcheck="false" 
-
       .clearfix
       button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="changeAdvParamsBtnText()"
         i.fa.fa-pencil-square-o
@@ -47,13 +46,12 @@
         .form-group.form-inline
           label.control-label for="database"  Advanced Parameters: Database
           br/
-          - @default_db.each do |path, hash|
-            label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-              input#sp type="radio" name="database" value="#{hash[0][:title]}" checked="" #{hash[0][:title]}
+          label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+            input#sp type="radio" name="database" value="#{@default_db.title.chomp}" checked="" #{@default_db.title.chomp}
           - unless @non_default_dbs.empty?
-            - @non_default_dbs.each do |path, hash|
+            - @non_default_dbs.each do |db|
               label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-                input#sp type="radio" name="database" value="#{hash[0][:title]}" #{hash[0][:title]}
+                input#sp type="radio" name="database" value="#{db.title.chomp}" #{db.title.chomp}
         .clearfix
       .form-group
         button#input_btn.btn.btn-lg.btn-primary.pull-right type="submit" value="input"

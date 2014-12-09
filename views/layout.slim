@@ -52,8 +52,6 @@ html lang="en"
             li
               a.nav_github_icon href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"
                 span.i.fa.fa-2x.fa-github
-
-
     .container
       ==yield
     #spinner.modal aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1"
@@ -85,4 +83,4 @@ html lang="en"
           a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  GeneValidator Web Application 
           | v#{GeneValidatorApp::VERSION} (using 
           a href="https://github.com/monicadragan/GeneValidator" target="_blank"  GeneValidator 
-          | v#{@GVversion})
+          | v#{@current_gv_version})

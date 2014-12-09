@@ -23,6 +23,23 @@ body {
   display:none;
 }
 
+.alert-danger{
+  background-color: #f2dede;
+}
+
+.alert-danger p {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+  font-weight: 400;
+  color: #ff1c21;
+}
+
+.alert-danger h3 {
+  color: #ff1c21;
+}
+
 
 /* Navbar
 -------------------------------------------------- */

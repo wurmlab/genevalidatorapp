@@ -22,9 +22,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~>10.3'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
+  spec.add_dependency "sinatra-cross_origin", "~> 0.3.1"
   spec.add_dependency 'bio', '~>1.4'
   spec.add_dependency 'slim', '~>3.0'
   spec.add_dependency 'GeneValidator', '~>1.3'
+  spec.add_dependency 'thin', '~>1.6'
   spec.post_install_message = <<INFO
 
 ------------------------------------------------------------------------
