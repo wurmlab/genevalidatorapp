@@ -148,7 +148,8 @@ module GeneValidatorApp
     # Copy the public folder (in the app root) to the web_dir location - this 
     #   web_dir is then used by the app to serve all dependencies... 
     def set_up_public_folder
-      @public_dir = Pathname.new(config[:web_dir]) + "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
+      @public_dir = Pathname.new(config[:web_dir]) +
+                    "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
       root_public_dir = GeneValidatorApp.root + 'public'
       FileUtils.cp_r(root_public_dir, @public_dir)
     end
