@@ -13,7 +13,10 @@ module GeneValidatorApp
       attr_reader :gv_dir, :tmp_gv_dir, :input_file, :xml_file, :raw_seq,
                   :unique_id
 
-      def init
+      ##
+      # Creates the Unique run ID
+      # 
+      def init(url)
         @unique_id  = create_unique_id
         @tmp_gv_dir = GeneValidatorApp.tempdir + unique_id
         # Create another Unique Id, if it already exists...
@@ -27,15 +30,16 @@ module GeneValidatorApp
         @input_fasta_file = @tmp_gv_dir + 'input_file.fa'
         @xml_file         = @tmp_gv_dir + 'output.xml'
         @raw_seq          = @tmp_gv_dir + 'output.xml.raw_seq'
+        @url              = produce_result_url_link(url)
       end
 
-      def run(params, url)
+      def run(params)
         write_seq_to_file(params[:seq].to_fasta)
         run_blast(params[:database], params[:seq])
         run_get_raw_sequence(params[:database])
         run_genevalidator
         if params[:result_link]
-          produce_result_url_link(url)
+          @url
         else
           produce_table_html
         end
@@ -43,13 +47,13 @@ module GeneValidatorApp
 
       private
 
-      # The Time - Includes yoctoseconds :\
       def create_unique_id
-        Time.new.strftime('%Y-%m-%d_%H-%M-%S_%L-%24N')
-        # + request.ip.gsub(/[.:]/, '-')
+        logger.debug('Creating Unique ID')
+        Time.new.strftime('%Y-%m-%d_%H-%M-%S_%L-%N')
       end
 
       def ensure_unique_id
+        logger.debug('Unique ID already exists - Creating new Unique ID')
         while File.exist?(@tmp_gv_dir)
           @unique_id = GeneValidator.create_unique_id
           @tmp_gv_dir = GeneValidatorApp.tempdir + @unique_id
@@ -113,7 +117,8 @@ module GeneValidatorApp
         local_plots_dir = Pathname.new('GeneValidator') + @unique_id +
                           'input_file.fa.html/files/json/input_file.fa_'
         full_html = IO.binread(table_file)
-        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s)
+        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s).gsub(
+                  '#Place_external_results_link_here', @url)
       end
 
       def produce_result_url_link(url)
@@ -125,10 +130,14 @@ module GeneValidatorApp
 end
 
 class String
+  extend Forwardable
+  
+  def_delegators GeneValidatorApp, :logger
+  
   # Adds a ID (based on the time when submitted) to sequences that are not in
-  #  fasta format. Adapted from SequenceServer.
+  #  fasta format.
   def to_fasta
-    # LOG.debug { 'Adding an ID to sequences that are not in fasta format.' }
+    logger.debug('Adding an ID to sequences that are not in fasta format.')
     unique_queries = {}
     sequence       = self.lstrip
     if sequence[0] != '>'
