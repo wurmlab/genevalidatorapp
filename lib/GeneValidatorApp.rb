@@ -20,8 +20,8 @@ module GeneValidatorApp
   EXIT_BLAST_INSTALLATION_FAILED  = 5
   EXIT_CONFIG_FILE_NOT_FOUND      = 6
   EXIT_NO_SEQUENCE_DIR            = 7
-  EXIT_GV_NOT_INSTALLED = 8
-  EXIT_GV_NOT_COMPATIBLE = 9
+  EXIT_GV_NOT_INSTALLED           = 8
+  EXIT_GV_NOT_COMPATIBLE          = 9
 
   class << self
     attr_reader :config_file, :config, :public_dir, :tempdir
@@ -51,7 +51,7 @@ module GeneValidatorApp
         :num_threads  => 1,
         :port         => 4567,
         :host         => 'localhost',
-        :web_dir      => Pathname.pwd
+        :web_dir      => Dir.pwd
       }.update(parse_config_file.merge(config))
 
       assert_genevalidator_installed_and_compatible
@@ -63,7 +63,7 @@ module GeneValidatorApp
       # TODO: assert_mafft_installed
 
       assert_dir_present('database dir', @config[:database_dir], EXIT_NO_SEQUENCE_DIR)
-      @config[:database_dir] = Pathname.new(@config[:database_dir]).expand_path
+      @config[:database_dir] = File.expand_path(@config[:database_dir])
       assert_blast_databases_present_in_database_dir
 
       Database.scan_databases_dir
@@ -71,7 +71,7 @@ module GeneValidatorApp
 
       @config[:num_threads] = Integer(@config[:num_threads])
       assert_num_threads_valid @config[:num_threads]
-      logger.debug("Will use #{@config[:num_threads]} threads to run BLAST.")
+      logger.debug("Will use #{@config[:num_threads]} threads to run GeneValidator.")
 
       if @config[:require]
         @config[:require] = Pathname.new(@config[:require]).expand_path
@@ -217,7 +217,7 @@ module GeneValidatorApp
       version = %x|blastdbcmd -version|.split[1]
       unless version >= MINIMUM_BLAST_VERSION
         puts "*** Your BLAST+ version #{version} is outdated."
-        puts "    SequenceServer needs NCBI BLAST+ version" \ 
+        puts "    SequenceServer needs NCBI BLAST+ version" \
              " #{MINIMUM_BLAST_VERSION} or higher."
         exit EXIT_BLAST_NOT_COMPATIBLE
       end
@@ -328,8 +328,8 @@ module GeneValidatorApp
     end
 
     post '/input' do
-      GeneValidator.init
-      GeneValidator.run(params, request.url)
+      GeneValidator.init(request.url)
+      GeneValidator.run(params)
     end
 
     error do
