@@ -1,53 +1,119 @@
 #!/usr/bin/env ruby
-require 'optparse'
-require 'GeneValidatorApp'
 require 'GeneValidatorApp/version'
+require 'slop'
 
-opt = {}
-optparse = OptionParser.new do |opts|
-  opts.banner = <<Banner
+ENV['RACK_ENV'] ||= 'production'
 
-* Usage: genevalidatorapp [options]
+# display name for tools like `ps`
+$PROGRAM_NAME = 'genevalidatorapp'
 
-* Available Options
+BANNER =<<BNR
+SUMMARY
 
-Banner
+GeneValidator - Identify problems with predicted genes 
 
-  opt[:config_file] = Pathname.new(Dir.home) + '.genevalidatorapp.conf'
-  opts.on('-c', '--config CONFIG_FILE', 'The Path to the configuration file',
-          'By default, GeneValidatorapp searches the home directory,',
-          '("~/genevalidatorapp.conf") for the configuration file.') do |config_file|
-    opt[:config_file] = config_file
+USAGE
+
+genevalidatorapp [options]
+
+Example 
+
+  # Launch GeneValidatorApp with the given config file
+  $ genevalidatorapp --config ~/.genevalidatorapp.conf
+
+  # Launch GeneValidatorApp with 8 threads at port 8888
+  $ genevalidatorapp --num_threads 8 --port 8888
+
+BNR
+
+begin
+  Slop.parse!(:strict => true, :help => true) do
+    banner BANNER
+
+    on 'c', 'config_file=',
+      'Use the given configuration file',
+      :argument => true
+
+    on 'b', 'blast_bin=',
+      'Load BLAST+ binaries from this directory',
+      :argument => true
+
+    on 'm', 'mafft_bin=',
+      'Load Mafft binaries from this directory',
+      :argument => true
+
+    on 'd', 'database_dir=',
+      'Read BLAST database from this directory',
+      :argument => true
+
+    on 'n', 'num_threads=',
+      'Number of threads to use to run a BLAST search',
+      :argument => true
+      #:as       => Integer
+
+    on 'r', 'require=',
+      'Load extension from this file',
+      :argument => true
+
+    on 'h', 'host=',
+      'Host to run SequenceServer on',
+      :argument => true
+
+    on 'p', 'port=',
+      'Port to run SequenceServer on',
+      :argument => true
+
+    on 's', 'set',
+      'Set configuration value in default or given config file'
+
+    on 'l', 'list_databases',
+      'List BLAST databases'
+
+    on 'D', 'devel',
+      'Start SequenceServer in development mode'
+
+    on '-v', '--version',
+      'Print version number of SequenceServer that will be loaded'
+
+    on '-h', '--help',
+      'Display this help message'
+
+    run do 
+      if version?
+        puts GeneValidatorApp::VERSION
+        exit 
+      end
+
+      ENV['RACK_ENV'] = 'development' if devel?
+
+      require 'GeneValidatorApp'
+      begin
+        opts = to_h.delete_if { |k, v| v.nil? }
+        opts.delete :set
+        GeneValidatorApp.init(opts)
+      rescue SystemExit => e
+        puts '*** Error: GeneValidator failed to initialise properly.'
+        puts '    Please try again.'
+        exit e.status
+      end
+      
+      if list_databases? 
+        puts GeneValidatorApp::Database.all?
+      end
+
+      if set?
+        GeneValidatorApp.send :write_config_file
+      end
+
+      if fetch_option(:set).value
+        GeneValidatorApp.send :write_config_file
+      end
+
+      GeneValidatorApp.run
+    end
   end
-
-  opt[:debug] = false
-  opts.on('-d', '--debug', 'Provides more information on each step taken in',
-          ' this program (which can also help for debugging)') do
-    opt[:debug] = true
-  end
-
-  opt[:port] = 4567
-  opts.on('-p', '--port PORT', 'The port at whihc to run the app.') do |port|
-    opt[:port] = port
-  end
-
-  opt[:num_threads] = 1
-  opts.on('-n', '--num_threads num_of_threads', Integer, 'Run the resource heavy BLAST (&',
-          ' Mafft) with more than one thread.') do |num_threads|
-    opt[:num_threads] = num_threads
-  end
-
-  opts.on('-v', '--version', 'Shows version') do
-    puts GeneValidatorApp::VERSION
-    exit
-  end
-
-  opts.on('-h', '--help', 'Display this screen') do
-    puts opts
-    exit
-  end
+rescue Slop::Error => e
+  puts e
+  puts "Run '#{$0} -h' for help with command line options."
+  exit
 end
-optparse.parse!
-
-GeneValidatorApp.init(opt)
-GeneValidatorApp.run
