@@ -62,16 +62,13 @@ module GeneValidatorApp
       assert_bin_dir('Mafft bin dir', @config[:mafft_bin]) if @config[:mafft_bin]
       # TODO: assert_mafft_installed
 
-      assert_dir_present('database dir', @config[:database_dir], EXIT_NO_SEQUENCE_DIR)
       @config[:database_dir] = File.expand_path(@config[:database_dir])
       assert_blast_databases_present_in_database_dir
 
       Database.scan_databases_dir
       # TODO: Warn if chosen default db does not exist (use the first db instead)
 
-      @config[:num_threads] = Integer(@config[:num_threads])
-      assert_num_threads_valid @config[:num_threads]
-      logger.debug("Will use #{@config[:num_threads]} threads to run GeneValidator.")
+      assert_num_threads_valid
 
       if @config[:require]
         @config[:require] = Pathname.new(@config[:require]).expand_path
@@ -244,15 +241,17 @@ module GeneValidatorApp
     end
 
     # Assert whether the num_threads value is valid...
-    def assert_num_threads_valid(num_threads)
-      unless num_threads > 0
-        puts "*** Can't use #{num_threads} number of threads."
+    def assert_num_threads_valid
+      @config[:num_threads] = Integer(@config[:num_threads])
+      unless @config[:num_threads] > 0
+        puts "*** Can't use #{@config[:num_threads]} number of threads."
         puts "    Number of threads should be greater than or equal to 1."
         exit 1
       end
-      if num_threads > 256
-        logger.warn "*** Number of threads set at #{num_threads} is unusually high."
+      if @config[:num_threads] > 256
+        logger.warn "*** Number of threads set at #{@config[:num_threads]} is unusually high."
       end
+      logger.debug("Will use #{@config[:num_threads]} threads to run GeneValidator.")
     rescue
       puts "*** Number of threads should be a number."
       exit 1
@@ -328,11 +327,25 @@ module GeneValidatorApp
     end
 
     post '/input' do
-      GeneValidator.init(request.url)
-      GeneValidator.run(params)
+      GeneValidator.init(request.url, params)
+      GeneValidator.run
     end
 
-    error do
+    # This error block will only ever be hit if the user gives us a funny
+    # sequence or incorrect advanced parameter. Well, we could hit this block
+    # if someone is playing around with our HTTP API too.
+    error GeneValidator::ArgumentError do 
+      status 400
+      slim :"500", layout: false
+    end
+
+    # This will catch any unhandled error and some very special errors. Ideally
+    # we will never hit this block. If we do, there's a bug in SequenceServer
+    # or something really weird going on.
+    # TODO: If we hit this error block we show the stacktrace to the user
+    # requesting them to post the same to our Google Group.
+    error Exception, GeneValidator::RuntimeError do
+      status 500
       slim :"500", layout: false
     end
 
