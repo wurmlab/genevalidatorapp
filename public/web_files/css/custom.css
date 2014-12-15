@@ -43,6 +43,10 @@ body {
 
 /* Navbar
 -------------------------------------------------- */
+.navbar-nav>li>a, .navbar-brand {
+  line-height: 27px;
+}
+
 .navbar-nav > li > a.nav_github_icon {
   padding-top: 0;
   padding-bottom: 0;
@@ -82,17 +86,19 @@ body {
 }
 
 .control-label{
-  font-size: 15px;
-  font-weight: bold;
+  font-size: 1.25em;
+  font-weight: normal;
 }
 
 label, .radio label, .checkbox label, .help-block {
-  font-size: 15px;
+  font-size: 0.9em;
+  font-weight: inherit;
 }
 
 .checkbox.inline.no_indent+.checkbox.inline.no_indent {
   margin-left: 0;
   margin-right: 10px;
+
 }
 .checkbox.inline.no_indent:last-child {
   margin-right: 0px;
@@ -132,6 +138,16 @@ textarea:-ms-input-placeholder {
    color: #2b3e50 !important;  
 }
 
+#results_header {
+  margin-top: 0;
+  margin-bottom: 30px;
+  margin-left:-15px;
+}
+
+#results_link_btn {
+  margin-top: 0;
+  margin-right: -15px;
+}
 
 /* Table
 -------------------------------------------------- */
