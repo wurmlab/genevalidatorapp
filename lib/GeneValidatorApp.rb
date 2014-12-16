@@ -53,7 +53,6 @@ module GeneValidatorApp
         :host         => 'localhost',
         :web_dir      => Dir.pwd
       }.update(parse_config_file.merge(config))
-
       assert_genevalidator_installed_and_compatible
 
       assert_bin_dir('BLAST bin dir', @config[:blast_bin]) if @config[:blast_bin]
@@ -78,6 +77,12 @@ module GeneValidatorApp
 
       set_up_gv_tempdir
       set_up_public_folder
+
+      # We don't validate port and host settings. If SequenceServer is run
+      # self-hosted, bind will fail on incorrect values. If SequenceServer
+      # is run via Apache+Passenger, we don't need to worry.
+
+      self
     end
 
     # Starting the app manually using Thin
@@ -133,14 +138,13 @@ module GeneValidatorApp
       App.call(env)
     end
 
-    private
-
-
     # Run by the logger method - sets the logger level to verbose if in
     #   development environment 
     def verbose?
       @verbose ||= (environment == 'development')
     end
+
+    private
 
     # Copy the public folder (in the app root) to the web_dir location - this 
     #   web_dir is then used by the app to serve all dependencies... 
