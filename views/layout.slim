@@ -35,7 +35,8 @@ html lang="en"
             span.icon-bar
             span.icon-bar
             span.icon-bar
-          span.navbar-brand href="#" GeneValidator
+          span.navbar-brand
+            a href="#" GeneValidator
         .navbar-collapse.collapse.navbar-responsive-collapse
           ul.nav.navbar-nav
             li.active
@@ -55,7 +56,7 @@ html lang="en"
                 span.i.fa.fa-2x.fa-github
     .container
       ==yield
-    #spinner.modal aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1"
+    #spinner.modal aria-hidden="true" aria-labelledby="spinner" role="dialog" tabindex="-1"
       .modal-dialog
         .modal-content
           .modal-body.text-center
@@ -64,8 +65,8 @@ html lang="en"
             i.fa.fa-spinner.fa-5x.fa-spin
     br/
     #footer
-      .container align="center"
-        p.text-muted 
+      .container
+        p.text-muted.text-center 
           | Please cite "Dragan M, Moghul MI, Priyam A & Wurm Y 
           em 
             | (in prep) 
