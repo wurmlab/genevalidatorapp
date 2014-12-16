@@ -68,11 +68,7 @@ module GeneValidatorApp
       end
 
       def non_default_dbs
-        if config[:default_db] && collection.include?(Digest::MD5.hexdigest config[:default_db])
-          all.find_all { |a| a.name != config[:default_db] }
-        else
-          all.find_all { |a| a != a.first }
-        end
+        all.find_all { |a| a != Database.default_db }
       end
 
       # Recurisvely scan `database_dir` for blast databases.
