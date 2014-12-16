@@ -251,6 +251,7 @@ textarea:-ms-input-placeholder {
   position: absolute;
   bottom: 0;
   width: 100%;
+  margin: 0 auto;
   background-color: rgb(78, 93, 108);
 }
 
