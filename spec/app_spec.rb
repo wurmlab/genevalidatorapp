@@ -1,12 +1,14 @@
 require 'GeneValidatorApp'
 require 'rack/test'
-# require 'w3c_validators'
+require 'nokogiri'
+require 'w3c_validators'
 
 module GeneValidatorApp
+  include W3CValidators
+  
   describe 'App' do
     ENV['RACK_ENV'] = 'test'
     include Rack::Test::Methods
-    # include W3CValidators
 
     let 'root' do
       GeneValidatorApp.root
@@ -27,9 +29,9 @@ module GeneValidatorApp
 
     before :each do
       app
-      @params = { 'seq' => 'AGCTAGCTAGCT',
+      @params = { 'seq'         => 'AGCTAGCTAGCT',
                   'validations' => '["lenc", "lenr", "dup", "merge", "align", "frame", "orf"]',
-                  'database' => Database.first.name}
+                  'database'    => Database.first.name}
     end
 
     it 'should start the app' do
@@ -69,16 +71,38 @@ module GeneValidatorApp
       last_response.status.should == 404
     end
 
-    # it 'validate the html' do
-    #   get '/'
-    #   html = last_response.body
-    #   @html_validator = MarkupValidator.new
-    #   @html_validator.set_doctype!(:html5)
+    it 'validate the html' do
+      get '/'
+      html = last_response.body
 
-    #   @html_validator.set_debug!(true)
-    #   results = @html_validator.validate_file(html)
+      validator = MarkupValidator.new
+      r = validator.validate_text(html)
+      
+      if r.errors.length > 0
+        r.errors.each do |err|
+          puts err.to_s
+        end
+        results = false
+      else
+        results = true 
+      end
+      results.should == true 
+    end
 
-    #   puts results
-    # end    
+    # it 'should validate the css' do
+    #   css = File.read(File.join(root, 'public/web_files/css/custom.min.css'))
+    #   validator = CSSValidator.new
+    #   r = validator.validate_text(css)
+
+    #   if r.errors.length > 0
+    #     r.errors.each do |err|
+    #       puts err.to_s
+    #     end
+    #     results = false
+    #   else
+    #     results = true 
+    #   end
+    #   results.should == true 
+    # end
   end
 end
