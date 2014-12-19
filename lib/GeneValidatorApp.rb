@@ -1,6 +1,7 @@
 require 'GeneValidatorApp/database'
 require 'GeneValidatorApp/genevalidator'
 require 'GeneValidatorApp/logger'
+require 'GeneValidatorApp/version'
 
 require 'pathname'
 require 'yaml'
