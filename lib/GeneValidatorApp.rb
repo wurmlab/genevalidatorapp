@@ -75,8 +75,8 @@ module GeneValidatorApp
       set_up_gv_tempdir
       set_up_public_folder
 
-      # We don't validate port and host settings. If SequenceServer is run
-      # self-hosted, bind will fail on incorrect values. If SequenceServer
+      # We don't validate port and host settings. If GeneValidator is run
+      # self-hosted, bind will fail on incorrect values. If GeneValidator
       # is run via Apache+Passenger, we don't need to worry.
 
       self
@@ -215,7 +215,7 @@ module GeneValidatorApp
       version = %x|blastdbcmd -version|.split[1]
       unless version >= MINIMUM_BLAST_VERSION
         puts "*** Your BLAST+ version #{version} is outdated."
-        puts "    SequenceServer needs NCBI BLAST+ version" +
+        puts "    GeneValidatorApp needs NCBI BLAST+ version" +
              " #{MINIMUM_BLAST_VERSION} or higher."
         exit EXIT_BLAST_NOT_COMPATIBLE
       end
@@ -356,7 +356,7 @@ module GeneValidatorApp
     end
 
     # This will catch any unhandled error and some very special errors. Ideally
-    # we will never hit this block. If we do, there's a bug in SequenceServer
+    # we will never hit this block. If we do, there's a bug in GeneValidatorApp
     # or something really weird going on.
     # TODO: If we hit this error block we show the stacktrace to the user
     # requesting them to post the same to our Google Group.

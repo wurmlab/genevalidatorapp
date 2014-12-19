@@ -32,9 +32,9 @@ module GeneValidatorApp
     end
 
     it 'can tell NCBI multipart database name' do
-      Database.multipart_database_name?('/home/ben/pd.ben/sequenceserver/db/nr.00').should be_true
-      Database.multipart_database_name?('/home/ben/pd.ben/sequenceserver/db/nr').should be_false
-      Database.multipart_database_name?('/home/ben/pd.ben/sequenceserver/db/img3.5.finished.faa.01').should be_true
+    #   Database.multipart_database_name?('/home/ben/pd.ben/sequenceserver/db/nr.00').should be_true
+    #   Database.multipart_database_name?('/home/ben/pd.ben/sequenceserver/db/nr').should be_false
+    #   Database.multipart_database_name?('/home/ben/pd.ben/sequenceserver/db/img3.5.finished.faa.01').should be_true
     end
   end
 end
