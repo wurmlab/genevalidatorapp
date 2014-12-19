@@ -246,7 +246,8 @@ module GeneValidatorApp
       unless command? 'mafft'
         puts "*** Could not find Mafft binaries."
         exit EXIT_MAFFT_NOT_INSTALLED
-      end    
+      end
+    end
 
     # Assert whether the num_threads value is valid...
     def assert_num_threads_valid
