@@ -6,15 +6,12 @@ module GeneValidatorApp
 
   # Captures a directory containing FASTA files and BLAST databases.
   #
-  # Formatting a FASTA for use with BLAST+ will create 3 or 6 files,
-  # collectively referred to as a BLAST database.
-  #
   # It is important that formatted BLAST database files have the same dirname and
-  # basename as the source FASTA for SequenceServer to be able to tell formatted
+  # basename as the source FASTA for GeneValidatorApp to be able to tell formatted
   # FASTA from unformatted. And that FASTA files be formatted with `parse_seqids`
   # option of `makeblastdb` for sequence retrieval to work.
   #
-  # SequenceServer will always place BLAST database files alongside input FASTA,
+  # GeneValidatorApp will always place BLAST database files alongside input FASTA,
   # and use `parse_seqids` option of `makeblastdb` to format databases.
   class Database < Struct.new(:name, :title, :type)
 

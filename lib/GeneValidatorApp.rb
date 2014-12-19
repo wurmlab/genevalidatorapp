@@ -12,7 +12,7 @@ require 'thin'
 module GeneValidatorApp
   # Use a fixed minimum version of BLAST+
   MINIMUM_BLAST_VERSION           = '2.2.29+'
-  MINIMUM_GV_VERSION              = '0.1'
+  MINIMUM_GV_VERSION              = '0.1' # TODO: Correct me :)
   # Use the following exit codes, or 1.
   EXIT_BLAST_NOT_INSTALLED        = 2
   EXIT_BLAST_NOT_COMPATIBLE       = 3
@@ -22,6 +22,7 @@ module GeneValidatorApp
   EXIT_NO_SEQUENCE_DIR            = 7
   EXIT_GV_NOT_INSTALLED           = 8
   EXIT_GV_NOT_COMPATIBLE          = 9
+  EXIT_MAFFT_NOT_INSTALLED        = 10
 
   class << self
     attr_reader :config_file, :config, :public_dir, :tempdir
@@ -35,7 +36,7 @@ module GeneValidatorApp
       @logger ||= Logger.new(STDERR, verbose?)
     end
 
-    # This is the root dir of the App (contains views dir)
+    # Root dir of the App 
     def root
       Pathname.new(__FILE__).dirname.parent
     end
@@ -59,9 +60,8 @@ module GeneValidatorApp
       assert_blast_installed_and_compatible
 
       assert_bin_dir('Mafft bin dir', @config[:mafft_bin]) if @config[:mafft_bin]
-      # TODO: assert_mafft_installed
-
-      @config[:database_dir] = File.expand_path(@config[:database_dir])
+      assert_mafft_installed
+      
       assert_blast_databases_present_in_database_dir
 
       Database.scan_databases_dir
@@ -69,11 +69,7 @@ module GeneValidatorApp
 
       assert_num_threads_valid
 
-      if @config[:require]
-        @config[:require] = Pathname.new(@config[:require]).expand_path
-        assert_file_present('extension file', @config[:require])
-        require @config[:require]
-      end
+      require_extension if @config[:require]
 
       set_up_gv_tempdir
       set_up_public_folder
@@ -155,8 +151,8 @@ module GeneValidatorApp
       FileUtils.cp_r(root_public_dir, @public_dir)
     end
 
-    # Creates a Temp directory (starting with 'GeneValidator_') each time the
-    #   GVapp is started. Within this Temp folder, separate folders are created
+    # Creates a Temp directory (starting with 'GeneValidator_') each time
+    #   GVapp is started. Within this Temp folder, sub directories are created
     #   in which GeneValidator is run.
     def set_up_gv_tempdir
       @tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
@@ -218,7 +214,7 @@ module GeneValidatorApp
       version = %x|blastdbcmd -version|.split[1]
       unless version >= MINIMUM_BLAST_VERSION
         puts "*** Your BLAST+ version #{version} is outdated."
-        puts "    SequenceServer needs NCBI BLAST+ version" \
+        puts "    SequenceServer needs NCBI BLAST+ version" +
              " #{MINIMUM_BLAST_VERSION} or higher."
         exit EXIT_BLAST_NOT_COMPATIBLE
       end
@@ -227,6 +223,7 @@ module GeneValidatorApp
     # Assert whether there are any databases present in the provided database
     #   directory
     def assert_blast_databases_present_in_database_dir
+      @config[:database_dir] = File.expand_path(@config[:database_dir])
       database_dir = config[:database_dir]
       out = %x|blastdbcmd -recursive -list #{database_dir}|
       if out.empty?
@@ -239,10 +236,17 @@ module GeneValidatorApp
         out.strip.split("\n").each do |l|
           puts "      #{l}"
         end
-        puts "    Please could you report this to https://github.com/IsmailM/GeneValidatorApp'?"
+        puts "    Please could you report this to 'https://github.com/IsmailM/GeneValidatorApp'?"
         exit EXIT_BLAST_DATABASE_ERROR
       end
     end
+
+    # Asserts whether mafft is installed.
+    def assert_mafft_installed 
+      unless command? 'mafft'
+        puts "*** Could not find Mafft binaries."
+        exit EXIT_MAFFT_NOT_INSTALLED
+      end    
 
     # Assert whether the num_threads value is valid...
     def assert_num_threads_valid
@@ -270,10 +274,16 @@ module GeneValidatorApp
       version = GeneValidatorApp.current_gv_version
       unless version >= MINIMUM_GV_VERSION
         puts "*** Your GeneValidator (version #{version}) is outdated."
-        puts "    GeneValidatorApp requires GeneValidator version" \
+        puts "    GeneValidatorApp requires GeneValidator version" +
              " #{MINIMUM_GV_VERSION} or higher."
         exit EXIT_GV_NOT_COMPATIBLE
       end
+    end
+
+    def require_extension
+      @config[:require] = Pathname.new(@config[:require]).expand_path
+      assert_file_present('extension file', @config[:require])
+      require @config[:require]
     end
 
     # Return `true` if the given command exists and is executable.
@@ -349,13 +359,13 @@ module GeneValidatorApp
     # TODO: If we hit this error block we show the stacktrace to the user
     # requesting them to post the same to our Google Group.
     error Exception, GeneValidator::RuntimeError do
-      status 500
+      status 500 # TODO Create another template...
       slim :"500", layout: false
     end
 
     not_found do
       status 404
-      slim :"500"
+      slim :"500" # TODO: Create another Template  
     end
   end
 end

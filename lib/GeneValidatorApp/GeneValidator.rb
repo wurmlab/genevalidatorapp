@@ -28,18 +28,18 @@ module GeneValidatorApp
       attr_reader :gv_dir, :tmp_gv_dir, :input_file, :xml_file, :raw_seq,
                   :unique_id, :params
 
-      #
+      # Setting the scene
       def init(url, params)
         create_unique_id
         create_subdir_in_main_tmpdir
         create_soft_link_from_tmpdir_to_GV_dir
-
         @params = params
         validate_params
-        # Set up some global variables
         @url = produce_result_url_link(url)
       end
 
+      # Run BLAST(X/P), get_raw_sequence and genevalidator
+      #  Returns html for just the table or a link to the page produced by GV 
       def run
         write_seq_to_file
         run_blast
@@ -50,12 +50,15 @@ module GeneValidatorApp
 
       private
 
+      # Creates a unique run ID (based on time),
       def create_unique_id
         @unique_id = Time.new.strftime('%Y-%m-%d_%H-%M-%S_%L-%N')
         @gv_tmpdir = GeneValidatorApp.tempdir + unique_id
         ensure_unique_id
       end
 
+      # Ensures that the Unique id is unique (if a sub dir is present in the  
+      #  temp dir with the unique id, it simply creates a new one)
       def ensure_unique_id
         while File.exist?(@gv_tmpdir)
           @unique_id = GeneValidator.create_unique_id
@@ -64,24 +67,30 @@ module GeneValidatorApp
         logger.debug("Unique ID = #{@unique_id}")
       end
 
+      # Create a sub_dir in the Tempdir (name is based on unique id)
       def create_subdir_in_main_tmpdir
         logger.debug("GV Tempdir = #{@gv_tmpdir}")
         FileUtils.mkdir_p(@gv_tmpdir)
       end
 
-      # Create the Tmp Dir and the create a soft link to it...
+      # Create the Tmp Dir and the create a soft link to it.
       def create_soft_link_from_tmpdir_to_GV_dir
         @gv_dir = GeneValidatorApp.public_dir + 'GeneValidator' + @unique_id
         logger.debug("Local GV dir = #{@gv_dir}")
         FileUtils.ln_s "#{@gv_tmpdir}", "#{@gv_dir}"
       end
 
+      # Validates the paramaters provided via the app.
+      #  Only important if POST request is sent via API - Web APP, validates 
+      #  all params via Javascript.
       def validate_params
         assert_seq_param_present
+        # TODO: validate the seq length is smaller than max Characters.
         assert_validations_param_present
         assert_database_params_present
       end
 
+      # Simply asserts whether that the seq param is present
       def assert_seq_param_present
         unless @params[:seq]
           fail ArgumentError, 'No input sequence provided.'
@@ -89,6 +98,7 @@ module GeneValidatorApp
         logger.debug("seq param = #{@params[:seq]}")
       end
 
+      # Asserts whether the validations param are specified
       def assert_validations_param_present
         unless @params[:validations]
           fail ArgumentError, 'No validations specified'
@@ -96,6 +106,7 @@ module GeneValidatorApp
         logger.debug("validations param = #{@params[:validations]}")
       end
 
+      # Asserts whether the database parameter is present
       def assert_database_params_present
         unless @params[:database]
           fail ArgumentError, 'No database specified'
@@ -103,6 +114,7 @@ module GeneValidatorApp
         logger.debug("database param = #{@params[:database]}")
       end
 
+      # Writes the input sequences to a file with the sub_dir in the temp_dir
       def write_seq_to_file
         @input_fasta_file = @gv_tmpdir + 'input_file.fa'
         seqs = @params[:seq].to_fasta
@@ -119,9 +131,11 @@ module GeneValidatorApp
         assert_input_file_present
       end
 
+      # Asserts whether the input file has been generated and whether it is 
+      #  empty
       def assert_input_file_present
-        unless File.exist?(@input_fasta_file)
-          fail RuntimeError, 'GeneValidatorApp was unable to create the input' \
+        unless File.exist?(@input_fasta_file) || File.zero?(@input_fasta_file)
+          fail RuntimeError, 'GeneValidatorApp was unable to create the input' +
                              ' file.'
         end
       end
@@ -132,68 +146,73 @@ module GeneValidatorApp
         (sequences.sequence_type? == Bio::Sequence::AA) ? 'blastp' : 'blastx'
       end
 
+      # Runs BLAST (P/X)
       def run_blast
         @xml_file  = @gv_tmpdir + 'output.xml'
         blast_type = get_blast_type(@params[:seq])
-        blast = "time #{blast_type} -db '#{@params[:database]}' -evalue 1e-5" \
-                " -outfmt 5 -max_target_seqs 200 -gapopen 11 -gapextend 1" \
-                " -query '#{@input_fasta_file}' -out '#{@xml_file}' -num_threads" \
-                " #{config[:num_threads]}"
+        blast = "time #{blast_type} -db '#{@params[:database]}' -evalue 1e-5" +
+                " -outfmt 5 -max_target_seqs 200 -gapopen 11 -gapextend 1" +
+                " -query '#{@input_fasta_file}' -out '#{@xml_file}'" +
+                " -num_threads #{config[:num_threads]}"
         logger.debug("Running: #{blast}")
         exit = %x(#{blast})
         logger.debug("BLAST exit status: #{$?.exitstatus}")
-        unless $?.exitstatus == 0
-          fail RuntimeError, "BLAST exited with the exit code:"\
-                             " #{$?.exitstatus}."
-        end
+        assert_exit_code_valid(blast_type.capitalize, $?.exitstatus)
       end
 
+      # Run get_raw_sequence (script from genevalidator)
       def run_get_raw_sequence
         @raw_seq = @gv_tmpdir + 'output.xml.raw_seq'
-        raw_seqs = "time get_raw_sequences -d '#{@params[:database]}' -o" \
+        raw_seqs = "time get_raw_sequences -d '#{@params[:database]}' -o" +
                    " '#{@raw_seq}' '#{@xml_file}'"
         logger.debug("Running: #{raw_seqs}")
         exit = %x(#{raw_seqs})
         logger.debug("Get_raw_seqs exit status: #{$?.exitstatus}")
-        unless $?.exitstatus == 0
-          fail RuntimeError, "The GeneValidator command failed (the" \
-                             "get_raw_sequences exited with exit code:"\
-                             " #{$?.exitstatus})."
-        end
+        assert_exit_code_valid('GeneValidator (get_raw_sequences)',
+                               $?.exitstatus)
       end
 
+      # Runs GeneValidator
       def run_genevalidator
-        gv_cmd = "time genevalidator -x '#{@xml_file}' -r '#{@raw_seq}'" \
-                 " -v '#{@params[:validations].to_s.gsub(/[\[\]\"]/, '')}'" \
+        gv_cmd = "time genevalidator -x '#{@xml_file}' -r '#{@raw_seq}'" +
+                 " -v '#{@params[:validations].to_s.gsub(/[\[\]\"]/, '')}'" +
                  " -n #{config[:num_threads]} #{@input_fasta_file}"
-
         logger.debug("Running: #{gv_cmd}")
         exit = %x(#{gv_cmd})
         logger.debug("GeneValidator exit status: #{$?.exitstatus}")
-        unless $?.exitstatus == 0
-          fail RuntimeError, "The Genevalidator command failed (genevalidator" \
-                        " exited with the exit code: #{$?.exitstatus}) "
+        assert_exit_code_valid('GeneValidator', $?.exitstatus)
+        assert_table_output_file_produced
+      end
+
+      # Assets whether the exit code is equal to 0, else fails with RuntimeError
+      def assert_exit_code_valid(program, exit_code)
+        unless exit_code == 0
+          fail RuntimeError, "#{program} exited with the exit code:" +
+                             " #{exit_code}."
         end
       end
 
-      def produce_table_html
-        table_file      = @gv_dir + 'input_file.fa.html/files/table.html'
-        orig_plots_dir  = 'files/json/input_file.fa_'
-        local_plots_dir = Pathname.new('GeneValidator') + @unique_id +
-                          'input_file.fa.html/files/json/input_file.fa_'
-        assert_table_output_file_present(table_file)
-        full_html = IO.binread(table_file)
-        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s).gsub(
-                  '#Place_external_results_link_here', @url)
-      end
-
-      def assert_table_output_file_present(table_file)
-        unless File.exist?(table_file)
-          fail RuntimeError, 'GeneValidator did not produce the required' \
+      # Assets whether the results file is produced by GeneValidator. 
+      def assert_table_output_file_produced
+        @table_file = @gv_dir + 'input_file.fa.html/files/table.html'
+        unless File.exist?(@table_file)
+          fail RuntimeError, 'GeneValidator did not produce the required' +
                              ' output file.'
         end
       end
 
+      # Reads the GV output table file.
+      # Updates links to the plots with relative links to plot jsons. 
+      def produce_table_html
+        orig_plots_dir  = 'files/json/input_file.fa_'
+        local_plots_dir = Pathname.new('GeneValidator') + @unique_id +
+                          'input_file.fa.html/files/json/input_file.fa_'
+        full_html = IO.binread(@table_file)
+        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s).gsub(
+                  '#Place_external_results_link_here', @url)
+      end
+
+      # Reuturns the URL of the results page.
       def produce_result_url_link(url)
         url.gsub(/input/, '').gsub(/\/*$/, '') +
         "/GeneValidator/#{@unique_id}/input_file.fa.html/results.html"
@@ -202,6 +221,7 @@ module GeneValidatorApp
   end
 end
 
+# Entending the String Class with a few useful functions.
 class String
   extend Forwardable
 

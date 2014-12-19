@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-require 'GeneValidatorApp/version'
 require 'slop'
 
 ENV['RACK_ENV'] ||= 'production'
@@ -80,6 +79,7 @@ begin
 
     run do 
       if version?
+        require 'GeneValidatorApp/version'
         puts GeneValidatorApp::VERSION
         exit 
       end
@@ -93,7 +93,8 @@ begin
         GeneValidatorApp.init(opts)
       rescue SystemExit => e
         puts '*** Error: GeneValidator failed to initialise properly.'
-        puts '    Please try again.'
+        puts '    Please check all paramaters and try again.'
+        puts '    See https://github.com/IsmailM/GeneValidatorApp for more help'
         exit e.status
       end
       
