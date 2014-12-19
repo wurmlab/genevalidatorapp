@@ -47,6 +47,14 @@ body {
   line-height: 27px;
 }
 
+.navbar-brand a {
+  color:#fff;
+}
+
+.navbar-brand a:hover {
+  text-decoration: none;
+}
+
 .navbar-nav > li > a.nav_github_icon {
   padding-top: 0;
   padding-bottom: 0;
