@@ -176,7 +176,8 @@ module GeneValidatorApp
       def run_genevalidator
         gv_cmd = "time genevalidator -x '#{@xml_file}' -r '#{@raw_seq}'" +
                  " -v '#{@params[:validations].to_s.gsub(/[\[\]\"]/, '')}'" +
-                 " -n #{config[:num_threads]} #{@input_fasta_file}"
+                 " -d '#{@params[:database]}' -n #{config[:num_threads]}" +
+                 " #{@input_fasta_file}"
         logger.debug("Running: #{gv_cmd}")
         exit = %x(#{gv_cmd})
         logger.debug("GeneValidator exit status: #{$?.exitstatus}")
