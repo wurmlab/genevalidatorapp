@@ -1,6 +1,5 @@
 require 'GeneValidatorApp'
 require 'rack/test'
-require 'nokogiri'
 require 'w3c_validators'
 
 module GeneValidatorApp
