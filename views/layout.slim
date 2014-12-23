@@ -35,28 +35,28 @@ html lang="en"
             span.icon-bar
             span.icon-bar
             span.icon-bar
-          span.navbar-brand href="#" GeneValidator
+          span.navbar-brand
+            a href="#" GeneValidator
         .navbar-collapse.collapse.navbar-responsive-collapse
           ul.nav.navbar-nav
-            li
+            li.active
               a href="#" Home
-            /! li.active
+            li
+              a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  Source Code
+            li
+              a href="https://ismailm.github.io/GeneValidatorApp-API" target="_blank"  API
             /!   a href="#"  Documentation
             /! li
             /!   a href="#"  Support
-            li
-              a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  Source Code
             li
               a href="http://yannick.poulet.org" target="_blank" Wurm Lab
           ul.nav.navbar-nav.navbar-right
             li
               a.nav_github_icon href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"
                 span.i.fa.fa-2x.fa-github
-
-
     .container
       ==yield
-    #spinner.modal aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1"
+    #spinner.modal aria-hidden="true" aria-labelledby="spinner" role="dialog" tabindex="-1"
       .modal-dialog
         .modal-content
           .modal-body.text-center
@@ -65,9 +65,9 @@ html lang="en"
             i.fa.fa-spinner.fa-5x.fa-spin
     br/
     #footer
-      .container align="center"
-        p.text-muted 
-          | Please cite "Dragan M, Moghul MI, Priyam A & Wurm Y 
+      .container
+        p.text-muted.text-center 
+          | Please cite "Dragan M, Moghul MI, Priyam A &amp; Wurm Y 
           em 
             | (in prep) 
           | GeneValidator: identify problematic gene predictions"
@@ -85,4 +85,4 @@ html lang="en"
           a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  GeneValidator Web Application 
           | v#{GeneValidatorApp::VERSION} (using 
           a href="https://github.com/monicadragan/GeneValidator" target="_blank"  GeneValidator 
-          | v#{@GVversion})
+          | v#{@current_gv_version})

@@ -1,92 +1,106 @@
 function showDiv(source, target){
-  var explanationId = '#' + target + 'explanation'
+  'use strict';
+  if (window.chrome && (window.location.protocol === 'file:') ) {
+    if (($('#browser-alert').length) === 0) {
+      $('#browseralertText').html('<stong>Sorry, this feature is not supported in your browser.');
+      $('#browseralert').modal();
+    }
+    return;
+  }
+  var explanationId = '#' + target + 'explanation';
 
-  if( $(explanationId).length) {
-    $(explanationId).remove()
+  if ( $(explanationId).length) {
+    $(explanationId).remove();
   }
 
-  var button = document.getElementById(target)
-  if(source.status == "pressed"){
-    button.style.display = "none";
+  var button = document.getElementById(target);
+  if (source.status === 'pressed'){
+    button.style.display = 'none';
     $(button).parent().parent().hide();
   } else {
-    d3.select("#".concat(target)).selectAll("svg").remove();    
-    button.style.display = "block";
-    $(button).parent().parent().show()
-    var pressedButtons = document.querySelectorAll('td')
+    d3.select('#'.concat(target)).selectAll('svg').remove();    
+    button.style.display = 'block';
+    $(button).parent().parent().show();
+    var pressedButtons = document.querySelectorAll('td');
     for (var i = 0; i < pressedButtons.length; i++) {
-      if(pressedButtons[i].status == "pressed") {
-        pressedButtons[i].status = "released"
+      if (pressedButtons[i].status === 'pressed') {
+        pressedButtons[i].status = 'released';
       }
     }
   }
 
-  if(source.status=="pressed")
-    source.status="released"
-  else {
-    source.status="pressed"
+  if (source.status=='pressed') {
+    source.status='released';
+  } else {
+    source.status='pressed';
   }
 }
 
-function AddExplanation(source, approach, explanation, conclusion, target){
-  var row = '#' + target +'row'
-  var approach_html = '<p><b>Approach:</b> ' + approach + '</p>'
-  var explanation_html = '<p><b>Explanation:</b> ' + explanation + '</p>'
-  var conclusion_html = '<p><b>Conclusion:</b> ' + conclusion + '</p>'
+function AddExplanation(source, target){
+  'use strict';
+  var row = '#' + target +'row';
+  var approach_html = '<p><b>Approach:</b> ' + source.getAttribute("data-approach") + '</p>';
+  var explanation_html = '<p><b>Explanation:</b> ' + source.getAttribute("data-explanation") + '</p>';
+  var conclusion_html = '<p><b>Conclusion:</b> ' + source.getAttribute("data-conclusion") + '</p>';
 
-  var explain = $('<div id="' + target + 'explanation" class="alert alert-info explanation_alert" role="alert">' + approach_html + explanation_html + conclusion_html + '</div>')
-  if (source.status == "pressed") {
-    $(row).prepend(explain)
+  var explain = $('<div id="' + target + 'explanation" class="alert alert-info explanation_alert" role="alert">' + approach_html + explanation_html + conclusion_html + '</div>');
+  if (source.status === 'pressed') {
+    $(row).prepend(explain);
   }
 }
 
 function addPlot(target, filename, type, title, footer, xtitle, ytitle, aux1, aux2){
-  if (footer == '')
-    var legend = []
-  else
-    var legend = footer.split(";");
+  'use strict';
+  var legend;
+  if (footer === '') {
+    legend = [];
+  } else {
+    legend = footer.split(';');
+  }
 
-  switch(type){
-    case "scatter":
-      plot_scatter(filename, target, title, footer, xtitle, ytitle, aux1, aux2)
+  switch(type) {
+    case 'scatter':
+      plot_scatter(filename, target, title, footer, xtitle, ytitle, aux1, aux2);
       break;
-    case "bars":
-      plot_bars(filename, target, title, legend, xtitle, ytitle, aux1)
+    case 'bars':
+      plot_bars(filename, target, title, legend, xtitle, ytitle, aux1);
       break;
-    case "simplebars":
-      plot_simple_bars(filename, target, title, legend, xtitle, ytitle) 
+    case 'simplebars':
+      plot_simple_bars(filename, target, title, legend, xtitle, ytitle);
       break;
-    case "lines":
-      if(aux2 != "")
-      aux2 = aux2.split(",");
-      plot_lines(filename, target, title, legend, xtitle, ytitle, aux1, aux2)
+    case 'lines':
+      if (aux2 !== '') {
+        aux2 = aux2.split(',');
+      }
+      plot_lines(filename, target, title, legend, xtitle, ytitle, aux1, aux2);
       break;
-    case "align":
-      if(aux2 != "")
-      aux2 = aux2.split(",");
-      plot_align(filename, target, title, legend, xtitle, ytitle, aux1, aux2)
+    case 'align':
+      if (aux2 !== '') {
+        aux2 = aux2.split(',');
+      }
+      plot_align(filename, target, title, legend, xtitle, ytitle, aux1, aux2);
       break;
     default:
       break;
   }
 }
 
-
 function color_beautification(color){
+  'use strict';
   switch(color){
-    case "red":
+    case 'red':
       return d3.rgb(189,54,47);
-      case "blue":
+    case 'blue':
       return d3.rgb(58,135,173);
-    case "green":
+    case 'green':
       return d3.rgb(70,136,71);
-    case "yellow":
+    case 'yellow':
       return d3.rgb(255,255,51);
-    case "orange":
+    case 'orange':
       return d3.rgb(248,148,6);
-    case "violet":
+    case 'violet':
       return d3.rgb(153,0,153);
-    case "gray":
+    case 'gray':
       return d3.rgb(160,160,160);
     default:
       return color;
@@ -95,7 +109,6 @@ function color_beautification(color){
 
 // bars plot
 function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
-
   var margin = {top: 70, right: 50, bottom: 75, left: 50},
     width = 600 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;      
@@ -105,7 +118,7 @@ function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     
   svg.append("text")
     .attr("x", (width / 2))             
@@ -117,7 +130,7 @@ function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
   var colors = new Array("orange", "blue", "green", "yellow", "brown");
   var no_colors = colors.length
 
-    var padding = 100
+  var padding = 100
 
   d3.json(filename, function(error, alldata) {
     
@@ -128,12 +141,12 @@ function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
       .range([height, 0]);
 
     var xMin = d3.min(flattened_data, function(d) { return d.key; })
-    if(bar!=undefined){
+    if (bar!=undefined){
       var xMin = Math.min(xMin, bar); 
     }
  
     var xMax = d3.max(flattened_data, function(d) { return d.key; })
-    if(bar!=undefined){
+    if (bar!=undefined){
       var xMax = Math.max(xMax, bar); 
     }
 
@@ -187,7 +200,7 @@ function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
           .attr("fill", function(d) { if (d.main == true) return color_beautification("red"); return color_beautification("blue");});
     }); 
 
-    if(bar!=undefined){
+    if (bar!=undefined){
       svg.append("rect")
         .attr("x", x(bar))
         .attr("width", 4)
@@ -201,12 +214,9 @@ function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
         .attr("x", -yMax/10 - 35)
         .attr("y", x(bar) - 5)
           .text("query");
-
         }   
   });
 
-   
-    
   var offset = 0
   var total_len = 0
   for (var i = 0; i < footer.length; i++) {
@@ -238,6 +248,7 @@ function plot_bars(filename, target, title, footer, xTitle, yTitle, bar){
 
 // bars plot
 function plot_simple_bars(filename, target, title, footer, xTitle, yTitle){
+  'use strict';
 
   var margin = {top: 70, right: 50, bottom: 75, left: 50},
     width = 600 - margin.left - margin.right,
@@ -331,6 +342,7 @@ function plot_simple_bars(filename, target, title, footer, xTitle, yTitle){
 // scatter plot
 // ecuation of the line: slope * x + yLine
 function plot_scatter(filename, target, title, footer, xTitle, yTitle, yLine, slope){
+  'use strict';
 
   var margin = {top: 50, right: 30, bottom: 75, left: 50},
     width = 500 - margin.left - margin.right,
@@ -414,7 +426,7 @@ function plot_scatter(filename, target, title, footer, xTitle, yTitle, yLine, sl
       .style("fill", function(d) { return color_beautification("red"); })
       .style("opacity",0.6);
 
-       if((slope!=undefined && slope != "") && (yLine!=undefined && yLine != "")){
+       if ((slope!=undefined && slope != "") && (yLine!=undefined && yLine != "")){
 
         yLine = parseFloat(yLine.replace(",", "."));
         var xMaxValue = xMax
@@ -457,6 +469,7 @@ function plot_scatter(filename, target, title, footer, xTitle, yTitle, yLine, sl
 // line plot
 // maximum 80 lines
 function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, yValues){
+  'use strict';
   var margin = {top: 50, right: 50, bottom: 75, left: 50},
     width = 600 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;      
@@ -517,7 +530,7 @@ function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, y
       .style("text-anchor", "start")
       .text(xTitle)
       
-      if(yValues != ""){
+      if (yValues != ""){
       svg.append("g")
         .attr("class", "y axis")
         .call(yAxis
@@ -566,7 +579,7 @@ function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, y
             return height/no_lines/5
           }
           })
-          .style("stroke-dasharray", function(d) { if(d.dotted == undefined) return ("0, 0"); return ("2, 6");}) 
+          .style("stroke-dasharray", function(d) { if (d.dotted == undefined) return ("0, 0"); return ("2, 6");}) 
           .attr("stroke", function(d) { return color_beautification(d.color); })
   });
 
@@ -608,6 +621,7 @@ function plot_lines(filename, target, title, footer, xTitle, yTitle, no_lines, y
 // line plot
 // maximum 80 lines
 function plot_align(filename, target, title, footer, xTitle, yTitle, no_lines, yValues){
+  'use strict';
 
   var margin = {top: 75, right: 50, bottom: 75, left: 150},
     width = 600 - margin.left - margin.right,
@@ -663,7 +677,7 @@ function plot_align(filename, target, title, footer, xTitle, yTitle, no_lines, y
       .style("text-anchor", "start")
       .text(xTitle)
       
-      if(yValues != ""){
+      if (yValues != ""){
       svg.append("g")
         .attr("class", "y axis")
         .call(yAxis
@@ -700,7 +714,7 @@ function plot_align(filename, target, title, footer, xTitle, yTitle, no_lines, y
           .attr("y1", function(d) { return y(d.y); })                 
           .attr("x2", function(d) { return x(d.stop); })
           .attr("y2", function(d) { return y(d.y); })                 
-          .attr("stroke-width", function(d) { if(d.height == -1) return height/no_lines; return (height/no_lines * d.height) ; })
+          .attr("stroke-width", function(d) { if (d.height == -1) return height/no_lines; return (height/no_lines * d.height) ; })
           .attr("stroke", function(d) { return color_beautification(d.color); })
   });
 
