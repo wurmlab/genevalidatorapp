@@ -68,6 +68,11 @@ module GeneValidatorApp
         all.find_all { |a| a != Database.default_db }
       end
 
+      # Returns the original structure that the title is within. 
+      def obtain_original_structure(db_title)
+        all.find_all { |a| a.title.chomp == db_title }
+      end
+
       # Recurisvely scan `database_dir` for blast databases.
       def scan_databases_dir
         database_dir = config[:database_dir]

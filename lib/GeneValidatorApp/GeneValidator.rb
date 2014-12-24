@@ -35,6 +35,7 @@ module GeneValidatorApp
         create_soft_link_from_tmpdir_to_GV_dir
         @params = params
         validate_params
+        obtain_db_path
         @url = produce_result_url_link(url)
       end
 
@@ -114,6 +115,12 @@ module GeneValidatorApp
         logger.debug("database param = #{@params[:database]}")
       end
 
+      def obtain_db_path
+        Database.obtain_original_structure(@params[:database]).each do |db|
+          @db = db.name
+        end
+      end
+
       # Writes the input sequences to a file with the sub_dir in the temp_dir
       def write_seq_to_file
         @input_fasta_file = @gv_tmpdir + 'input_file.fa'
@@ -150,8 +157,8 @@ module GeneValidatorApp
       def run_blast
         @xml_file  = @gv_tmpdir + 'output.xml'
         blast_type = get_blast_type(@params[:seq])
-        blast = "time #{blast_type} -db '#{@params[:database]}' -evalue 1e-5" +
-                " -outfmt 5 -max_target_seqs 200 -gapopen 11 -gapextend 1" +
+        blast = "time #{blast_type} -db '#{@db}' -evalue 1e-5 -outfmt 5 " +
+                " -max_target_seqs 200 -gapopen 11 -gapextend 1" +
                 " -query '#{@input_fasta_file}' -out '#{@xml_file}'" +
                 " -num_threads #{config[:num_threads]}"
         logger.debug("Running: #{blast}")
@@ -163,8 +170,8 @@ module GeneValidatorApp
       # Run get_raw_sequence (script from genevalidator)
       def run_get_raw_sequence
         @raw_seq = @gv_tmpdir + 'output.xml.raw_seq'
-        raw_seqs = "time get_raw_sequences -d '#{@params[:database]}' -o" +
-                   " '#{@raw_seq}' '#{@xml_file}'"
+        raw_seqs = "time get_raw_sequences -d '#{@db}' -o '#{@raw_seq}'" +
+                   " '#{@xml_file}'"
         logger.debug("Running: #{raw_seqs}")
         exit = %x(#{raw_seqs})
         logger.debug("Get_raw_seqs exit status: #{$?.exitstatus}")
@@ -176,8 +183,7 @@ module GeneValidatorApp
       def run_genevalidator
         gv_cmd = "time genevalidator -x '#{@xml_file}' -r '#{@raw_seq}'" +
                  " -v '#{@params[:validations].to_s.gsub(/[\[\]\"]/, '')}'" +
-                 " -d '#{@params[:database]}' -n #{config[:num_threads]}" +
-                 " #{@input_fasta_file}"
+                 " -n #{config[:num_threads]} #{@input_fasta_file}"
         logger.debug("Running: #{gv_cmd}")
         exit = %x(#{gv_cmd})
         logger.debug("GeneValidator exit status: #{$?.exitstatus}")
