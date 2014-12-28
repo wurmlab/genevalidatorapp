@@ -1,6 +1,3 @@
-
-/* Main Structure
--------------------------------------------------- */
 html {
   /* This is required in order to make the footer stick to the bottom..*/
   /* There is a js function that controls the bottom margin...*/
@@ -9,18 +6,37 @@ html {
 }
 
 body {
-  /* Necessary due to the fixed navbar...*/
-  margin-top: 50px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin: 0; 
+  margin-top: 60px;
+  background-color:#F5F5F5;
 }
 
-.page-header{
-  margin: 20px 0 20px;
+section {
+  width: 100%;
+  padding: 0 5%;
+  display: table;
+  margin: 0;
+  max-width: none;
+  padding-bottom: 35px;
 }
 
-#spinner {
-  color: #fff;
-  display:none;
+.nav-container {
+  width:100%;
+  padding: 0 5%;
+  margin: 0;
+}
+
+.navbar-brand {
+  padding-left: 0;
+}
+
+footer {
+  bottom: 0;
+  width: 100%;
+  margin: 0 auto;
+  position: absolute;
+  border-top: 2px solid #DBDBDB;
+  padding-top:10px;
 }
 
 .alert-danger{
@@ -62,15 +78,12 @@ body {
 
 .fa-github {
   color: #fff;
-  padding-top: 11px;
-  padding-bottom: 11px;
+  padding-top: 18px;
+  padding-bottom: 18px;
 }
 
-
-/* Jumbotron
--------------------------------------------------- */
-.jumbotron {
-  padding: 45px;
+h1 .small {
+  color: #2C3E50;
 }
 
 .input_seq-label {
@@ -86,10 +99,16 @@ body {
 }
 
 #adv_params_btn {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 5px;
 }
 
 #input_btn {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 20px;
 }
 
@@ -126,30 +145,9 @@ label.radio-inline.no_indent {
   color:#ffa3a6;
 }
 
-.form-control {
-  background-color: #D8ECFF;
-}
-
-textarea::-webkit-input-placeholder {
-   color: #2b3e50 !important;
-}
-
-textarea:-moz-placeholder { /* Firefox 18- */
-   color: #2b3e50 !important;  
-}
-
-textarea::-moz-placeholder {  /* Firefox 19+ */
-   color: #2b3e50 !important;  
-}
-
-textarea:-ms-input-placeholder {  
-   color: #2b3e50 !important;  
-}
-
 #results_header {
   margin-top: 0;
   margin-bottom: 30px;
-  margin-left:-15px;
 }
 
 #results_link_btn {
@@ -170,6 +168,17 @@ textarea:-ms-input-placeholder {
 .table td {
   font-size: 13px !important;
   border-color: rgb(221, 221, 221) !important;
+}
+
+table .success,
+.table .success,
+table .warning,
+.table .warning,
+table .danger,
+.table .danger,
+table .info,
+.table .info {
+  color: #333;  
 }
 
 .table-bordered {
@@ -217,23 +226,15 @@ textarea:-ms-input-placeholder {
 }
 
 .plot_btn {
-  background-color: rgb(217, 237, 247);
-  border-color: rgb(188, 232, 241);
-  border-style: solid;
-  border-width: 1px;
-  border-collapse: collapse;
-  box-sizing: border-box;
-  color: rgb(49, 112, 143);
-  display: block;
-  padding: 10px;
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
 }
 
 .plot_btn:hover {
-  background-color: #c0e3ff;
-  color: rgb(49, 112, 143);
-    border-color: rgb(188, 232, 241);
-  border-style: solid;
-  border-width: 1px;
+  color: #333;
+  background-color: #ebebeb;
+  border-color: #adadad
 }
 
 .table-bordered>thead>tr>th,
@@ -251,22 +252,6 @@ textarea:-ms-input-placeholder {
 
 .error_header {
   margin-top: 10px;
-}
-
-/* Footer
--------------------------------------------------- */
-#footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  margin: 0 auto;
-  background-color: rgb(78, 93, 108);
-}
-
-/* for the text in the footer */
-.container .text-muted {
-  color: rgba(255, 255, 255, 0.7);
-  margin: 20px 0;
 }
 
 
@@ -288,7 +273,6 @@ ___________________________*/
   border-collapse: collapse;
   background-clip: padding-box;
   text-align: left;
-
 }
 
 .table th,
@@ -299,7 +283,6 @@ ___________________________*/
 
 tr {
   height: 39px;
-  background-color: rgba(241, 248, 255, 1);
 }
 
 .expanded-child{
@@ -497,8 +480,14 @@ ___________________________*/
 ___________________________*/
 
 @media (min-width: 768px) {
+  #adv_params_btn {
+    float:left !important;
+    margin-top: 5px;
+  }
+
   #input_btn {
-    margin-top: -40px;
+    float:right !important;
+    margin-top: -43px;
   }
 
   .container{

@@ -29,7 +29,7 @@ html lang="en"
 
   body#mainbody
     .navbar.navbar-default.navbar-fixed-top role="navigation"
-      .container
+      .nav-container
         .navbar-header
           button.navbar-toggle data-target=".navbar-responsive-collapse" data-toggle="collapse" type="button" 
             span.icon-bar
@@ -39,7 +39,7 @@ html lang="en"
             a href="#" GeneValidator
         .navbar-collapse.collapse.navbar-responsive-collapse
           ul.nav.navbar-nav
-            li.active
+            li
               a href="#" Home
             li
               a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  Source Code
@@ -54,8 +54,7 @@ html lang="en"
             li
               a.nav_github_icon href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"
                 span.i.fa.fa-2x.fa-github
-    .container
-      ==yield
+    ==yield
     #spinner.modal aria-hidden="true" aria-labelledby="spinner" role="dialog" tabindex="-1"
       .modal-dialog
         .modal-content
@@ -63,26 +62,24 @@ html lang="en"
             h2  Calculating...
             p.results_link  This may take some time. Please leave this page open.
             i.fa.fa-spinner.fa-5x.fa-spin
-    br/
-    #footer
-      .container
-        p.text-muted.text-center 
-          | Please cite "Dragan M, Moghul MI, Priyam A &amp; Wurm Y 
-          em 
-            | (in prep) 
-          | GeneValidator: identify problematic gene predictions"
-          br
-          |  Developed at 
-          a href="http://yannick.poulet.org" target="_blank" Wurm Lab
-          | , 
-          a href="http://www.sbcs.qmul.ac.uk" target="_blank" QMUL
-          |  with funding by 
-          a href="http://www.bbsrc.ac.uk/home/home.aspx" target="_blank" BBSRC
-          |  and 
-          a href="https://www.google-melange.com/gsoc/homepage/google/gsoc2013" target="_blank"  Google Summer of Code 2013
-          br
-          | This page was created by 
-          a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  GeneValidator Web Application 
-          | v#{GeneValidatorApp::VERSION} (using 
-          a href="https://github.com/monicadragan/GeneValidator" target="_blank"  GeneValidator 
-          | v#{@current_gv_version})
+    footer#footer
+      p.text-muted.text-center 
+        | Please cite "Dragan M, Moghul MI, Priyam A &amp; Wurm Y 
+        em 
+          | (in prep) 
+        | GeneValidator: identify problematic gene predictions"
+        br
+        |  Developed at 
+        a href="http://yannick.poulet.org" target="_blank" Wurm Lab
+        | , 
+        a href="http://www.sbcs.qmul.ac.uk" target="_blank" QMUL
+        |  with funding by 
+        a href="http://www.bbsrc.ac.uk/home/home.aspx" target="_blank" BBSRC
+        |  and 
+        a href="https://www.google-melange.com/gsoc/homepage/google/gsoc2013" target="_blank"  Google Summer of Code 2013
+        br
+        | This page was created by 
+        a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  GeneValidator Web Application 
+        | v#{GeneValidatorApp::VERSION} (using 
+        a href="https://github.com/monicadragan/GeneValidator" target="_blank"  GeneValidator 
+        | v#{@current_gv_version})

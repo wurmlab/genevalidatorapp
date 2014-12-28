@@ -1,67 +1,66 @@
-.col-md-12
+section#search
   h1.page-header
     span  GeneValidator&nbsp;
     span.small  Identify problems with gene predictions
-  .jumbotron
-    form#input action="#{uri('/input')}" method="POST"
-      .form-group#input_seq_group
-        label.control-label.input_seq-label for="seq"  Input Sequences:
-        - if @max_characters != 'undefined'
-          textarea#seq.form-control autofocus="" name="seq" placeholder="Paste your sequence(s) here..." rows="10" spellcheck="false" data-maxCharacters="#{@max_characters}"
-        - else
-          textarea#seq.form-control autofocus="" name="seq" placeholder="Paste your sequence(s) here..." rows="10" spellcheck="false" 
-      .clearfix
-      button#adv_params_btn.btn.btn-primary.pull-left type="button" onclick="changeAdvParamsBtnText()"
-        i.fa.fa-pencil-square-o
-        | &nbsp;&nbsp;Show Advanced Parameters
-      .clearfix
-      #adv_params.collapse
-        .form-group.form-inline#validations_group
-          br/
-          label.control-label  Advanced Parameters: Validations Types
-          br/
-          label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="lenc" class="check" type="checkbox" name="validations[]" checked="" value="lenc">Length Validation (via clusterization)
-          label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="lenr" class="check" type="checkbox" name="validations[]" checked="" value="lenr"> Length Validation (via ranking)
-          label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="dup" class="check" type="checkbox" name="validations[]" checked="" value="dup"> Duplication Check
-          label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="merge" class="check" type="checkbox" name="validations[]" checked="" value="merge"> Gene Merge Validation
-          label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="align" class="check" type="checkbox" name="validations[]" checked="" value="align"> Multiple Alignment Validation (proteins)
-          label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="frame" class="check" type="checkbox" name="validations[]" checked="" value="frame"> Blast Reading Frame Validation (nucleotides)
-          label#lastValidation.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input id="orf" class="check" type="checkbox" name="validations[]" checked="" value="orf"> Open Reading Frame Validation (nucleotides)
-        .clearfix
+  form#input action="#{uri('/input')}" method="POST"
+    .form-group#input_seq_group
+      label.control-label.input_seq-label for="seq"  Input Sequences:
+      - if @max_characters != 'undefined'
+        textarea#seq.form-control autofocus="" name="seq" placeholder="Paste your sequence(s) here..." rows="10" spellcheck="false" data-maxCharacters="#{@max_characters}"
+      - else
+        textarea#seq.form-control autofocus="" name="seq" placeholder="Paste your sequence(s) here..." rows="10" spellcheck="false" 
+    .clearfix
+    button#adv_params_btn.btn.btn-primary type="button" onclick="changeAdvParamsBtnText()"
+      i.fa.fa-pencil-square-o
+      | &nbsp;&nbsp;Show Advanced Parameters
+    .clearfix
+    #adv_params.collapse
+      .form-group.form-inline#validations_group
         br/
-        .form-group.form-inline
-          label.control-label  Advanced Parameters: Database
-          br/
-          label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-            <input type="radio" name="database" value="#{@default_db.title.chomp}" checked=""> #{@default_db.title.chomp}
-          - unless @non_default_dbs.empty?
-            - @non_default_dbs.each do |db|
-              label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
-                <input type="radio" name="database" value="#{db.title.chomp}"> #{db.title.chomp}
-        .clearfix
-      .form-group
-        button#input_btn.btn.btn-lg.btn-primary.pull-right type="submit" value="input"
-          i.fa.fa-search
-          | &nbsp;&nbsp;Analyse Sequences
-        .clearfix
-      .show_examples_text
-        span 
-          a#protein_example onclick="examplarSequence('protein')"
-            | Show a protein example
-        span
-          | &nbsp;&#124;&nbsp;
-        span
-          a#genetic_example onclick="examplarSequence('genetic')"
-            | Show a genetic example
-.col-md-12
+        label.control-label  Advanced Parameters: Validations Types
+        br/
+        label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="lenc" class="check" type="checkbox" name="validations[]" checked="" value="lenc">Length Validation (via clusterization)
+        label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="lenr" class="check" type="checkbox" name="validations[]" checked="" value="lenr"> Length Validation (via ranking)
+        label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="dup" class="check" type="checkbox" name="validations[]" checked="" value="dup"> Duplication Check
+        label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="merge" class="check" type="checkbox" name="validations[]" checked="" value="merge"> Gene Merge Validation
+        label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="align" class="check" type="checkbox" name="validations[]" checked="" value="align"> Multiple Alignment Validation (proteins)
+        label.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="frame" class="check" type="checkbox" name="validations[]" checked="" value="frame"> Blast Reading Frame Validation (nucleotides)
+        label#lastValidation.checkbox-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input id="orf" class="check" type="checkbox" name="validations[]" checked="" value="orf"> Open Reading Frame Validation (nucleotides)
+      .clearfix
+      br/
+      .form-group.form-inline
+        label.control-label  Advanced Parameters: Database
+        br/
+        label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+          <input type="radio" name="database" value="#{@default_db.title.chomp}" checked=""> #{@default_db.title.chomp}
+        - unless @non_default_dbs.empty?
+          - @non_default_dbs.each do |db|
+            label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+              <input type="radio" name="database" value="#{db.title.chomp}"> #{db.title.chomp}
+      .clearfix
+    .form-group
+      button#input_btn.btn.btn-lg.btn-primary type="submit" value="input"
+        i.fa.fa-search
+        | &nbsp;&nbsp;Analyse Sequences
+      .clearfix
+    .show_examples_text
+      span 
+        a#protein_example onclick="examplarSequence('protein')"
+          | Show a protein example
+      span
+        | &nbsp;&#124;&nbsp;
+      span
+        a#genetic_example onclick="examplarSequence('genetic')"
+          | Show a genetic example
+section#results
   #results_box style="display:none;"
-    h2#output_header.page-header
+    h1#output_header.page-header
       span Results
-    .jumbotron#output
+    #output

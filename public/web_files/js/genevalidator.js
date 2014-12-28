@@ -138,6 +138,12 @@ function ajaxFunction() {
       initTableSorter(); // initiate the table sorter
       $("[data-toggle='tooltip']").tooltip(); // Initiate the tooltips
       removeEmptyColumns(); // Remove Unwanted Columns
+
+      $('#mainbody').css({'background-color': '#fff'});
+      $('#search').css({'background-color': '#F5F5F5'})
+      $('#search').css({'border-bottom': '3px solid #DBDBDB'})
+      $('#search').css({'margin-bottom': '0'})
+      
       $('#spinner').modal('hide'); // remove progress notification
     },
     error: function (e, status) {
