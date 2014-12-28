@@ -342,7 +342,7 @@ module GeneValidatorApp
       slim :index
     end
 
-    post '/input' do
+    post '/' do
       GeneValidator.init(request.url, params)
       GeneValidator.run
     end
