@@ -55,6 +55,7 @@ module GeneValidatorApp
         :host         => 'localhost',
         :web_dir      => Dir.pwd
       }.update(parse_config_file.merge(config))
+
       assert_genevalidator_installed_and_compatible
 
       assert_bin_dir('BLAST bin dir', @config[:blast_bin]) if @config[:blast_bin]
@@ -69,6 +70,7 @@ module GeneValidatorApp
       # TODO: Warn if chosen default db does not exist (use the first db instead)
 
       assert_num_threads_valid
+      assert_max_characters_valid
 
       require_extension if @config[:require]
 
@@ -114,7 +116,7 @@ module GeneValidatorApp
 
     # Set the max characters accepted from the app (for the app templates)
     def max_characters
-      (config[:max_characters]) ? config[:max_characters].to_i : 'undefined'
+      (config[:max_characters]) ? config[:max_characters] : 'undefined'
     end
 
     # Returns the version of the GeneValidator installed
@@ -267,6 +269,12 @@ module GeneValidatorApp
       exit 1
     end
 
+    def assert_max_characters_valid
+      @config[:max_characters] = Integer(@config[:max_characters])
+    rescue
+      puts "*** The 'Max Characters' value should be a number."
+      exit 1
+    end 
     # Assert whether GV is installed and is also compatible
     def assert_genevalidator_installed_and_compatible
       unless command? 'genevalidator'
@@ -326,8 +334,6 @@ module GeneValidatorApp
       # This is the full path to the public folder...
       set :public_folder, lambda { GeneValidatorApp.public_dir }
 
-      # Required for GVAPP-API to work...
-      enable :cross_origin
     end
 
     # Set up global variables for the templates...
@@ -343,6 +349,7 @@ module GeneValidatorApp
     end
 
     post '/' do
+      cross_origin # Required for the API to work...
       GeneValidator.init(request.url, params)
       GeneValidator.run
     end
