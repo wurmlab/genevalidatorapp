@@ -86,7 +86,7 @@ module GeneValidatorApp
       #  all params via Javascript.
       def validate_params
         assert_seq_param_present
-        # TODO: validate the seq length is smaller than max Characters.
+        assert_seq_length if config[:max_characters]
         assert_validations_param_present
         assert_database_params_present
       end
@@ -97,6 +97,13 @@ module GeneValidatorApp
           fail ArgumentError, 'No input sequence provided.'
         end
         logger.debug("seq param = #{@params[:seq]}")
+      end
+
+      def assert_seq_length
+        unless @params[:seq].length < config[:max_characters]
+          fail ArgumentError, 'The input sequence is too long.'
+        end
+        logger.debug("seq length = #{@params[:seq].length}")
       end
 
       # Asserts whether the validations param are specified
