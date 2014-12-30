@@ -55,11 +55,11 @@ begin
       :argument => true
 
     on 'h', 'host=',
-      'Host to run SequenceServer on',
+      'Host to run GeneValidatorApp on',
       :argument => true
 
     on 'p', 'port=',
-      'Port to run SequenceServer on',
+      'Port to run GeneValidatorApp on',
       :argument => true
 
     on 's', 'set',
@@ -69,10 +69,10 @@ begin
       'List BLAST databases'
 
     on 'D', 'devel',
-      'Start SequenceServer in development mode'
+      'Start GeneValidatorApp in development mode'
 
     on '-v', '--version',
-      'Print version number of SequenceServer that will be loaded'
+      'Print version number of GeneValidatorApp that will be loaded'
 
     on '-h', '--help',
       'Display this help message'
