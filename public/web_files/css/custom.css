@@ -90,10 +90,6 @@ h1 .small {
   font-size: 26px;
 }
 
-.show_examples_text {
-  font-size: 17px;
-}
-
 #protein_example, #genetic_example {
   cursor: pointer;
 }
@@ -110,6 +106,11 @@ h1 .small {
   margin-left: auto;
   margin-right: auto;
   margin-top: 20px;
+}
+
+.show_examples_text {
+  font-size: 17px;
+  text-align: center;
 }
 
 .control-label{
@@ -488,6 +489,10 @@ ___________________________*/
   #input_btn {
     float:right !important;
     margin-top: -43px;
+  }
+  
+  .show_examples_text {
+    text-align: left;
   }
 
   .container{
