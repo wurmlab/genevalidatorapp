@@ -43,8 +43,6 @@ module GeneValidatorApp
       #  Returns html for just the table or a link to the page produced by GV 
       def run
         write_seq_to_file
-        run_blast
-        run_get_raw_sequence
         run_genevalidator
         (@params[:result_link]) ? @url : produce_table_html
       end
@@ -160,36 +158,10 @@ module GeneValidatorApp
         (sequences.sequence_type? == Bio::Sequence::AA) ? 'blastp' : 'blastx'
       end
 
-      # Runs BLAST (P/X)
-      def run_blast
-        @xml_file  = @gv_tmpdir + 'output.xml'
-        blast_type = get_blast_type(@params[:seq])
-        blast = "time #{blast_type} -db '#{@db}' -evalue 1e-5 -outfmt 5 " +
-                " -max_target_seqs 200 -gapopen 11 -gapextend 1" +
-                " -query '#{@input_fasta_file}' -out '#{@xml_file}'" +
-                " -num_threads #{config[:num_threads]}"
-        logger.debug("Running: #{blast}")
-        exit = %x(#{blast})
-        logger.debug("BLAST exit status: #{$?.exitstatus}")
-        assert_exit_code_valid(blast_type.capitalize, $?.exitstatus)
-      end
-
-      # Run get_raw_sequence (script from genevalidator)
-      def run_get_raw_sequence
-        @raw_seq = @gv_tmpdir + 'output.xml.raw_seq'
-        raw_seqs = "time get_raw_sequences -d '#{@db}' -o '#{@raw_seq}'" +
-                   " '#{@xml_file}'"
-        logger.debug("Running: #{raw_seqs}")
-        exit = %x(#{raw_seqs})
-        logger.debug("Get_raw_seqs exit status: #{$?.exitstatus}")
-        assert_exit_code_valid('GeneValidator (get_raw_sequences)',
-                               $?.exitstatus)
-      end
-
       # Runs GeneValidator
       def run_genevalidator
-        gv_cmd = "time genevalidator -x '#{@xml_file}' -r '#{@raw_seq}'" +
-                 " -v '#{@params[:validations].to_s.gsub(/[\[\]\"]/, '')}'" +
+        gv_cmd = "time genevalidator -x '#{@xml_file}' -d '#{@db}'" +
+                 " -v '#{@params[:validations].join(' ,')}' -f " +
                  " -n #{config[:num_threads]} #{@input_fasta_file}"
         logger.debug("Running: #{gv_cmd}")
         exit = %x(#{gv_cmd})
