@@ -70,7 +70,7 @@ module GeneValidatorApp
       # TODO: Warn if chosen default db does not exist (use the first db instead)
 
       assert_num_threads_valid
-      assert_max_characters_valid
+      assert_max_characters_valid if @config[:max_characters]
 
       require_extension if @config[:require]
 
@@ -269,12 +269,14 @@ module GeneValidatorApp
       exit 1
     end
 
+    # Assert whether the Max Characters value is a number
     def assert_max_characters_valid
       @config[:max_characters] = Integer(@config[:max_characters])
     rescue
       puts "*** The 'Max Characters' value should be a number."
       exit 1
     end 
+
     # Assert whether GV is installed and is also compatible
     def assert_genevalidator_installed_and_compatible
       unless command? 'genevalidator'
