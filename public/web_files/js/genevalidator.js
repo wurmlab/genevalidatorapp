@@ -141,7 +141,7 @@ function ajaxFunction() {
 
       $('#mainbody').css({'background-color': '#fff'});
       $('#search').css({'background-color': '#F5F5F5'})
-      $('#search').css({'border-bottom': '3px solid #DBDBDB'})
+      $('#results').css({'border-top': '3px solid #DBDBDB'})
       $('#search').css({'margin-bottom': '0'})
       
       $('#spinner').modal('hide'); // remove progress notification
