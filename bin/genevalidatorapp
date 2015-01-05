@@ -23,6 +23,8 @@ Example
   # Launch GeneValidatorApp with 8 threads at port 8888
   $ genevalidatorapp --num_threads 8 --port 8888
 
+  # Create a config file with the other arguments
+  $ genevalidatorapp -s -d ~/database_dir 
 BNR
 
 begin
@@ -30,52 +32,56 @@ begin
     banner BANNER
 
     on 'c', 'config_file=',
-      'Use the given configuration file',
-      :argument => true
-
-    on 'b', 'blast_bin=',
-      'Load BLAST+ binaries from this directory',
-      :argument => true
-
-    on 'm', 'mafft_bin=',
-      'Load Mafft binaries from this directory',
-      :argument => true
+       'Use the given configuration file',
+       :argument => true
 
     on 'd', 'database_dir=',
-      'Read BLAST database from this directory',
-      :argument => true
+       'Read BLAST database from this directory',
+       :argument => true
+
+    on 'f', 'default_db=',
+       'The Path to the the default database',
+       :argument => true
 
     on 'n', 'num_threads=',
-      'Number of threads to use to run a BLAST search',
-      :argument => true
-      #:as       => Integer
+       'Number of threads to use to run a BLAST search',
+       :argument => true
+       #:as       => Integer
 
     on 'r', 'require=',
-      'Load extension from this file',
-      :argument => true
+       'Load extension from this file',
+       :argument => true
 
     on 'h', 'host=',
-      'Host to run GeneValidatorApp on',
-      :argument => true
+       'Host to run GeneValidatorApp on',
+       :argument => true
 
     on 'p', 'port=',
-      'Port to run GeneValidatorApp on',
-      :argument => true
+       'Port to run GeneValidatorApp on',
+       :argument => true
 
     on 's', 'set',
-      'Set configuration value in default or given config file'
+       'Set configuration value in default or given config file'
 
     on 'l', 'list_databases',
-      'List BLAST databases'
+       'List BLAST databases'
+
+    on 'b', 'blast_bin=',
+       'Load BLAST+ binaries from this directory',
+       :argument => true
+
+    on 'm', 'mafft_bin=',
+       'Load Mafft binaries from this directory',
+       :argument => true
 
     on 'D', 'devel',
-      'Start GeneValidatorApp in development mode'
+       'Start GeneValidatorApp in development mode'
 
     on '-v', '--version',
-      'Print version number of GeneValidatorApp that will be loaded'
+       'Print version number of GeneValidatorApp that will be loaded'
 
     on '-h', '--help',
-      'Display this help message'
+       'Display this help message'
 
     run do 
       if version?
