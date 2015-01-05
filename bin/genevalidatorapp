@@ -31,14 +31,15 @@ begin
   Slop.parse!(:strict => true, :help => true) do
     banner BANNER
 
-    separator "Compulsory Argument, unless set in a config file"
+    separator 'Compulsory Argument, unless set in a config file'
 
     on 'd', 'database_dir=',
        'Read BLAST database from this directory',
        :argument => true
 
+    separator ''
     separator 'Optional Arguments'
-
+    
     on 'f', 'default_db=',
        'The Path to the the default database',
        :argument => true
