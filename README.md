@@ -72,7 +72,7 @@ In order to create a config file, run genevalidator with the `-s` or `--set` arg
 
     $ genevalidator -s -d database_dir -f default_db -n num_threads -p port -b blast_bin -m mafft_bin
 
-The `-- set` argument create a config file at `~/.genevalidatorapp.conf` using all the other arguments used. Thereafter, GeneValidatorApp will read the config file before starting the app. This means that you are not required provide the same arguments again and again.
+The `--set` argument create a config file at `~/.genevalidatorapp.conf` using all the other arguments used. Thereafter, GeneValidatorApp will read the config file before starting the app. This means that you are not required provide the same arguments again and again.
 
 ### Config file
 
