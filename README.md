@@ -21,64 +21,6 @@ This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http
 
     $ gem install GeneValidatorApp
 
-3) Set up your configuration file (see the next section).
-
-## Configuration File
-
-A configuration file needs to set up in order for GeneValidatorApp to run. The default location for the configuration file is in the home directory (`~/.genevalidatorapp.conf`).
-
-### Obtain an exemplar configuration file. 
-
-When run, GeneValidatorApp will look for the configuration file and if one is not found, the program will provide you with a personalised command to run in order to copy the exemplar configuration file to your home directory.
-
-1) Run GeneValidatorApp
-
-    $ genevalidatorapp
-
-2) Run the command shown.
-
-There are a number of compulsory variables (that is required for GeneValidatorApp to run), and a few optional variables that allow the end-user to customise the installation to their requirements.
-
-### Compulsory Variables
-
-##### BLAST database directory 
-This is the full path to the directory containing your BLAST database. GeneValidatorApp then analyses this directory for any BLAST databases. This variable is to be set as follows (please edit this example):
-
-    database-dir: /Users/ismailm/blastdb
-
-##### BLAST bin Path (Compulsory if BLAST is not in the $PATH)
-This is a compulsory variable only if BLAST is not in your $PATH (you can find out if 'BLAST' is your $PATH through the following command `$ which blastp`).
-
-This is the full path to the bin folder of your BLAST installation. This variable is to be set as follows (please edit this example):
-
-    blast-bin-path: /Users/ismailm/blast/bin
-
-##### Mafft Path (Compulsory if Mafft is not in the $PATH)
-This is a compulsory variable only if Mafft is not in your $PATH (you can find out if 'Mafft' is your $PATH through the following command `$ which mafft`).
-
-This is the full path to your mafft bin folder. This variable is to be set as follows (please edit this example):
-
-    mafft-bin-path: /Users/ismailm/mafft/bin/
-
-### Optional Variables 
-
-##### Default BLAST database
-This is the full path to your default database (don't include any file endings). If this is not set, a single database is choosen at random. This is set as follows (please edit this example):
-
-    default-database: /Users/ismailm/blastdb/SwissProt
-
-##### Website Directory
-This is the directory that GeneValidator serves to the web application.
-
-By default, this is This folder contains all the files that the web application requires as well as any files produced when analysing sequences. This variable is set as follows (please edit this example):
-
-    web-dir: /Users/ismailm/GV/
-
-##### Maximum input length
-If you wish to limit the input size (for example, for server load reasons), you can use the following option to limit the length of the input sequences. The example shown below limits the input size to 100,000 characters.
-
-    max-characters: 100000
-
 ## Usage
 
 After installing simply type in:
@@ -89,6 +31,62 @@ and then go to [http://localhost:4567](http://localhost:4567) (if on a local ser
 
 See `$ genevalidator -h` for more information on how to run GeneValidatorApp.
 
+    USAGE
+    
+    genevalidatorapp [options]
+    
+    Example
+    
+      # Launch GeneValidatorApp with the given config file
+      $ genevalidatorapp --config ~/.genevalidatorapp.conf
+    
+      # Launch GeneValidatorApp with 8 threads at port 8888
+      $ genevalidatorapp --num_threads 8 --port 8888
+
+      # Create a config file with the other arguments
+      $ genevalidatorapp -s -d ~/database_dir 
+    
+    Compulsory (unless set in a config file)
+        -d, --database_dir          Read BLAST database from this directory
+        
+    Optional
+        -f, --default_db            The Path to the the default database
+        -n, --num_threads           Number of threads to use to run a BLAST search
+        -c, --config_file           Use the given configuration file
+        -r, --require               Load extension from this file
+        -p, --port                  Port to run GeneValidatorApp on
+        -s, --set                   Set configuration value in default or given config file
+        -l, --list_databases        List BLAST databases
+        -b, --blast_bin             Load BLAST+ binaries from this directory
+        -m, --mafft_bin             Load Mafft binaries from this directory
+        -D, --devel                 Start GeneValidatorApp in development mode
+        -v, --version               Print version number of GeneValidatorApp that will be loaded
+        -h, --help                  Display this help message.
+
+
+## Setting up a Config File
+
+GeneValidatorApp requires a number of arguments in order to work. You can either provide these variables to the app through a config file or through command line arguments.
+
+In order to create a config file, run genevalidator with the `-s` or `--set` argument as follows.
+
+    $ genevalidator -s -d database_dir -f default_db -n num_threads -p port -b blast_bin -m mafft_bin
+
+The `-- set` argument create a config file at `~/.genevalidatorapp.conf` using all the other arguments used. Thereafter, GeneValidatorApp will read the config file before starting the app. This means that you are not required provide the same arguments again and again.
+
+### Config file
+
+A config file can also be set up manually. Below is an example:   
+
+    :database_dir: "/Users/ismailm/blastdb"
+    :default_db: "/Users/ismailm/blastdb/SwissProt"
+    :web_dir: "/Users/ismailm/GV"
+    :num_threads: 8
+    :port: 4567
+    :host: localhost
+    :devel: true
+    :blast_bin: "/Users/ismailm/blast/bin"
+    :mafft_bin: "/Users/ismailm/mafft/bin"
 
 ## API
 
