@@ -31,13 +31,13 @@ begin
   Slop.parse!(:strict => true, :help => true) do
     banner BANNER
 
-    on 'c', 'config_file=',
-       'Use the given configuration file',
-       :argument => true
+    separator "Compulsory Argument, unless set in a config file"
 
     on 'd', 'database_dir=',
        'Read BLAST database from this directory',
        :argument => true
+
+    separator 'Optional Arguments'
 
     on 'f', 'default_db=',
        'The Path to the the default database',
@@ -48,11 +48,15 @@ begin
        :argument => true
        #:as       => Integer
 
+    on 'c', 'config_file=',
+       'Use the given configuration file',
+       :argument => true
+
     on 'r', 'require=',
        'Load extension from this file',
        :argument => true
 
-    on 'h', 'host=',
+    on 'host=',
        'Host to run GeneValidatorApp on',
        :argument => true
 
