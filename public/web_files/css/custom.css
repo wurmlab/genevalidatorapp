@@ -142,10 +142,6 @@ label.radio-inline.no_indent {
   margin-right: 10px;
 }
 
-.has-error .help-block, .has-error .control-label, .has-error .form-control-feedback {
-  color:#ffa3a6;
-}
-
 #results_header {
   margin-top: 0;
   margin-bottom: 30px;
