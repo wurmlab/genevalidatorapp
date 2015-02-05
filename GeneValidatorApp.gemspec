@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'GeneValidator', '~>1.3'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
-  spec.add_dependency "sinatra-cross_origin", "~> 0.3"
+  spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
   spec.add_dependency 'slim', '~>3.0'
   spec.add_dependency 'slop', '~>3.6'
   spec.add_dependency 'thin', '~>1.6'

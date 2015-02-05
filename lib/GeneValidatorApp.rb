@@ -28,7 +28,7 @@ module GeneValidatorApp
   class << self
     attr_reader :config_file, :config, :public_dir, :tempdir
 
-    # Returns the Rack Environment 
+    # Returns the Rack Environment
     def environment
       ENV['RACK_ENV']
     end
@@ -37,7 +37,7 @@ module GeneValidatorApp
       @logger ||= Logger.new(STDERR, verbose?)
     end
 
-    # Root dir of the App 
+    # Root dir of the App
     def root
       Pathname.new(__FILE__).dirname.parent
     end
@@ -50,10 +50,10 @@ module GeneValidatorApp
       assert_file_present('config file', config_file, EXIT_CONFIG_FILE_NOT_FOUND)
 
       @config = {
-        :num_threads  => 1,
-        :port         => 4567,
-        :host         => 'localhost',
-        :web_dir      => Dir.pwd
+        num_threads: 1,
+        port: 4567,
+        host: 'localhost',
+        web_dir: Dir.pwd
       }.update(parse_config_file.merge(config))
 
       assert_genevalidator_installed_and_compatible
@@ -63,7 +63,7 @@ module GeneValidatorApp
 
       assert_bin_dir('Mafft bin dir', @config[:mafft_bin]) if @config[:mafft_bin]
       assert_mafft_installed
-      
+
       assert_blast_databases_present_in_database_dir
 
       Database.scan_databases_dir
@@ -87,31 +87,31 @@ module GeneValidatorApp
     # Starting the app manually using Thin
     def run
       url = "http://#{config[:host]}:#{config[:port]}"
-      server = Thin::Server.new(config[:host], config[:port], :signals => false) do
+      server = Thin::Server.new(config[:host], config[:port], signals: false) do
         use Rack::CommonLogger
         run GeneValidatorApp
       end
       server.silent = true
       server.backend.start do
-        puts "** GeneValidatorApp is ready."
+        puts '** GeneValidatorApp is ready.'
         puts "   Go to #{url} in your browser and start analysing Genes!"
-        puts "   Press CTRL+C to quit."
+        puts '   Press CTRL+C to quit.'
         [:INT, :TERM].each do |sig|
           trap sig do
             server.stop!
             puts
             puts
-            puts "** Thank you for using GeneValidatorApp :)."
-            puts "   Please cite: "
-            puts "             Dragan M., Moghul M.I., Priyam A., Wurm Y (in prep)."
-            puts "             GeneValidator: identify problematic gene predictions."
+            puts '** Thank you for using GeneValidatorApp :).'
+            puts '   Please cite: '
+            puts '             Dragan M., Moghul M.I., Priyam A., Wurm Y (in prep).'
+            puts '             GeneValidator: identify problematic gene predictions.'
           end
         end
       end
     rescue
-      puts "** Oops! There was an error."
+      puts '** Oops! There was an error.'
       puts "   Is GeneValidatorApp already accessible at #{url}?"
-      puts "   Try running GeneValidatorApp on another port, like so: genevalidatorapp -p 4570."
+      puts '   Try running GeneValidatorApp on another port, like so: genevalidatorapp -p 4570.'
     end
 
     # Set the max characters accepted from the app (for the app templates)
@@ -121,7 +121,7 @@ module GeneValidatorApp
 
     # Returns the version of the GeneValidator installed
     def current_gv_version
-      %x(genevalidator --version)
+      `genevalidator --version`
     end
 
     def [](key)
@@ -138,15 +138,15 @@ module GeneValidatorApp
     end
 
     # Run by the logger method - sets the logger level to verbose if in
-    #   development environment 
+    #   development environment
     def verbose?
       @verbose ||= (environment == 'development')
     end
 
     private
 
-    # Copy the public folder (in the app root) to the web_dir location - this 
-    #   web_dir is then used by the app to serve all dependencies... 
+    # Copy the public folder (in the app root) to the web_dir location - this
+    #   web_dir is then used by the app to serve all dependencies...
     def set_up_public_folder
       @public_dir = Pathname.new(config[:web_dir]) +
                     "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
@@ -165,17 +165,17 @@ module GeneValidatorApp
     def parse_config_file
       logger.debug("Reading configuration file: #{@config_file}.")
       config = YAML.load_file(config_file) || {}
-      config.inject({}){|c, e| c[e.first.to_sym] = e.last; c}
+      config.inject({}) { |c, e| c[e.first.to_sym] = e.last; c }
     rescue ArgumentError => error
       puts "*** Error in config file: #{error}."
-      puts "    YAML is white space sensitive. Is your config file properly indented?"
+      puts '    YAML is white space sensitive. Is your config file properly indented?'
       exit 1
     end
 
     # Write to the config file.
     def write_config_file
       File.open(GeneValidatorApp.config_file, 'w') do |f|
-        f.puts(config.delete_if{|k, v| v.nil?}.to_yaml)
+        f.puts(config.delete_if { |_k, v| v.nil? }.to_yaml)
       end
     end
 
@@ -185,7 +185,6 @@ module GeneValidatorApp
       assert_dir_present(desc, bin_dir)
       export_bin_dir(bin_dir)
     end
-
 
     # Export bin dir to PATH environment variable.
     def export_bin_dir(dir)
@@ -197,27 +196,27 @@ module GeneValidatorApp
       end
     end
 
-    # Assert whether a file (or dir) is present - if not, then exit with the 
+    #  Assert whether a file (or dir) is present - if not, then exit with the
     #   supplied exit code.
     def assert_file_present(desc, file, exit_code = 1)
-      unless file and File.exists?( File.expand_path(file) )
+      unless file and File.exist?(File.expand_path(file))
         puts "*** Couldn't find #{desc}: #{file}."
         exit exit_code
       end
     end
 
-    alias assert_dir_present assert_file_present
+    alias_method :assert_dir_present, :assert_file_present
 
     # Assert whether BLAST is installed and compatible.
     def assert_blast_installed_and_compatible
       unless command? 'blastdbcmd'
-        puts "*** Could not find BLAST+ binaries."
+        puts '*** Could not find BLAST+ binaries.'
         exit EXIT_BLAST_NOT_INSTALLED
       end
-      version = %x|blastdbcmd -version|.split[1]
+      version = `blastdbcmd -version`.split[1]
       unless version >= MINIMUM_BLAST_VERSION
         puts "*** Your BLAST+ version #{version} is outdated."
-        puts "    GeneValidatorApp needs NCBI BLAST+ version" +
+        puts '    GeneValidatorApp needs NCBI BLAST+ version' \
              " #{MINIMUM_BLAST_VERSION} or higher."
         exit EXIT_BLAST_NOT_COMPATIBLE
       end
@@ -228,14 +227,14 @@ module GeneValidatorApp
     def assert_blast_databases_present_in_database_dir
       @config[:database_dir] = File.expand_path(@config[:database_dir])
       database_dir = config[:database_dir]
-      out = %x|blastdbcmd -recursive -list #{database_dir}|
+      out = `blastdbcmd -recursive -list #{database_dir}`
       if out.empty?
         puts "*** Could not find BLAST databases in '#{database_dir}'."
         exit EXIT_NO_BLAST_DATABASE
       elsif out.match(/BLAST Database error/) or not $?.success?
-        puts "*** Error obtaining BLAST databases."
+        puts '*** Error obtaining BLAST databases.'
         puts "    Tried: #{find_dbs_command}"
-        puts "    Error:"
+        puts '    Error:'
         out.strip.split("\n").each do |l|
           puts "      #{l}"
         end
@@ -245,9 +244,9 @@ module GeneValidatorApp
     end
 
     # Asserts whether mafft is installed.
-    def assert_mafft_installed 
+    def assert_mafft_installed
       unless command? 'mafft'
-        puts "*** Could not find Mafft binaries."
+        puts '*** Could not find Mafft binaries.'
         exit EXIT_MAFFT_NOT_INSTALLED
       end
     end
@@ -257,7 +256,7 @@ module GeneValidatorApp
       @config[:num_threads] = Integer(@config[:num_threads])
       unless @config[:num_threads] > 0
         puts "*** Can't use #{@config[:num_threads]} number of threads."
-        puts "    Number of threads should be greater than or equal to 1."
+        puts '    Number of threads should be greater than or equal to 1.'
         exit 1
       end
       if @config[:num_threads] > 256
@@ -265,7 +264,7 @@ module GeneValidatorApp
       end
       logger.debug("Will use #{@config[:num_threads]} threads to run GeneValidator.")
     rescue
-      puts "*** Number of threads should be a number."
+      puts '*** Number of threads should be a number.'
       exit 1
     end
 
@@ -275,18 +274,18 @@ module GeneValidatorApp
     rescue
       puts "*** The 'Max Characters' value should be a number."
       exit 1
-    end 
+    end
 
     # Assert whether GV is installed and is also compatible
     def assert_genevalidator_installed_and_compatible
       unless command? 'genevalidator'
-        puts "*** GeneValidator is not installed."
+        puts '*** GeneValidator is not installed.'
         exit EXIT_GV_NOT_INSTALLED
       end
       version = GeneValidatorApp.current_gv_version
       unless version >= MINIMUM_GV_VERSION
         puts "*** Your GeneValidator (version #{version}) is outdated."
-        puts "    GeneValidatorApp requires GeneValidator version" +
+        puts '    GeneValidatorApp requires GeneValidator version' \
              " #{MINIMUM_GV_VERSION} or higher."
         exit EXIT_GV_NOT_COMPATIBLE
       end
@@ -303,7 +302,6 @@ module GeneValidatorApp
       system("which #{command} > /dev/null 2>&1")
     end
   end
-  
 
   # The Actual App...
   class App < Sinatra::Base
@@ -325,7 +323,7 @@ module GeneValidatorApp
       # or http_status` methods. Error blocks errors must explicitly set http
       # status, if needed, by calling `status` method.
       # method.
-      enable  :dump_errors
+      enable :dump_errors
 
       # We don't want Sinatra do setup any loggers for us. We will use our own.
       set :logging, nil
@@ -335,7 +333,6 @@ module GeneValidatorApp
 
       # This is the full path to the public folder...
       set :public_folder, lambda { GeneValidatorApp.public_dir }
-
     end
 
     # Set up global variables for the templates...
@@ -359,7 +356,7 @@ module GeneValidatorApp
     # This error block will only ever be hit if the user gives us a funny
     # sequence or incorrect advanced parameter. Well, we could hit this block
     # if someone is playing around with our HTTP API too.
-    error GeneValidator::ArgumentError do 
+    error GeneValidator::ArgumentError do
       status 400
       slim :"500", layout: false
     end
@@ -376,7 +373,7 @@ module GeneValidatorApp
 
     not_found do
       status 404
-      slim :"500" # TODO: Create another Template  
+      slim :"500" # TODO: Create another Template
     end
   end
 end

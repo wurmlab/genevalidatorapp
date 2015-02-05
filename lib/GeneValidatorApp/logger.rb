@@ -1,9 +1,7 @@
 require 'logger'
 
 module GeneValidatorApp
-
   class Logger < Logger
-
     def initialize(dev, verbose = false)
       super dev
       self.level     = verbose ? DEBUG : INFO
@@ -12,14 +10,13 @@ module GeneValidatorApp
 
     # We change Logging format so that it is consistent with Sinatra's
     class Formatter < Formatter
-
       Format = "[%s] %s  %s\n"
 
       def initialize
-        self.datetime_format = "%Y-%m-%d %H:%M:%S"
+        self.datetime_format = '%Y-%m-%d %H:%M:%S'
       end
 
-      def call(severity, time, progname, msg)
+      def call(severity, time, _progname, msg)
         Format % [format_datetime(time), severity, msg2str(msg)]
       end
     end

@@ -6,16 +6,16 @@ ENV['RACK_ENV'] ||= 'production'
 # display name for tools like `ps`
 $PROGRAM_NAME = 'genevalidatorapp'
 
-BANNER =<<BNR
+BANNER = <<BNR
 SUMMARY
 
-GeneValidator - Identify problems with predicted genes 
+GeneValidator - Identify problems with predicted genes
 
 USAGE
 
 genevalidatorapp [options]
 
-Example 
+Example
 
   # Launch GeneValidatorApp with the given config file
   $ genevalidatorapp --config ~/.genevalidatorapp.conf
@@ -24,46 +24,46 @@ Example
   $ genevalidatorapp --num_threads 8 --port 8888
 
   # Create a config file with the other arguments
-  $ genevalidatorapp -s -d ~/database_dir 
+  $ genevalidatorapp -s -d ~/database_dir
 BNR
 
 begin
-  Slop.parse!(:strict => true, :help => true) do
+  Slop.parse!(strict: true, help: true) do
     banner BANNER
 
     separator 'Compulsory Argument, unless set in a config file'
 
     on 'd', 'database_dir=',
        'Read BLAST database from this directory',
-       :argument => true
+       argument: true
 
     separator ''
     separator 'Optional Arguments'
-    
+
     on 'f', 'default_db=',
        'The Path to the the default database',
-       :argument => true
+       argument: true
 
     on 'n', 'num_threads=',
        'Number of threads to use to run a BLAST search',
-       :argument => true
-       #:as       => Integer
+       argument: true
+    #:as       => Integer
 
     on 'c', 'config_file=',
        'Use the given configuration file',
-       :argument => true
+       argument: true
 
     on 'r', 'require=',
        'Load extension from this file',
-       :argument => true
+       argument: true
 
     on 'host=',
        'Host to run GeneValidatorApp on',
-       :argument => true
+       argument: true
 
     on 'p', 'port=',
        'Port to run GeneValidatorApp on',
-       :argument => true
+       argument: true
 
     on 's', 'set',
        'Set configuration value in default or given config file'
@@ -73,11 +73,11 @@ begin
 
     on 'b', 'blast_bin=',
        'Load BLAST+ binaries from this directory',
-       :argument => true
+       argument: true
 
     on 'm', 'mafft_bin=',
        'Load Mafft binaries from this directory',
-       :argument => true
+       argument: true
 
     on 'D', 'devel',
        'Start GeneValidatorApp in development mode'
@@ -88,18 +88,18 @@ begin
     on '-h', '--help',
        'Display this help message'
 
-    run do 
+    run do
       if version?
         require 'GeneValidatorApp/version'
         puts GeneValidatorApp::VERSION
-        exit 
+        exit
       end
 
       ENV['RACK_ENV'] = 'development' if devel?
 
       require 'GeneValidatorApp'
       begin
-        opts = to_h.delete_if { |k, v| v.nil? }
+        opts = to_h.delete_if { |_k, v| v.nil? }
         opts.delete :set
         GeneValidatorApp.init(opts)
       rescue SystemExit => e
@@ -108,8 +108,8 @@ begin
         puts '    See https://github.com/IsmailM/GeneValidatorApp for more help'
         exit e.status
       end
-      
-      if list_databases? 
+
+      if list_databases?
         puts GeneValidatorApp::Database.all?
       end
 
@@ -126,6 +126,6 @@ begin
   end
 rescue Slop::Error => e
   puts e
-  puts "Run '#{$0} -h' for help with command line options."
+  puts "Run '#{$PROGRAM_NAME} -h' for help with command line options."
   exit
 end

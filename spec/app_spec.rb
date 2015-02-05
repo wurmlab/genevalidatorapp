@@ -4,7 +4,7 @@ require 'w3c_validators'
 
 module GeneValidatorApp
   include W3CValidators
-  
+
   describe 'App' do
     ENV['RACK_ENV'] = 'test'
     include Rack::Test::Methods
@@ -22,20 +22,20 @@ module GeneValidatorApp
     end
 
     let 'app' do
-      GeneValidatorApp.init(:config_file => empty_config,
-                            :database_dir => database_dir)
+      GeneValidatorApp.init(config_file: empty_config,
+                            database_dir: database_dir)
     end
 
     before :each do
       app
       @params = { 'seq'         => 'AGCTAGCTAGCT',
                   'validations' => '["lenc", "lenr", "dup", "merge", "align", "frame", "orf"]',
-                  'database'    => Database.first.name}
+                  'database'    => Database.first.name }
     end
 
     it 'should start the app' do
       get '/'
-      last_response.ok?.should == true 
+      last_response.ok?.should == true
     end
 
     it 'returns Bad Request (400) if no sequence is provided' do
@@ -76,16 +76,16 @@ module GeneValidatorApp
 
       validator = MarkupValidator.new
       r = validator.validate_text(html)
-      
+
       if r.errors.length > 0
         r.errors.each do |err|
           puts err.to_s
         end
         results = false
       else
-        results = true 
+        results = true
       end
-      results.should == true 
+      results.should == true
     end
 
     # it 'should validate the css' do
@@ -99,9 +99,9 @@ module GeneValidatorApp
     #     end
     #     results = false
     #   else
-    #     results = true 
+    #     results = true
     #   end
-    #   results.should == true 
+    #   results.should == true
     # end
   end
 end
