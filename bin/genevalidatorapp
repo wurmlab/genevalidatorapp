@@ -27,105 +27,85 @@ Example
   $ genevalidatorapp -s -d ~/database_dir
 BNR
 
-begin
-  Slop.parse!(strict: true, help: true) do
-    banner BANNER
+opts = Slop.parse do |o|
+  # o.banner 'sddssdsdsdsdsdds'
 
-    separator 'Compulsory Argument, unless set in a config file'
+  o.separator 'Compulsory Argument, unless set in a config file'
 
-    on 'd', 'database_dir=',
-       'Read BLAST database from this directory',
-       argument: true
+  o.string '-d', '--database_dir',
+           'Read BLAST database from this directory'
 
-    separator ''
-    separator 'Optional Arguments'
+  o.separator ''
+  o.separator 'Optional Arguments'
 
-    on 'f', 'default_db=',
-       'The Path to the the default database',
-       argument: true
+  o.string '-f', '--default_db',
+           'The Path to the the default database'
 
-    on 'n', 'num_threads=',
-       'Number of threads to use to run a BLAST search',
-       argument: true
-    #:as       => Integer
+  o.string '-n', '--num_threads',
+           'Number of threads to use to run a BLAST search'
 
-    on 'c', 'config_file=',
-       'Use the given configuration file',
-       argument: true
+  o.string '-c', '--config_file',
+           'Use the given configuration file'
 
-    on 'r', 'require=',
-       'Load extension from this file',
-       argument: true
+  o.string '-r', '--require'
+           'Load extension from this file'
 
-    on 'host=',
-       'Host to run GeneValidatorApp on',
-       argument: true
+  o.string '--host',
+           'Host to run GeneValidatorApp on'
+  
+  o.string '-p', '--port'
+           'Port to run GeneValidatorApp on'
+  
+  o.string '-s', '--set',
+           'Set configuration value in the config file'
+  
+  o.string '-l', '--list_dbs',
+           'List BLAST databases'
+  
+  o.string '-b', '--blast_bin',
+           'Load BLAST+ binaries from this directory'
+  
+  o.string '-m', '--mafft_bin',
+           'Load Mafft binaries from this directory'
+  
+  o.bool   '-D', '--devel'
+           'Start GeneValidatorApp in development mode'
+           
+  o.bool   '-v', '--version',
+           'Print version number of GeneValidatorApp that will be loaded'
+  
+end
 
-    on 'p', 'port=',
-       'Port to run GeneValidatorApp on',
-       argument: true
-
-    on 's', 'set',
-       'Set configuration value in default or given config file'
-
-    on 'l', 'list_databases',
-       'List BLAST databases'
-
-    on 'b', 'blast_bin=',
-       'Load BLAST+ binaries from this directory',
-       argument: true
-
-    on 'm', 'mafft_bin=',
-       'Load Mafft binaries from this directory',
-       argument: true
-
-    on 'D', 'devel',
-       'Start GeneValidatorApp in development mode'
-
-    on '-v', '--version',
-       'Print version number of GeneValidatorApp that will be loaded'
-
-    on '-h', '--help',
-       'Display this help message'
-
-    run do
-      if version?
-        require 'GeneValidatorApp/version'
-        puts GeneValidatorApp::VERSION
-        exit
-      end
-
-      ENV['RACK_ENV'] = 'development' if devel?
-
-      require 'GeneValidatorApp'
-      begin
-        opts = to_h.delete_if { |_k, v| v.nil? }
-        opts.delete :set
-        GeneValidatorApp.init(opts)
-      rescue SystemExit => e
-        puts '*** Error: GeneValidator failed to initialise properly.'
-        puts '    Please check all paramaters and try again.'
-        puts '    See https://github.com/IsmailM/GeneValidatorApp for more help'
-        exit e.status
-      end
-
-      if list_databases?
-        puts GeneValidatorApp::Database.all?
-      end
-
-      if set?
-        GeneValidatorApp.send :write_config_file
-      end
-
-      if fetch_option(:set).value
-        GeneValidatorApp.send :write_config_file
-      end
-
-      GeneValidatorApp.run
-    end
-  end
-rescue Slop::Error => e
-  puts e
-  puts "Run '#{$PROGRAM_NAME} -h' for help with command line options."
+if opts.version?
+  require 'GeneValidatorApp/version'
+  puts GeneValidatorApp::VERSION
   exit
 end
+
+ENV['RACK_ENV'] = 'development' if opts.devel?
+
+require 'GeneValidatorApp'
+begin
+  o = opts.to_hash.delete_if { |_k, v| k == :set || k == :version || v.nil? }
+  GeneValidatorApp.init(o)
+rescue SystemExit => e
+
+  puts '*** Error: GeneValidator failed to initialise properly.'
+  puts '    Please check all paramaters and try again.'
+  puts '    See https://github.com/IsmailM/GeneValidatorApp for more help'
+  exit e.status
+end
+
+if opts.list_databases?
+  puts GeneValidatorApp::Database.all?
+end
+
+if opts.set?
+  GeneValidatorApp.send :write_config_file
+end
+
+# if fetch_option(:set).value
+#   GeneValidatorApp.send :write_config_file
+# end
+
+GeneValidatorApp.run
