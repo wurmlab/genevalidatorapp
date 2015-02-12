@@ -6,17 +6,16 @@ ENV['RACK_ENV'] ||= 'production'
 # display name for tools like `ps`
 $PROGRAM_NAME = 'genevalidatorapp'
 
-BANNER = <<BNR
-SUMMARY
+opts = Slop.parse do |o|
+  o.banner = <<BNR
 
-GeneValidator - Identify problems with predicted genes
+SUMMARY:
+  GeneValidator - Identify problems with predicted genes
 
-USAGE
+USAGE:
+  $ genevalidatorapp [options]
 
-genevalidatorapp [options]
-
-Example
-
+Examples:
   # Launch GeneValidatorApp with the given config file
   $ genevalidatorapp --config ~/.genevalidatorapp.conf
 
@@ -26,9 +25,6 @@ Example
   # Create a config file with the other arguments
   $ genevalidatorapp -s -d ~/database_dir
 BNR
-
-opts = Slop.parse do |o|
-  # o.banner 'sddssdsdsdsdsdds'
 
   o.separator 'Compulsory Argument, unless set in a config file'
 
@@ -68,12 +64,23 @@ opts = Slop.parse do |o|
   o.string '-m', '--mafft_bin',
            'Load Mafft binaries from this directory'
   
+  o.string '-w', '--web_dir',
+           'Path to the web directory (contains ' \
+           'supporting files utilised by the app).'
+
   o.bool   '-D', '--devel'
            'Start GeneValidatorApp in development mode'
            
   o.bool   '-v', '--version',
-           'Print version number of GeneValidatorApp that will be loaded'
-  
+           'Print version number of GeneValidatorApp that will be loaded' 
+
+  o.on     '-h', '--help',
+           'Show this screen'
+end
+
+if opts.help?
+  puts opts
+  exit
 end
 
 if opts.version?
