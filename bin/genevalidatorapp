@@ -86,8 +86,8 @@ ENV['RACK_ENV'] = 'development' if opts.devel?
 
 require 'GeneValidatorApp'
 begin
-  o = opts.to_hash.delete_if { |_k, v| k == :set || k == :version || v.nil? }
-  GeneValidatorApp.init(o)
+  clean_opts = opts.to_hash.delete_if { |k, v| k == :set || k == :version || v.nil? }
+  GeneValidatorApp.init(clean_opts)
 rescue SystemExit => e
 
   puts '*** Error: GeneValidator failed to initialise properly.'
