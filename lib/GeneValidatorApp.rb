@@ -64,6 +64,7 @@ module GeneValidatorApp
       assert_bin_dir('Mafft bin dir', @config[:mafft_bin]) if @config[:mafft_bin]
       assert_mafft_installed
 
+      assert_blast_database_dir_argument_present
       assert_blast_databases_present_in_database_dir
 
       Database.scan_databases_dir
@@ -219,6 +220,16 @@ module GeneValidatorApp
         puts '    GeneValidatorApp needs NCBI BLAST+ version' \
              " #{MINIMUM_BLAST_VERSION} or higher."
         exit EXIT_BLAST_NOT_COMPATIBLE
+      end
+    end
+
+    def assert_blast_database_dir_argument_present
+      unless @config[:database_dir]
+        puts '*** No BLAST dbs have been passed to GeneValidatorApp.'
+        puts '    Please use the "-d" command line argument to set the directory'
+        puts '    containing the BLAST databases (alternatively set the database_dir'
+        puts '    variable in the config file)'
+        exit 1
       end
     end
 
