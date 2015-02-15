@@ -1,9 +1,10 @@
 require 'forwardable'
 require 'bio'
 require 'fileutils'
+require 'genevalidator'
 
 module GeneValidatorApp
-  module GeneValidator
+  module RunGeneValidator
     # To signal error in query sequence or options.
     #
     # ArgumentError is raised when BLAST+'s exit status is 1; see [1].
@@ -59,7 +60,7 @@ module GeneValidatorApp
       #  temp dir with the unique id, it simply creates a new one)
       def ensure_unique_id
         while File.exist?(@gv_tmpdir)
-          @unique_id = GeneValidator.create_unique_id
+          @unique_id = create_unique_id
           @gv_tmpdir = GeneValidatorApp.tempdir + @unique_id
         end
         logger.debug("Unique ID = #{@unique_id}")
@@ -79,44 +80,39 @@ module GeneValidatorApp
       end
 
       # Validates the paramaters provided via the app.
-      #  Only important if POST request is sent via API - Web APP, validates
+      #  Only important if POST request is sent via API - Web APP also validates
       #  all params via Javascript.
       def validate_params
-        assert_seq_param_present
-        assert_seq_length if config[:max_characters]
-        assert_validations_param_present
-        assert_database_params_present
+        check_seq_param_present
+        check_seq_length 
+        check_validations_param_present
+        check_database_params_present
       end
 
       # Simply asserts whether that the seq param is present
-      def assert_seq_param_present
+      def check_seq_param_present
         unless @params[:seq]
           fail ArgumentError, 'No input sequence provided.'
         end
-        logger.debug("seq param = #{@params[:seq]}")
       end
 
-      def assert_seq_length
+      def check_seq_length
+        return unless config[:max_characters]
         unless @params[:seq].length < config[:max_characters]
           fail ArgumentError, 'The input sequence is too long.'
         end
-        logger.debug("seq length = #{@params[:seq].length}")
       end
 
       # Asserts whether the validations param are specified
-      def assert_validations_param_present
+      def check_validations_param_present
         unless @params[:validations]
           fail ArgumentError, 'No validations specified'
         end
-        logger.debug("validations param = #{@params[:validations]}")
       end
 
       # Asserts whether the database parameter is present
-      def assert_database_params_present
-        unless @params[:database]
-          fail ArgumentError, 'No database specified'
-        end
-        logger.debug("database param = #{@params[:database]}")
+      def check_database_params_present
+        fail ArgumentError, 'No database specified' unless @params[:database]
       end
 
       def obtain_db_path
@@ -128,17 +124,10 @@ module GeneValidatorApp
       # Writes the input sequences to a file with the sub_dir in the temp_dir
       def write_seq_to_file
         @input_fasta_file = @gv_tmpdir + 'input_file.fa'
-        seqs = @params[:seq].to_fasta
         logger.debug("Writing input seqs to: '#{@input_fasta_file}'")
-        file = File.open(@input_fasta_file, 'w+')
-        Bio::FlatFile.foreach(StringIO.new(seqs)) do |entry|
-          file.write(">#{entry.definition}")
-          file.write("\n#{entry.seq.gsub(/\W/, '')}\n")
+        File.open(@input_fasta_file, 'w+') do |f|
+          f.write(@params[:seq].to_fasta)
         end
-      rescue IOError => e
-        # some error occur, dir not writable etc.
-      ensure
-        file.close unless file.nil?
         assert_input_file_present
       end
 
@@ -159,22 +148,18 @@ module GeneValidatorApp
 
       # Runs GeneValidator
       def run_genevalidator
-        gv_cmd = "time genevalidator -x '#{@xml_file}' -d '#{@db}'" \
-                 " -v '#{@params[:validations].join(' ,')}' -f " \
-                 " -n #{config[:num_threads]} #{@input_fasta_file}"
-        logger.debug("Running: #{gv_cmd}")
-        `#{gv_cmd}`
-        logger.debug("GeneValidator exit status: #{$?.exitstatus}")
-        assert_exit_code_valid('GeneValidator', $?.exitstatus)
+        opts = {
+          validations: @params[:validations],
+          db: @db,
+          num_threads: config[:num_threads],
+          fast: true,
+          input_fasta_file: @input_fasta_file.to_s
+          }
+        logger.debug("Running GeneValidator with options: #{opts.to_s}")
+        (GeneValidator::Validation.new(opts)).run
         assert_table_output_file_produced
-      end
-
-      # Assets whether the exit code is equal to 0, else fails with RuntimeError
-      def assert_exit_code_valid(program, exit_code)
-        unless exit_code == 0
-          fail RuntimeError, "#{program} exited with the exit code:" \
-                             " #{exit_code}."
-        end
+      rescue SystemExit
+        raise RuntimeError, 'GeneValidator failed to run properly'
       end
 
       # Assets whether the results file is produced by GeneValidator.

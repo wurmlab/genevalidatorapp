@@ -75,7 +75,7 @@ BNR
            'Print version number of GeneValidatorApp that will be loaded' 
 
   o.on     '-h', '--help',
-           'Show this screen'
+           'Display this help message'
 end
 
 if opts.help?
@@ -91,12 +91,24 @@ end
 
 ENV['RACK_ENV'] = 'development' if opts.devel?
 
+# Exit gracefully on SIGINT.
+stty = `stty -g`.chomp
+trap('INT') do
+  puts ''
+  puts 'Aborted.'
+  system('stty', stty)
+  exit
+end
+
+clean_opts = lambda do |hash|
+  hash.delete_if { |k, v| k == :set || k == :version || v.nil? }
+  hash
+end
+
 require 'GeneValidatorApp'
 begin
-  clean_opts = opts.to_hash.delete_if { |k, v| k == :set || k == :version || v.nil? }
-  GeneValidatorApp.init(clean_opts)
+  GeneValidatorApp.init clean_opts[opts.to_hash]
 rescue SystemExit => e
-
   puts '*** Error: GeneValidator failed to initialise properly.'
   puts '    Please check all paramaters and try again.'
   puts '    See https://github.com/IsmailM/GeneValidatorApp for more help'
@@ -110,9 +122,5 @@ end
 if opts.set?
   GeneValidatorApp.send :write_config_file
 end
-
-# if fetch_option(:set).value
-#   GeneValidatorApp.send :write_config_file
-# end
 
 GeneValidatorApp.run

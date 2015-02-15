@@ -41,6 +41,10 @@ module GeneValidatorApp
         collection.values
       end
 
+      def each(&block)
+        all.each(&block)
+      end
+
       def include?(path)
         collection.include? Digest::MD5.hexdigest path
       end
@@ -54,7 +58,7 @@ module GeneValidatorApp
       end
 
       def default_db
-        if config[:default_db] && collection.include?(Digest::MD5.hexdigest config[:default_db])
+        if config[:default_db] && Database.include?(config[:default_db])
           all.find { |a| a.name == config[:default_db] }
         else
           all.first
