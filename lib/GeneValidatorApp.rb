@@ -83,7 +83,7 @@ module GeneValidatorApp
       puts '** Oops! There was an error.'
       puts "   Is GeneValidatorApp already accessible at #{url}?"
       puts '   Try running GeneValidatorApp on another port, like so:'
-      puts 
+      puts
       puts '      genevalidatorapp -p 4570.'
     end
 
@@ -119,7 +119,7 @@ module GeneValidatorApp
     def using_ssh?
       true if ENV['SSH_CLIENT'] || ENV['SSH_TTY'] || ENV['SSH_CONNECTION']
     end
-    
+
     def init_blast_and_mafft_binaries
       init_binaries(config[:blast_bin], 'NCBI BLAST+')
       assert_blast_installed_and_compatible
@@ -135,7 +135,7 @@ module GeneValidatorApp
         end
         logger.debug("Will use #{type} at: #{config[:blast_bin]}")
         export_bin_dir bin_dir
-      else 
+      else
         logger.debug("Will use #{type} at: $PATH")
       end
     end
