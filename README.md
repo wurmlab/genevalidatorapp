@@ -14,7 +14,7 @@ This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http
 
 ## Installation
 
-1) Install all GeneValidator Prerequisites (ruby <=1.9.3, Mafft, BLAST+). You would also require a BLAST database. 
+1) Install all GeneValidator Prerequisites (ruby <=1.9.3, Mafft, BLAST+, GSL). You would also require a BLAST database. 
   * Please see [here](https://gist.github.com/IsmailM/b783e8a06565197084e6) for more information.
 
 2) Install GeneValidatorApp
