@@ -179,7 +179,7 @@ module GeneValidatorApp
         create_gv_log_file
         original_stdout = $stdout.clone
         $stdout.reopen(@gv_log_file, 'w')
-        (GeneValidator::Validation.new(opts)).run
+        (GeneValidator::Validation.new(opts, 1, true, true)).run
         $stdout = original_stdout
         assert_table_output_file_produced
       rescue SystemExit
