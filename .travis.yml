@@ -5,4 +5,3 @@ rvm:
   - '2.2.0'
 before_install:
   - sudo apt-get install -y libgsl0-dev
-  - gem install genevalidator

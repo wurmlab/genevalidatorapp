@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = 'A Web App wrapper for GeneValidator.'
   spec.description   = 'A Web App wrapper for GeneValidator, a program for validating gene predictions.'
   spec.homepage      = 'https://github.com/IsmailM/GeneValidatorApp'
-  spec.license       = 'MIT'
+  spec.license       = 'AGPL'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rack-test', '~> 0.6'
 
   spec.add_dependency 'bio', '~>1.4'
-  spec.add_dependency 'genevalidator', '~>1.5'
+  spec.add_dependency 'GeneValidator', '~>1.5'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
