@@ -140,9 +140,9 @@ function ajaxFunction() {
       removeEmptyColumns(); // Remove Unwanted Columns
 
       $('#mainbody').css({'background-color': '#fff'});
-      $('#search').css({'background-color': '#F5F5F5'})
-      $('#results').css({'border-top': '3px solid #DBDBDB'})
-      $('#search').css({'margin-bottom': '0'})
+      $('#search').css({'background-color': '#F5F5F5'});
+      $('#results').css({'border-top': '3px solid #DBDBDB'});
+      $('#search').css({'margin-bottom': '0'});
       
       $('#spinner').modal('hide'); // remove progress notification
     },
@@ -257,11 +257,16 @@ function checkType(sequence, threshold, length, index) {
     index = 1;
   }
   var seq = sequence.slice(index - 1, length);
-  var total = seq.length;
-  var acgMatch = ((seq.match(/[ACG]/gi) || []).length) / total;
-  var tMatch = ((seq.match(/[T]/gi) || []).length) / total;
-  var uMatch = ((seq.match(/[U]/gi) || []).length) / total;
-  var proteinMatch = ((seq.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / total;
+
+  var dnaSeq = seq.replace(/N/gi,'');
+  var dnaTotal = dnaSeq.length;
+  var acgMatch = ((dnaSeq.match(/[ACG]/gi) || []).length) / dnaTotal;
+  var tMatch = ((dnaSeq.match(/[T]/gi) || []).length) / dnaTotal;
+  var uMatch = ((dnaSeq.match(/[U]/gi) || []).length) / dnaTotal;
+  
+  var proteinSeq = seq.replace(/X/gi,'');
+  var proteinTotal = proteinSeq.length;
+  var proteinMatch = ((seq.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / proteinTotal;
 
   if (((acgMatch + tMatch) >= threshold) || ((acgMatch + uMatch) >= threshold)) {
     if (tMatch >= uMatch) {
