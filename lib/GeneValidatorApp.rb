@@ -60,6 +60,7 @@ module GeneValidatorApp
         use Rack::CommonLogger if GeneValidatorApp.environment == 'development'
         run GeneValidatorApp
       end
+      server.timeout = 2700 #  45 minutes
       server.silent = true
       server.backend.start do
         puts '** GeneValidatorApp is ready.'
