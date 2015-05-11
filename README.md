@@ -1,8 +1,8 @@
 # GeneValidatorApp
-[![Build Status](https://travis-ci.org/IsmailM/GeneValidatorApp.svg?branch=master)](https://travis-ci.org/IsmailM/GeneValidatorApp)
+[![Build Status](https://travis-ci.org/wurmlab/GeneValidatorApp.svg?branch=master)](https://travis-ci.org/wurmlab/GeneValidatorApp)
 [![Gem Version](https://badge.fury.io/rb/GeneValidatorApp.svg)](http://badge.fury.io/rb/GeneValidatorApp)
-[![Dependency Status](https://gemnasium.com/IsmailM/GeneValidatorApp.svg)](https://gemnasium.com/IsmailM/GeneValidatorApp)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/IsmailM/GeneValidatorApp/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/IsmailM/GeneValidatorApp/?branch=master)
+[![Dependency Status](https://gemnasium.com/wurmlab/GeneValidatorApp.svg)](https://gemnasium.com/wurmlab/GeneValidatorApp)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/wurmlab/GeneValidatorApp/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/wurmlab/GeneValidatorApp/?branch=master)
 
 This is a Sinatra based web wrapper for [GeneValidator](https://github.com/monicadragan/GeneValidator); a program that validates gene predictions. A working example can be seen at [genevalidator.sbcs.qmul.ac.uk](http://genevalidator.sbcs.qmul.ac.uk).
 
@@ -94,7 +94,7 @@ See [GeneValidatorApp-API](https://github.com/IsmailM/GeneValidatorApp-API) for 
 
 ## Contributing
 
-1. Fork it ( https://github.com/IsmailM/GeneValidatorApp/fork )
+1. Fork it ( https://github.com/wurmlab/GeneValidatorApp/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
