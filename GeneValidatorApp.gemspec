@@ -4,13 +4,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'GeneValidatorApp/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'GeneValidatorApp'
+  spec.name          = 'genevalidatorapp'
   spec.version       = GeneValidatorApp::VERSION
   spec.authors       = ['Ismail Moghul']
   spec.email         = ['Ismail.Moghul@gmail.com']
   spec.summary       = 'A Web App wrapper for GeneValidator.'
   spec.description   = 'A Web App wrapper for GeneValidator, a program for validating gene predictions.'
-  spec.homepage      = 'https://github.com/IsmailM/GeneValidatorApp'
+  spec.homepage      = 'https://github.com/wurmlab/GeneValidatorApp'
   spec.license       = 'AGPL'
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rack-test', '~> 0.6'
 
   spec.add_dependency 'bio', '~>1.4'
-  spec.add_dependency 'GeneValidator', '~>1.5'
+  spec.add_dependency 'genevalidator', '~>1.5'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
 
     $ genevalidatorapp [options]
 
-  Visit https://github.com/IsmailM/GeneValidatorApp for more information.
+  Visit https://github.com/wurmlab/GeneValidatorApp for more information.
 ------------------------------------------------------------------------
 
 INFO

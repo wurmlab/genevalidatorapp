@@ -19,7 +19,7 @@ This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http
 
 2) Install GeneValidatorApp
 
-    $ gem install GeneValidatorApp
+    $ gem install genevalidatorapp
 
 ## Usage
 
