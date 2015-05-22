@@ -84,7 +84,7 @@ module GeneValidatorApp
       #  all params via Javascript.
       def validate_params
         check_seq_param_present
-        check_seq_length 
+        check_seq_length
         check_validations_param_present
         check_database_params_present
       end
@@ -125,6 +125,7 @@ module GeneValidatorApp
       def write_seq_to_file
         @input_fasta_file = @gv_tmpdir + 'input_file.fa'
         logger.debug("Writing input seqs to: '#{@input_fasta_file}'")
+        ensure_unix_line_ending
         ensure_fasta_valid
         File.open(@input_fasta_file, 'w+') do |f|
           f.write(@params[:seq])
@@ -132,8 +133,12 @@ module GeneValidatorApp
         assert_input_file_present
       end
 
-      # Adds a ID (based on the time when submitted) to sequences that are not in
-      #  fasta format.
+      def ensure_unix_line_ending
+        @params[:seq].gsub!(/\r\n?/, "\n")
+      end
+
+      # Adds a ID (based on the time when submitted) to sequences that are not
+      #  in fasta format.
       def ensure_fasta_valid
         logger.debug('Adding an ID to sequences that are not in fasta format.')
         unique_queries = {}
