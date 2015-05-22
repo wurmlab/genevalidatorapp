@@ -4,6 +4,7 @@ require 'fileutils'
 require 'genevalidator'
 
 module GeneValidatorApp
+  # Module that runs GeneValidator
   module RunGeneValidator
     # To signal error in query sequence or options.
     #
@@ -17,7 +18,7 @@ module GeneValidatorApp
     # in running BLAST, get_raw_sequence or genevalidator. These are rare,
     # infrastructure errors, used internally, and of concern only to the
     # admins/developers.
-    class RuntimeError  < RuntimeError
+    class RuntimeError < RuntimeError
     end
 
     class << self
@@ -180,15 +181,19 @@ module GeneValidatorApp
       # Runs GeneValidator
       def run_genevalidator
         opts = set_up_gv_opts
-        logger.debug("Running GeneValidator with options: #{opts.to_s}")
+        logger.debug("Running GeneValidator with options: #{opts}")
         create_gv_log_file
+        run_gv
+        assert_table_output_file_produced
+      rescue SystemExit
+        raise RuntimeError, 'GeneValidator failed to run properly'
+      end
+
+      def run_gv
         original_stdout = $stdout.clone unless logger.debug?
         $stdout.reopen(@gv_log_file, 'w') unless logger.debug?
         (GeneValidator::Validation.new(opts, 1, true, true)).run
         $stdout = original_stdout unless logger.debug?
-        assert_table_output_file_produced
-      rescue SystemExit
-        raise RuntimeError, 'GeneValidator failed to run properly'
       end
 
       def set_up_gv_opts
