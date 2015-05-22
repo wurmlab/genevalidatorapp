@@ -5,7 +5,7 @@ require 'rspec/core/rake_task'
 task default: [:build]
 desc 'Installs the ruby gem'
 task :build do
-  exec("gem build GeneValidatorApp.gemspec && gem install ./GeneValidatorApp-#{GeneValidatorApp::VERSION}.gem")
+  exec("gem build genevalidatorapp.gemspec && gem install ./genevalidatorapp-#{GeneValidatorApp::VERSION}.gem")
 end
 
 task test: :spec
