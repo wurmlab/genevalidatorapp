@@ -182,10 +182,10 @@ module GeneValidatorApp
         opts = set_up_gv_opts
         logger.debug("Running GeneValidator with options: #{opts.to_s}")
         create_gv_log_file
-        original_stdout = $stdout.clone
-        $stdout.reopen(@gv_log_file, 'w')
+        original_stdout = $stdout.clone unless logger.debug?
+        $stdout.reopen(@gv_log_file, 'w') unless logger.debug?
         (GeneValidator::Validation.new(opts, 1, true, true)).run
-        $stdout = original_stdout
+        $stdout = original_stdout unless logger.debug?
         assert_table_output_file_produced
       rescue SystemExit
         raise RuntimeError, 'GeneValidator failed to run properly'
