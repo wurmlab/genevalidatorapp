@@ -198,6 +198,10 @@ table .info,
   background-color: rgb(204, 228, 200) !important;
 }
 
+.warning {
+  background-color: rgb(252, 248, 227) !important;
+}
+
 .alert-info {
   background-color: rgb(217, 237, 247);
   border-color: rgb(188, 232, 241);
