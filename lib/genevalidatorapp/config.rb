@@ -82,5 +82,4 @@ module GeneValidatorApp
       '~/.genevalidatorapp.conf'
     end
   end
-
 end

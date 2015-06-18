@@ -180,8 +180,6 @@ module GeneValidatorApp
 
       # Runs GeneValidator
       def run_genevalidator
-        opts = set_up_gv_opts
-        logger.debug("Running GeneValidator with options: #{opts}")
         create_gv_log_file
         run_gv
         assert_table_output_file_produced
@@ -192,18 +190,11 @@ module GeneValidatorApp
       def run_gv
         original_stdout = $stdout.clone unless logger.debug?
         $stdout.reopen(@gv_log_file, 'w') unless logger.debug?
-        (GeneValidator::Validation.new(opts, 1, true, true)).run
+        cmd = "genevalidator -f -v '#{@params[:validations].join(', ')}'" \
+              " -d #{@db} -n #{config[:num_threads]} #{@input_fasta_file.to_s}"
+        logger.debug("GV command: $ #{cmd}")
+        `#{cmd}`
         $stdout = original_stdout unless logger.debug?
-      end
-
-      def set_up_gv_opts
-        {
-          validations: @params[:validations],
-          db: @db,
-          num_threads: config[:num_threads],
-          fast: true,
-          input_fasta_file: @input_fasta_file.to_s
-        }
       end
 
       def create_gv_log_file
@@ -227,13 +218,13 @@ module GeneValidatorApp
         local_plots_dir = Pathname.new('GeneValidator') + @unique_id +
                           'input_file.fa.html/files/json/input_file.fa_'
         full_html = IO.binread(@table_file)
-        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s).gsub(
-                  '#Place_external_results_link_here', @url)
+        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s)
+                  .gsub('#Place_external_results_link_here', @url)
       end
 
       # Reuturns the URL of the results page.
       def produce_result_url_link(url)
-        url.gsub(/input/, '').gsub(/\/*$/, '') +
+        url.gsub(/input/, '').gsub(%r(/*$), '') +
           "/GeneValidator/#{@unique_id}/input_file.fa.html/results.html"
       end
     end
