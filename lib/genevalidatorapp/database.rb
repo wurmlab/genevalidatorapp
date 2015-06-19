@@ -81,12 +81,13 @@ module GeneValidatorApp
         list.each_line do |line|
           type, name, title =  line.split('	')
           next if multipart_database_name?(name)
-          next unless type.downcase == 'protein' # to ensure we only have protein dbs
+          next unless type.downcase == 'protein'
           self << Database.new(name, title, type)
         end
       end
 
-      # Returns true if the database name appears to be a multi-part database name.
+      # Returns true if the database name appears to be a multi-part database
+      # name.
       #
       # e.g.
       # /home/ben/pd.ben/sequenceserver/db/nr.00 => yes

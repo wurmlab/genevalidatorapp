@@ -49,7 +49,7 @@ module GeneValidatorApp
       self
     end
 
-    # Starting the app manually using Thin
+    # Starting the app manually
     def run
       check_host
       Server.run(self)
