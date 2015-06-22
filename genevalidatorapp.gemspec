@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.2'
   spec.add_development_dependency 'rack-test', '~> 0.6'
 
-  spec.add_dependency 'genevalidator', '~>1.7'
+  spec.add_dependency 'genevalidator', '~>1.6'
   spec.add_dependency 'bio', '~>1.4'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
