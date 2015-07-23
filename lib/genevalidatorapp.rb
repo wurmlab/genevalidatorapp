@@ -1,20 +1,20 @@
+require 'yaml'
+require 'fileutils'
+
+require 'genevalidatorapp/config'
 require 'genevalidatorapp/database'
+require 'genevalidatorapp/exceptions'
 require 'genevalidatorapp/genevalidator'
 require 'genevalidatorapp/logger'
-require 'genevalidatorapp/config'
-require 'genevalidatorapp/version'
-require 'genevalidatorapp/server'
 require 'genevalidatorapp/routes'
-require 'pathname'
-require 'yaml'
+require 'genevalidatorapp/server'
+require 'genevalidatorapp/version'
 
 module GeneValidatorApp
   # Use a fixed minimum version of BLAST+
   MINIMUM_BLAST_VERSION = '2.2.30+'
 
   class << self
-    attr_reader :public_dir, :tempdir, :config
-
     def environment
       ENV['RACK_ENV']
     end
@@ -23,31 +23,32 @@ module GeneValidatorApp
       @verbose ||= (environment == 'development')
     end
 
+    def root
+      File.dirname(File.dirname(__FILE__))
+    end
+
     def logger
       @logger ||= Logger.new(STDERR, verbose?)
-    end
-
-    def root
-      Pathname.new(__FILE__).dirname.parent
-    end
-
-    # Set the max characters accepted from the app (for the app templates)
-    def max_characters
-      (config[:max_characters]) ? config[:max_characters] : 'undefined'
     end
 
     # Setting up the environment before running the app...
     def init(config = {})
       @config = Config.new(config)
-      init_blast_and_mafft_binaries
+
+      init_binaries
       init_database
+
+      check_dirs
+      init_gv_tempdir
+      init_public_dir
+
       load_extension
       check_num_threads
       check_max_characters
-      init_gv_tempdir
-      init_public_dir
       self
     end
+
+    attr_reader :config, :temp_dir, :public_dir
 
     # Starting the app manually
     def run
@@ -58,7 +59,7 @@ module GeneValidatorApp
       puts "   Is GeneValidator already accessible at #{server_url}?"
       puts '   No? Try running GeneValidator on another port, like so:'
       puts
-      puts '       genevalidator -p 4570.'
+      puts '       genevalidatorapp -p 4570.'
     rescue Errno::EACCES
       puts "** Need root privilege to bind to port #{config[:port]}."
       puts '   It is not advisable to run GeneValidator as root.'
@@ -80,14 +81,9 @@ module GeneValidatorApp
       puts '        GeneValidator: identify problematic gene predictions.'
     end
 
-    def [](key)
-      config[key]
-    end
-
     # Rack-interface.
     #
-    # Inject our logger in the env and dispatch request to our
-    # controller.
+    # Inject our logger in the env and dispatch request to our controller.
     def call(env)
       env['rack.logger'] = logger
       Routes.call(env)
@@ -95,41 +91,31 @@ module GeneValidatorApp
 
     private
 
-    def init_blast_and_mafft_binaries
-      init_binaries(config[:blast_bin], 'NCBI BLAST+')
+    def check_dirs
+      config[:gv_app_dir] = File.expand_path(config[:gv_app_dir])
+      unique_run_id       = 'GV_' + "#{Time.now.strftime('%Y%m%d-%H-%M-%S')}"
+      @public_dir         = File.join(config[:gv_app_dir], unique_run_id)
+      FileUtils.mkdir_p(File.join(@public_dir, 'GeneValidator'))
+    end
+
+    # Creates a Temp directory (starting with 'GeneValidator_') each time
+    #   GVapp is started. Within this Temp folder, sub directories are created
+    #   in which GeneValidator is run.
+    def init_gv_tempdir
+      @temp_dir = Dir.mktmpdir('GeneValidator_')
+    end
+
+    # Copy the public folder (in the app root) to the gv_app_dir location - this
+    #   gv_app_dir is then used by the app to serve all dependencies...
+    def init_public_dir
+      root_web_files_dir  = File.join(GeneValidatorApp.root, 'public/web_files')
+      FileUtils.cp_r(root_web_files_dir, @public_dir)
+    end
+
+    def init_binaries
+      config[:bin] = init_bins if config[:bin]
       assert_blast_installed_and_compatible
-      init_binaries(config[:mafft_bin], 'Mafft')
       assert_mafft_installed
-    end
-
-    def init_binaries(bin_dir, type)
-      if bin_dir
-        bin_dir = File.expand_path bin_dir
-        unless File.exist?(bin_dir) && File.directory?(bin_dir)
-          fail BIN_DIR_NOT_FOUND, bin_dir
-        end
-        logger.debug("Will use #{type} at: #{bin_dir}")
-        export_bin_dir bin_dir
-      else
-        logger.debug("Will use #{type} at: $PATH")
-      end
-    end
-
-    # Export bin dir to PATH environment variable.
-    def export_bin_dir(bin_dir)
-      return unless bin_dir
-      return if ENV['PATH'].split(':').include? bin_dir
-      ENV['PATH'] = "#{bin_dir}:#{ENV['PATH']}"
-    end
-
-    def assert_blast_installed_and_compatible
-      fail BLAST_NOT_INSTALLED unless command? 'blastdbcmd'
-      version = `blastdbcmd -version`.split[1]
-      fail BLAST_NOT_COMPATIBLE, version unless version >= MINIMUM_BLAST_VERSION
-    end
-
-    def assert_mafft_installed
-      fail MAFFT_NOT_INSTALLED unless command? 'mafft'
     end
 
     def init_database
@@ -151,35 +137,8 @@ module GeneValidatorApp
       end
     end
 
-    def assert_blast_databases_present_in_database_dir
-      cmd = "blastdbcmd -recursive -list #{config[:database_dir]}"
-      out = `#{cmd}`
-      errpat = /BLAST Database error/
-      fail NO_BLAST_DATABASE_FOUND, config[:database_dir] if out.empty?
-      fail BLAST_DATABASE_ERROR, cmd, out if out.match(errpat) ||
-                                             !$?.success?
-    end
-
-    def check_num_threads
-      num_threads = Integer(config[:num_threads])
-      fail NUM_THREADS_INCORRECT unless num_threads > 0
-      logger.debug "Will use #{num_threads} threads to run BLAST."
-      if num_threads > 256
-        logger.warn "Number of threads set at #{num_threads} is unusually high."
-      end
-    rescue
-      raise NUM_THREADS_INCORRECT
-    end
-
-    def check_max_characters
-      Integer(config[:max_characters]) if config[:max_characters]
-    rescue
-      raise MAX_CHARACTERS_INCORRECT
-    end
-
     def load_extension
       return unless config[:require]
-
       config[:require] = File.expand_path config[:require]
       unless File.exist?(config[:require]) && File.file?(config[:require])
         fail EXTENSION_FILE_NOT_FOUND, config[:require]
@@ -189,28 +148,72 @@ module GeneValidatorApp
       require config[:require]
     end
 
-    # Creates a Temp directory (starting with 'GeneValidator_') each time
-    #   GVapp is started. Within this Temp folder, sub directories are created
-    #   in which GeneValidator is run.
-    def init_gv_tempdir
-      @tempdir = Pathname.new(Dir.mktmpdir('GeneValidator_'))
+    def assert_blast_databases_present_in_database_dir
+      cmd = "blastdbcmd -recursive -list #{config[:database_dir]}"
+      out = `#{cmd}`
+      errpat = /BLAST Database error/
+      fail NO_BLAST_DATABASE_FOUND, config[:database_dir] if out.empty?
+      fail BLAST_DATABASE_ERROR, cmd, out if out.match(errpat) ||
+                                             !$CHILD_STATUS.success?
     end
 
-    # Copy the public folder (in the app root) to the web_dir location - this
-    #   web_dir is then used by the app to serve all dependencies...
-    def init_public_dir
-      @public_dir = Pathname.new(config[:web_dir]) +
-                    "GeneValidator_#{Time.now.strftime('%Y%m%d-%H%M%S')}"
-      root_public_dir = GeneValidatorApp.root + 'public'
-      FileUtils.cp_r(root_public_dir, @public_dir)
+    def check_num_threads
+      num_threads = Integer(config[:num_threads])
+      fail NUM_THREADS_INCORRECT unless num_threads > 0
+
+      logger.debug "Will use #{num_threads} threads to run BLAST."
+      if num_threads > 256
+        logger.warn "Number of threads set at #{num_threads} is unusually high."
+      end
+    rescue
+      raise NUM_THREADS_INCORRECT
+    end
+
+    def check_max_characters
+      if config[:max_characters] != 'undefined'
+        config[:max_characters] = Integer(config[:max_characters])
+      end
+    rescue
+      raise MAX_CHARACTERS_INCORRECT
+    end
+
+    def init_bins
+      bins = []
+      config[:bin].each do |bin|
+        bins << File.expand_path(bin)
+        unless File.exist?(bin) && File.directory?(bin)
+          fail BIN_DIR_NOT_FOUND, config[:bin]
+        end
+        export_bin_dir(bin)
+      end
+      bins
+    end
+
+    ## Checks if dir is in $PATH and if not, it adds the dir to the $PATH.
+    def export_bin_dir(bin_dir)
+      return unless bin_dir
+      return if ENV['PATH'].split(':').include?(bin_dir)
+      ENV['PATH'] = "#{bin_dir}:#{ENV['PATH']}"
+    end
+
+    def assert_blast_installed_and_compatible
+      fail BLAST_NOT_INSTALLED unless command? 'blastdbcmd'
+      version = `blastdbcmd -version`.split[1]
+      fail BLAST_NOT_COMPATIBLE, version unless version >= MINIMUM_BLAST_VERSION
+    end
+
+    def assert_mafft_installed
+      fail MAFFT_NOT_INSTALLED unless command? 'mafft'
     end
 
     # Check and warn user if host is 0.0.0.0 (default).
     def check_host
+      # rubocop:disable Style/GuardClause
       if config[:host] == '0.0.0.0'
         logger.warn 'Will listen on all interfaces (0.0.0.0).' \
                     ' Consider using 127.0.0.1 (--host option).'
       end
+      # rubocop:enable Style/GuardClause
     end
 
     def server_url

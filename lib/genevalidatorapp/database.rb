@@ -3,15 +3,7 @@ require 'digest/md5'
 require 'forwardable'
 
 module GeneValidatorApp
-  # Captures a directory containing FASTA files and BLAST databases.
-  #
-  # It is important that formatted BLAST database files have the same dirname and
-  # basename as the source FASTA for GeneValidatorApp to be able to tell formatted
-  # FASTA from unformatted. And that FASTA files be formatted with `parse_seqids`
-  # option of `makeblastdb` for sequence retrieval to work.
-  #
-  # GeneValidatorApp will always place BLAST database files alongside input FASTA,
-  # and use `parse_seqids` option of `makeblastdb` to format databases.
+  # class on the BLAST databases
   class Database < Struct.new(:name, :title, :type)
     class << self
       extend Forwardable
@@ -77,9 +69,11 @@ module GeneValidatorApp
       # Recurisvely scan `database_dir` for blast databases.
       def scan_databases_dir
         database_dir = config[:database_dir]
-        list = `blastdbcmd -recursive -list #{database_dir} -list_outfmt "%p	%f	%t" 2>&1`
+        cmd  = "blastdbcmd -recursive -list #{database_dir} -list_outfmt" \
+               ' "%p::%f::%t"'
+        list = `#{cmd} 2>&1`
         list.each_line do |line|
-          type, name, title =  line.split('	')
+          type, name, title =  line.split('::', 3)
           next if multipart_database_name?(name)
           next unless type.downcase == 'protein'
           self << Database.new(name, title, type)

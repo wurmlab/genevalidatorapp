@@ -1,10 +1,11 @@
 require 'sinatra/base'
 require 'sinatra/cross_origin'
 require 'genevalidator/version'
-require 'genevalidator/version'
+require 'genevalidatorapp/version'
 require 'slim'
 
 module GeneValidatorApp
+  # The Sinatra Routes
   class Routes < Sinatra::Base
     register Sinatra::CrossOrigin
 
@@ -39,7 +40,7 @@ module GeneValidatorApp
     before '/' do
       @default_db         = Database.default_db
       @non_default_dbs    = Database.non_default_dbs
-      @max_characters     = GeneValidatorApp.max_characters
+      @max_characters     = GeneValidatorApp.config[:max_characters]
       @current_gv_version = GeneValidator::VERSION
     end
 
@@ -50,7 +51,8 @@ module GeneValidatorApp
     post '/' do
       cross_origin # Required for the API to work...
       RunGeneValidator.init(request.url, params)
-      RunGeneValidator.run
+      @json_results = RunGeneValidator.run
+      slim :results, layout: false
     end
 
     # This error block will only ever be hit if the user gives us a funny

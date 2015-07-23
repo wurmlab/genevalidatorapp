@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Ismail Moghul']
   spec.email         = ['Ismail.Moghul@gmail.com']
   spec.summary       = 'A Web App wrapper for GeneValidator.'
-  spec.description   = 'A Web App wrapper for GeneValidator, a program for validating gene predictions.'
+  spec.description   = 'A Web App wrapper for GeneValidator, a program for' \
+                       ' validating gene predictions.'
   spec.homepage      = 'https://github.com/wurmlab/genevalidatorapp'
   spec.license       = 'AGPL'
 
@@ -31,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
   spec.add_dependency 'slim', '~>3.0'
-  spec.add_dependency 'slop', '~>4.0'
+  spec.add_dependency 'slop', '~>3.6'
   spec.add_dependency 'thin', '~>1.6'
   spec.add_dependency 'w3c_validators', '~>1.1'
   spec.post_install_message = <<INFO

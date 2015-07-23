@@ -36,6 +36,7 @@ module GeneValidatorApp
     # Write config data to config file.
     def write_config_file
       return unless config_file
+
       File.open(config_file, 'w') do |f|
         f.puts(data.delete_if { |_, v| v.nil? }.to_yaml)
       end
@@ -71,10 +72,11 @@ module GeneValidatorApp
     # Default configuration data.
     def defaults
       {
-        :num_threads  => 1,
-        :port         => 4567,
-        :host         => '0.0.0.0',
-        :web_dir      => Dir.pwd
+        :num_threads    => 1,
+        :port           => 4567,
+        :host           => '0.0.0.0',
+        :gv_app_dir     => '~/.genevalidatorapp/',
+        :max_characters => 'undefined'
       }
     end
 

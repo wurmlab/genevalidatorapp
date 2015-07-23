@@ -2,6 +2,7 @@ require 'forwardable'
 require 'bio'
 require 'fileutils'
 require 'genevalidator'
+require 'json'
 
 module GeneValidatorApp
   # Module that runs GeneValidator
@@ -24,7 +25,7 @@ module GeneValidatorApp
     class << self
       extend Forwardable
 
-      def_delegators GeneValidatorApp, :config, :logger
+      def_delegators GeneValidatorApp, :config, :logger, :public_dir
 
       attr_reader :gv_dir, :tmp_gv_dir, :input_file, :xml_file, :raw_seq,
                   :unique_id, :params
@@ -33,7 +34,7 @@ module GeneValidatorApp
       def init(url, params)
         create_unique_id
         create_subdir_in_main_tmpdir
-        create_soft_link_from_tmpdir_to_GV_dir
+        create_soft_link_from_tmpdir_to_gv_dir
         @params = params
         validate_params
         obtain_db_path
@@ -45,7 +46,9 @@ module GeneValidatorApp
       def run
         write_seq_to_file
         run_genevalidator
-        (@params[:result_link]) ? @url : produce_table_html
+        copy_json_folder
+        (@params[:result_link]) ? @url : output_json_file_path
+        parse_output_json
       end
 
       private
@@ -53,7 +56,7 @@ module GeneValidatorApp
       # Creates a unique run ID (based on time),
       def create_unique_id
         @unique_id = Time.new.strftime('%Y-%m-%d_%H-%M-%S_%L-%N')
-        @gv_tmpdir = GeneValidatorApp.tempdir + unique_id
+        @gv_tmpdir = File.join(GeneValidatorApp.temp_dir, unique_id)
         ensure_unique_id
       end
 
@@ -62,7 +65,7 @@ module GeneValidatorApp
       def ensure_unique_id
         while File.exist?(@gv_tmpdir)
           @unique_id = create_unique_id
-          @gv_tmpdir = GeneValidatorApp.tempdir + @unique_id
+          @gv_tmpdir = File.join(GeneValidatorApp.temp_dir, unique_id)
         end
         logger.debug("Unique ID = #{@unique_id}")
       end
@@ -74,8 +77,9 @@ module GeneValidatorApp
       end
 
       # Create the Tmp Dir and the create a soft link to it.
-      def create_soft_link_from_tmpdir_to_GV_dir
-        @gv_dir = GeneValidatorApp.public_dir + 'GeneValidator' + @unique_id
+      def create_soft_link_from_tmpdir_to_gv_dir
+        @gv_dir = File.join(GeneValidatorApp.public_dir, 'GeneValidator',
+                            @unique_id)
         logger.debug("Local GV dir = #{@gv_dir}")
         FileUtils.ln_s "#{@gv_tmpdir}", "#{@gv_dir}"
       end
@@ -84,6 +88,7 @@ module GeneValidatorApp
       #  Only important if POST request is sent via API - Web APP also validates
       #  all params via Javascript.
       def validate_params
+        logger.debug("Input Paramaters: #{@params}")
         check_seq_param_present
         check_seq_length
         check_validations_param_present
@@ -92,23 +97,20 @@ module GeneValidatorApp
 
       # Simply asserts whether that the seq param is present
       def check_seq_param_present
-        unless @params[:seq]
-          fail ArgumentError, 'No input sequence provided.'
-        end
+        return if @params[:seq]
+        fail ArgumentError, 'No input sequence provided.'
       end
 
       def check_seq_length
-        return unless config[:max_characters]
-        unless @params[:seq].length < config[:max_characters]
-          fail ArgumentError, 'The input sequence is too long.'
-        end
+        return unless config[:max_characters] != 'undefined'
+        return if @params[:seq].length < config[:max_characters]
+        fail ArgumentError, 'The input sequence is too long.'
       end
 
       # Asserts whether the validations param are specified
       def check_validations_param_present
-        unless @params[:validations]
-          fail ArgumentError, 'No validations specified'
-        end
+        return if @params[:validations]
+        fail ArgumentError, 'No validations specified'
       end
 
       # Asserts whether the database parameter is present
@@ -124,7 +126,7 @@ module GeneValidatorApp
 
       # Writes the input sequences to a file with the sub_dir in the temp_dir
       def write_seq_to_file
-        @input_fasta_file = @gv_tmpdir + 'input_file.fa'
+        @input_fasta_file = File.join(@gv_tmpdir, 'input_file.fa')
         logger.debug("Writing input seqs to: '#{@input_fasta_file}'")
         ensure_unix_line_ending
         ensure_fasta_valid
@@ -145,7 +147,8 @@ module GeneValidatorApp
         unique_queries = {}
         sequence       = @params[:seq].lstrip
         if sequence[0] != '>'
-          sequence.insert(0, ">Submitted:#{Time.now.strftime('%H:%M-%B_%d_%Y')}\n")
+          sequence.insert(0, '>Submitted:'\
+                             "#{Time.now.strftime('%H:%M-%B_%d_%Y')}\n")
         end
         sequence.gsub!(/^\>(\S+)/) do |s|
           if unique_queries.key?(s)
@@ -163,8 +166,7 @@ module GeneValidatorApp
       #  empty
       def assert_input_file_present
         unless File.exist?(@input_fasta_file) || File.zero?(@input_fasta_file)
-          fail RuntimeError, 'GeneValidatorApp was unable to create the input' \
-                             ' file.'
+          fail 'GeneValidatorApp was unable to create the input file.'
         end
       end
 
@@ -182,50 +184,53 @@ module GeneValidatorApp
       def run_genevalidator
         create_gv_log_file
         run_gv
-        assert_table_output_file_produced
+        # assert_table_output_file_produced
       rescue SystemExit
-        raise RuntimeError, 'GeneValidator failed to run properly'
+        raise 'GeneValidator failed to run properly'
       end
 
       def run_gv
-        original_stdout = $stdout.clone unless logger.debug?
-        $stdout.reopen(@gv_log_file, 'w') unless logger.debug?
-        cmd = "genevalidator -f -v '#{@params[:validations].join(', ')}'" \
-              " -d #{@db} -n #{config[:num_threads]} #{@input_fasta_file.to_s}"
+        cmd = "genevalidator -v '#{@params[:validations].join(', ')}'" \
+              " -d #{@db} -n #{config[:num_threads]} #{@input_fasta_file}"
         logger.debug("GV command: $ #{cmd}")
-        `#{cmd}`
-        $stdout = original_stdout unless logger.debug?
+        log_file = (logger.debug?) ? "> #{@gv_log_file} 2>&1" : ''
+        `#{cmd} #{log_file}`
       end
 
       def create_gv_log_file
-        @gv_log_file = (@gv_tmpdir + 'log_file.txt').to_s
+        @gv_log_file = File.join(@gv_tmpdir, 'log_file.txt')
         logger.debug("Log file: #{@gv_log_file}")
       end
 
-      # Assets whether the results file is produced by GeneValidator.
-      def assert_table_output_file_produced
-        @table_file = @gv_dir + 'input_file.fa.html/files/table.html'
-        unless File.exist?(@table_file)
-          fail RuntimeError, 'GeneValidator did not produce the required' \
-                             ' output file.'
-        end
-      end
-
-      # Reads the GV output table file.
-      # Updates links to the plots with relative links to plot jsons.
-      def produce_table_html
-        orig_plots_dir  = 'files/json/input_file.fa_'
-        local_plots_dir = Pathname.new('GeneValidator') + @unique_id +
-                          'input_file.fa.html/files/json/input_file.fa_'
-        full_html = IO.binread(@table_file)
-        full_html.gsub(/#{orig_plots_dir}/, local_plots_dir.to_s)
-                  .gsub('#Place_external_results_link_here', @url)
-      end
+      # # Assets whether the results file is produced by GeneValidator.
+      # def assert_table_output_file_produced
+      #   @table_file = @gv_dir + 'input_file.fa.html/files/table.html'
+      #   unless File.exist?(@table_file)
+      #     fail RuntimeError, 'GeneValidator did not produce the required' \
+      #                        ' output file.'
+      #   end
+      # end
 
       # Reuturns the URL of the results page.
       def produce_result_url_link(url)
-        url.gsub(/input/, '').gsub(%r(/*$), '') +
+        url.gsub(/input/, '').gsub(%r{/*$}, '') +
           "/GeneValidator/#{@unique_id}/input_file.fa.html/results.html"
+      end
+
+      def parse_output_json
+        json_contents = File.read(output_json_file_path)
+        JSON.parse(json_contents)
+      end
+
+      def output_json_file_path
+        "#{@input_fasta_file}.json"
+      end
+
+      def copy_json_folder
+        json_dir = File.join("#{@input_fasta_file}.html", 'files/json')
+        web_dir_json = File.join(public_dir, 'web_files/json')
+        logger.debug("Moving JSON files from #{json_dir} to #{web_dir_json}")
+        FileUtils.cp_r(json_dir, web_dir_json)
       end
     end
   end
