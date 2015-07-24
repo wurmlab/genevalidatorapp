@@ -59,7 +59,7 @@ function addSeqValidation() {
               return false;
             }
           }
-        } 
+        }
       }
       var firstType = types[0];
       for (var j = 0; j < types.length; j++) {
@@ -138,6 +138,7 @@ function bind_td_clicks() {
   });
 }
 
+
 // Sends the data within the form to the Server
 function ajaxFunction() {
   'use strict';
@@ -148,6 +149,7 @@ function ajaxFunction() {
     success: function(response){
       $('#results_box').show();
       $('#output').html(response);
+      toggle_overview_btn(); // add overview info from JSON
       initTableSorter(); // initiate the table sorter
       $("[data-toggle='tooltip']").tooltip(); // Initiate the tooltips
       removeEmptyColumns(); // Remove Unwanted Columns
@@ -156,7 +158,7 @@ function ajaxFunction() {
       $('#search').css({'background-color': '#F5F5F5'});
       $('#results').css({'border-top': '3px solid #DBDBDB'});
       $('#search').css({'margin-bottom': '0'});
-      
+
       $('#spinner').modal('hide'); // remove progress notification
     },
     error: function (e, status) {
@@ -176,8 +178,8 @@ function ajaxFunction() {
   });
 }
 
-//  Table sortert Initialiser 
-//   Contains a custom parser that allows the Stars to be sorted. 
+//  Table sortert Initialiser
+//   Contains a custom parser that allows the Stars to be sorted.
 function initTableSorter() {
   'use strict';
   $.tablesorter.addParser({
@@ -187,7 +189,7 @@ function initTableSorter() {
       var $cell = $(cell);
       if (cellIndex === 1) {
         return $cell.attr('data-score') || s;
-      } 
+      }
       return s;
     },
     parsed: false,
@@ -211,7 +213,7 @@ function removeEmptyColumns() {
     // Check if all cells in the column are empty
     if ($(this).hasClass( 'chart-column' )) {
     } else {
-      if ($(this).text().trim() == '') { 
+      if ($(this).text().trim() == '') {
         //hide header
         $(this).hide();
         //hide cells
@@ -276,7 +278,7 @@ function checkType(sequence, threshold, length, index) {
   var acgMatch = ((dnaSeq.match(/[ACG]/gi) || []).length) / dnaTotal;
   var tMatch = ((dnaSeq.match(/[T]/gi) || []).length) / dnaTotal;
   var uMatch = ((dnaSeq.match(/[U]/gi) || []).length) / dnaTotal;
-  
+
   var proteinSeq = seq.replace(/X/gi,'');
   var proteinTotal = proteinSeq.length;
   var proteinMatch = ((seq.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / proteinTotal;

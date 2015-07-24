@@ -18,12 +18,22 @@ function addData(source, val){
   }
 
   $('table').trigger('update');
-
 }
 
-function addOverallPlot(file){
-  $.getJSON(file, function( json ) {
-    addPlot(json.data, 'report_1', json.type, json.title, json.footer, json.xtitle, json.ytitle);
+function toggle_overview_btn() {
+  var jsonFile = 'web_files/json/overview.json';
+  $.getJSON(jsonFile, function( json ) {
+    var overview = $('<span>' + json.less + '</span><br>');
+    var full_overview  = $('<span>' + json.evaluation + '</span><br>');
+    if ( $('#overview_btn').hasClass('active')){
+      $('#overview_text').html(full_overview);
+      $('#overview_btn').text('Show Less');
+      addPlot(json.data, 'overview', json.type, json.title, json.footer, json.xtitle, json.ytitle);
+    } else {
+      $('#overview').find('svg').remove();
+      $('#overview_text').html(overview);
+      $('#overview_btn').text('Show More');
+    }
   });
 }
 
