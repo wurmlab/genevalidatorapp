@@ -44,7 +44,8 @@ table#sortable_table.table.table-striped.table-collapsed.table-bordered.table-co
         td title="Definition" = query['definition']
         td title=("No. Hits") = query['no_hits']
         - query['validations'].each do |_short_header, item|
-          td class="#{item['status']}" title="#{item['header']}" = item['print']
+          td class="#{item['status']}" title="#{item['header']}"
+            == item['print'].gsub(/\s/, '&nbsp;').gsub(';&nbsp;', '; ')
         - if query['validations'].select{|_short_header, item| item['graphs'] != nil}.map{|_short_header, item| item['graphs'].length}.inject(0){|r, e| r+e } != 0
           td
             button.plot_btn.btn.btn-default title=("Show plots")
