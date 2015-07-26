@@ -6,7 +6,7 @@ html {
 }
 
 body {
-  margin: 0; 
+  margin: 0;
   margin-top: 60px;
   background-color:#F5F5F5;
 }
@@ -175,7 +175,7 @@ table .danger,
 .table .danger,
 table .info,
 .table .info {
-  color: #333;  
+  color: #333;
 }
 
 .table-bordered {
@@ -245,11 +245,11 @@ table .info,
 .table-bordered>tbody>tr>td,
 .table-bordered>tfoot>tr>td {
   border:none;
-} 
+}
 
 .table-bordered>tbody>tr {
   border-bottom: 2px solid #DDD;
-} 
+}
 
 .error_header {
   margin-top: 10px;
@@ -291,11 +291,6 @@ tr {
   text-align: center;
 }
 
-/* table striped backgrounds ___________*/
-
-/*tbody > tr:nth-child(4n+1), tbody > tr:nth-child(4n+2) {
-}
-*/
 /* table sorter ___________*/
 
 
@@ -337,7 +332,7 @@ tr {
 .table tbody td.success,
 .table tbody td.danger,
 .table tbody td.warning {
-  padding-left:30px !important; 
+  padding-left:30px !important;
   position:relative;
 }
 
@@ -390,7 +385,7 @@ ___________________________*/
     border-right:5px solid transparent;
     border-top:5px solid #CCC
 }
-  
+
 /* D3Js & Axis
 ___________________________*/
 .axis path,
@@ -490,7 +485,7 @@ ___________________________*/
     float:right !important;
     margin-top: -43px;
   }
-  
+
   .show_examples_text {
     text-align: left;
   }
@@ -501,7 +496,7 @@ ___________________________*/
 }
 
 
-/* Browser Specific 
+/* Browser Specific
 ___________________________*/
 
 /* Border on Stars ________*/

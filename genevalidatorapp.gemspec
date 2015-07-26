@@ -1,7 +1,7 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'GeneValidatorApp/version'
+require 'genevalidatorapp/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'genevalidatorapp'
@@ -9,8 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Ismail Moghul']
   spec.email         = ['Ismail.Moghul@gmail.com']
   spec.summary       = 'A Web App wrapper for GeneValidator.'
-  spec.description   = 'A Web App wrapper for GeneValidator, a program for validating gene predictions.'
-  spec.homepage      = 'https://github.com/wurmlab/GeneValidatorApp'
+  spec.description   = 'A Web App wrapper for GeneValidator, a program for' \
+                       ' validating gene predictions.'
+  spec.homepage      = 'https://github.com/wurmlab/genevalidatorapp'
   spec.license       = 'AGPL'
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -25,13 +26,13 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.2'
   spec.add_development_dependency 'rack-test', '~> 0.6'
 
+  spec.add_dependency 'genevalidator', '~>1.6'
   spec.add_dependency 'bio', '~>1.4'
-  spec.add_dependency 'genevalidator', '~>1.5'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
   spec.add_dependency 'slim', '~>3.0'
-  spec.add_dependency 'slop', '~>4.0'
+  spec.add_dependency 'slop', '~>3.6'
   spec.add_dependency 'thin', '~>1.6'
   spec.add_dependency 'w3c_validators', '~>1.1'
   spec.post_install_message = <<INFO
@@ -43,7 +44,7 @@ Gem::Specification.new do |spec|
 
     $ genevalidatorapp [options]
 
-  Visit https://github.com/wurmlab/GeneValidatorApp for more information.
+  Visit https://github.com/wurmlab/genevalidatorapp for more information.
 ------------------------------------------------------------------------
 
 INFO

@@ -4,6 +4,7 @@ $(document).ready(function() {
   keepFooterFixedToBottom();
   addSeqValidation();
   inputValidation();
+  bind_td_clicks();
 
   $(document).bind('keydown', function (e) {
     if (e.ctrlKey && e.keyCode === 13 ) {
@@ -12,8 +13,8 @@ $(document).ready(function() {
   });
 });
 
-// Looks for a cookie (called 'GeneValidator_adv_params_status') to check the state of the adv_params box when it was last closed. 
-//  This function is called upon as soon as the website is loaded;  
+// Looks for a cookie (called 'GeneValidator_adv_params_status') to check the state of the adv_params box when it was last closed.
+//  This function is called upon as soon as the website is loaded;
 function checkCollapseState() {
   'use strict';
   if ($.cookie('GeneValidator_adv_params_status')){
@@ -58,7 +59,7 @@ function addSeqValidation() {
               return false;
             }
           }
-        } 
+        }
       }
       var firstType = types[0];
       for (var j = 0; j < types.length; j++) {
@@ -125,6 +126,19 @@ function inputValidation() {
   });
 }
 
+function bind_td_clicks() {
+  $( document ).on( "click", "td, .plot_btn", function( event ) {
+      if ($(this).hasClass('success') || $(this).hasClass('danger')){
+        var title = $(this).attr('title');
+        var val = title.replace(/[ \/]/g, '');
+        addData(this, val);
+      } else if ($(this).hasClass('plot_btn')){
+        addData(this, 'all');
+      }
+  });
+}
+
+
 // Sends the data within the form to the Server
 function ajaxFunction() {
   'use strict';
@@ -135,15 +149,15 @@ function ajaxFunction() {
     success: function(response){
       $('#results_box').show();
       $('#output').html(response);
+      toggle_overview_btn(); // add overview info from JSON
       initTableSorter(); // initiate the table sorter
       $("[data-toggle='tooltip']").tooltip(); // Initiate the tooltips
-      removeEmptyColumns(); // Remove Unwanted Columns
 
       $('#mainbody').css({'background-color': '#fff'});
       $('#search').css({'background-color': '#F5F5F5'});
       $('#results').css({'border-top': '3px solid #DBDBDB'});
       $('#search').css({'margin-bottom': '0'});
-      
+
       $('#spinner').modal('hide'); // remove progress notification
     },
     error: function (e, status) {
@@ -163,8 +177,8 @@ function ajaxFunction() {
   });
 }
 
-//  Table sortert Initialiser 
-//   Contains a custom parser that allows the Stars to be sorted. 
+//  Table sortert Initialiser
+//   Contains a custom parser that allows the Stars to be sorted.
 function initTableSorter() {
   'use strict';
   $.tablesorter.addParser({
@@ -174,7 +188,7 @@ function initTableSorter() {
       var $cell = $(cell);
       if (cellIndex === 1) {
         return $cell.attr('data-score') || s;
-      } 
+      }
       return s;
     },
     parsed: false,
@@ -186,25 +200,6 @@ function initTableSorter() {
       1 : { sorter: 'star_scores' }
     },
     sortList: [[0,0]],
-  });
-}
-
-// Remove empty colums that are not used for that type of input data...
-function removeEmptyColumns() {
-  'use strict';
-  $('#sortable_table tr th').each(function(i) {
-    var tds = $(this).parents('table') // Select all tds in column
-    .find('tr td:nth-child(' + (i + 1) + ')');
-    // Check if all cells in the column are empty
-    if ($(this).hasClass( 'chart-column' )) {
-    } else {
-      if ($(this).text().trim() == '') { 
-        //hide header
-        $(this).hide();
-        //hide cells
-        tds.hide();
-      }
-    }
   });
 }
 
@@ -263,7 +258,7 @@ function checkType(sequence, threshold, length, index) {
   var acgMatch = ((dnaSeq.match(/[ACG]/gi) || []).length) / dnaTotal;
   var tMatch = ((dnaSeq.match(/[T]/gi) || []).length) / dnaTotal;
   var uMatch = ((dnaSeq.match(/[U]/gi) || []).length) / dnaTotal;
-  
+
   var proteinSeq = seq.replace(/X/gi,'');
   var proteinTotal = proteinSeq.length;
   var proteinMatch = ((seq.match(/[ARNDCQEGHILKMFPSTWYV\*]/gi) || []).length) / proteinTotal;

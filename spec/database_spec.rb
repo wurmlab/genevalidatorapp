@@ -1,5 +1,5 @@
-require 'GeneValidatorApp'
-require 'GeneValidatorApp/database'
+require 'genevalidatorapp'
+require 'genevalidatorapp/database'
 require 'rspec'
 
 module GeneValidatorApp

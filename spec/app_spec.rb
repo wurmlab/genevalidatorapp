@@ -1,4 +1,4 @@
-require 'GeneValidatorApp'
+require 'genevalidatorapp'
 require 'rack/test'
 require 'w3c_validators'
 

@@ -4,23 +4,14 @@ html lang="en"
     meta charset="utf-8"
     meta content="IE=edge" http-equiv="X-UA-Compatible"
     meta content="width=device-width, initial-scale=1" name="viewport"
-    meta content="" name="description"
-    meta content="" name="author"
+    meta content="GeneValidator | Identify problems with Gene Predictions" name="description"
+    meta content="Wurmlab" name="author"
     title GeneValidator | Identify problems with Gene Predictions
 
-    script type="text/javascript" src="#{uri('web_files/js/jquery.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/bootstrap.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/jquery.tablesorter.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/d3.v3.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/plots.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/genevalidator.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/jquery.cookie.min.js')}"
-    script type="text/javascript" src="#{uri('web_files/js/jquery.validate.min.js')}"
+    script type="text/javascript" src="#{uri('web_files/js/GV_compiled_js.min.js')}"
 
     /! Bootstrap core CSS
-    link href="#{uri('web_files/css/bootstrap1.min.css')}" rel="stylesheet" type="text/css"
-    link href="#{uri('web_files/css/font-awesome.min.css')}" rel="stylesheet" type="text/css"
-    link href="#{uri('web_files/css/custom.min.css')}" rel="stylesheet" type="text/css"
+    link href="#{uri('web_files/css/GV_compiled_css.min.css')}" rel="stylesheet" type="text/css"
 
     /! HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
     /![if lt IE 9]
@@ -31,7 +22,7 @@ html lang="en"
     .navbar.navbar-default.navbar-fixed-top role="navigation"
       .nav-container
         .navbar-header
-          button.navbar-toggle data-target=".navbar-responsive-collapse" data-toggle="collapse" type="button" 
+          button.navbar-toggle data-target=".navbar-responsive-collapse" data-toggle="collapse" type="button"
             span.icon-bar
             span.icon-bar
             span.icon-bar
@@ -49,10 +40,10 @@ html lang="en"
             /! li
             /!   a href="#"  Support
             li
-              a href="http://wurmlab.github.io" target="_blank" Wurm Lab
+              a href="https://wurmlab.github.io" target="_blank" Wurm Lab
           ul.nav.navbar-nav.navbar-right
             li
-              a.nav_github_icon href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"
+              a.nav_github_icon href="https://github.com/wurmlab/genevalidatorapp" target="_blank"
                 span.i.fa.fa-2x.fa-github
     ==yield
     #spinner.modal aria-hidden="true" aria-labelledby="spinner" role="dialog" tabindex="-1"
@@ -63,14 +54,14 @@ html lang="en"
             p.results_link  This may take some time. Please leave this page open.
             i.fa.fa-spinner.fa-5x.fa-spin
     footer#footer
-      p.text-muted.text-center 
-        | Please cite "Dragan M, Moghul MI, Priyam A &amp; Wurm Y 
-        em 
+      p.text-muted.text-center
+        | Please cite "Dragan M<sup>&Dagger;</sup>, Moghul MI<sup>&Dagger;</sup>, Priyam A, Bustos C &amp; Wurm Y 
+        em
           | (in prep) 
         | GeneValidator: identify problematic gene predictions"
         br
         |  Developed at 
-        a href="http://yannick.poulet.org" target="_blank" Wurm Lab
+        a href="https://wurmlab.github.io" target="_blank" Wurm Lab
         | , 
         a href="http://www.sbcs.qmul.ac.uk" target="_blank" QMUL
         |  with funding by 
@@ -79,7 +70,7 @@ html lang="en"
         a href="https://www.google-melange.com/gsoc/homepage/google/gsoc2013" target="_blank"  Google Summer of Code 2013
         br
         | This page was created by 
-        a href="https://github.com/IsmailM/GeneValidatorApp" target="_blank"  GeneValidator Web Application 
+        a href="https://github.com/wurmlab/genevalidatorapp" target="_blank"  GeneValidator Web Application 
         | v#{GeneValidatorApp::VERSION} (using 
-        a href="https://github.com/monicadragan/GeneValidator" target="_blank"  GeneValidator 
+        a href="https://github.com/wurmlab/genevalidator" target="_blank"  GeneValidator 
         | v#{@current_gv_version})
