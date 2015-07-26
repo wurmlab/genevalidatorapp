@@ -152,7 +152,6 @@ function ajaxFunction() {
       toggle_overview_btn(); // add overview info from JSON
       initTableSorter(); // initiate the table sorter
       $("[data-toggle='tooltip']").tooltip(); // Initiate the tooltips
-      removeEmptyColumns(); // Remove Unwanted Columns
 
       $('#mainbody').css({'background-color': '#fff'});
       $('#search').css({'background-color': '#F5F5F5'});
@@ -201,25 +200,6 @@ function initTableSorter() {
       1 : { sorter: 'star_scores' }
     },
     sortList: [[0,0]],
-  });
-}
-
-// Remove empty colums that are not used for that type of input data...
-function removeEmptyColumns() {
-  'use strict';
-  $('#sortable_table tr th').each(function(i) {
-    var tds = $(this).parents('table') // Select all tds in column
-    .find('tr td:nth-child(' + (i + 1) + ')');
-    // Check if all cells in the column are empty
-    if ($(this).hasClass( 'chart-column' )) {
-    } else {
-      if ($(this).text().trim() == '') {
-        //hide header
-        $(this).hide();
-        //hide cells
-        tds.hide();
-      }
-    }
   });
 }
 
