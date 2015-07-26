@@ -184,7 +184,7 @@ module GeneValidatorApp
       def run_genevalidator
         create_gv_log_file
         run_gv
-        # assert_table_output_file_produced
+        assert_json_output_file_produced
       rescue SystemExit
         raise 'GeneValidator failed to run properly'
       end
@@ -193,7 +193,7 @@ module GeneValidatorApp
         cmd = "genevalidator -v '#{@params[:validations].join(', ')}'" \
               " -d #{@db} -n #{config[:num_threads]} #{@input_fasta_file}"
         logger.debug("GV command: $ #{cmd}")
-        log_file = (logger.debug?) ? "> #{@gv_log_file} 2>&1" : ''
+        log_file = (logger.debug?) ? '' : "> #{@gv_log_file} 2>&1"
         `#{cmd} #{log_file}`
       end
 
@@ -202,14 +202,12 @@ module GeneValidatorApp
         logger.debug("Log file: #{@gv_log_file}")
       end
 
-      # # Assets whether the results file is produced by GeneValidator.
-      # def assert_table_output_file_produced
-      #   @table_file = @gv_dir + 'input_file.fa.html/files/table.html'
-      #   unless File.exist?(@table_file)
-      #     fail RuntimeError, 'GeneValidator did not produce the required' \
-      #                        ' output file.'
-      #   end
-      # end
+      # Assets whether the results file is produced by GeneValidator.
+      def assert_json_output_file_produced
+        @json_file = File.join(@gv_dir, 'input_file.fa.json')
+        return if File.exist?(@json_file)
+        fail 'GeneValidator did not produce the required output file.'
+      end
 
       # Reuturns the URL of the results page.
       def produce_result_url_link(url)
