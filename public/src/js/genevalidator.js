@@ -4,7 +4,7 @@ $(document).ready(function() {
   keepFooterFixedToBottom();
   addSeqValidation();
   inputValidation();
-  bind_td_clicks();
+  bindTdClicks();
 
   $(document).bind('keydown', function (e) {
     if (e.ctrlKey && e.keyCode === 13 ) {
@@ -15,7 +15,7 @@ $(document).ready(function() {
 
 // Looks for a cookie (called 'GeneValidator_adv_params_status') to check the state of the adv_params box when it was last closed.
 //  This function is called upon as soon as the website is loaded;
-function checkCollapseState() {
+var checkCollapseState = function () {
   'use strict';
   if ($.cookie('GeneValidator_adv_params_status')){
     var adv_params_status = $.cookie('GeneValidator_adv_params_status');
@@ -25,25 +25,26 @@ function checkCollapseState() {
       $('#adv_params').addClass('in');
     }
   }
-}
+};
 
 // This function simply ensures that the footer stays to fixed to the bottom of the window
-function keepFooterFixedToBottom() {
+var keepFooterFixedToBottom = function () {
   'use strict';
   $('#mainbody').css({'margin-bottom': (($('#footer').height()) + 15)+'px'});
   $(window).resize(function(){
       $('#mainbody').css({'margin-bottom': (($('#footer').height()) + 15)+'px'});
   });
-}
+};
 
 // Creates a custom Validation for Jquery Validation plugin...
 // It ensures that sequences are either protein or DNA data...
 // If there are multiple sequences, ensures that they are of the same type
 // It utilises the checkType function (further below)...
-function addSeqValidation() {
+var addSeqValidation = function () {
   'use strict';
   jQuery.validator.addMethod('checkInputType', function(value, element) {
-    var types = [];
+    var types = [],
+        type  = '';
     if (value.charAt(0) === '>') {
       var seqs_array = value.split('>');
       for (var i = 1; i < seqs_array.length; i++) {
@@ -53,7 +54,7 @@ function addSeqValidation() {
           if (clean_lines.length !== 0){
             clean_lines.shift();
             var seq = clean_lines.join('');
-            var type = checkType(seq, 0.9);
+            type = checkType(seq, 0.9);
             types.push(type);
             if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
               return false;
@@ -69,7 +70,7 @@ function addSeqValidation() {
       }
       return true;
     } else {
-      var type = checkType(value, 0.9);
+      type = checkType(value, 0.9);
       if ((type !== 'protein') && (type !== 'dna') && (type !== 'rna')) {
         return false;
       } else {
@@ -77,11 +78,11 @@ function addSeqValidation() {
       }
     }
   }, '* The Input must be either DNA or protein sequence(s). Please ensure that your sequences do not contains any non-letter character(s). If there are multiple sequences, ensure that they are all of one type. ');
-}
+};
 
 
 // A function that validates the input - Utilises Jquery.Validator.js
-function inputValidation() {
+var inputValidation = function () {
   'use strict';
   var maxCharacters = $('#seq').attr('data-maxCharacters'); // returns a number or undefined
   $('#input').validate({
@@ -124,23 +125,22 @@ function inputValidation() {
       ajaxFunction();
     }
   });
-}
+};
 
-function bind_td_clicks() {
+var bindTdClicks = function () {
   $( document ).on( "click", "td, .plot_btn", function( event ) {
       if ($(this).hasClass('success') || $(this).hasClass('danger')){
         var title = $(this).attr('title');
         var val = title.replace(/[ \/]/g, '');
-        addData(this, val);
+        GV.addData(this, val);
       } else if ($(this).hasClass('plot_btn')){
-        addData(this, 'all');
+        GV.addData(this, 'all');
       }
   });
-}
-
+};
 
 // Sends the data within the form to the Server
-function ajaxFunction() {
+var ajaxFunction = function () {
   'use strict';
   $.ajax({
     type: 'POST',
@@ -149,7 +149,7 @@ function ajaxFunction() {
     success: function(response){
       $('#results_box').show();
       $('#output').html(response);
-      toggle_overview_btn(); // add overview info from JSON
+      GV.toggleOverviewBtn(); // add overview info from JSON
       initTableSorter(); // initiate the table sorter
       $("[data-toggle='tooltip']").tooltip(); // Initiate the tooltips
 
@@ -175,11 +175,11 @@ function ajaxFunction() {
       }
     }
   });
-}
+};
 
 //  Table sortert Initialiser
 //   Contains a custom parser that allows the Stars to be sorted.
-function initTableSorter() {
+var initTableSorter = function () {
   'use strict';
   $.tablesorter.addParser({
     id: 'star_scores',
@@ -201,10 +201,10 @@ function initTableSorter() {
     },
     sortList: [[0,0]],
   });
-}
+};
 
 // Function is called each time the Adv. Params button is pressed...
-function changeAdvParamsBtnText() {
+var changeAdvParamsBtnText = function () {
   'use strict';
   var btn = document.getElementById('adv_params_btn');
   if (btn.innerHTML === '<i class="fa fa-pencil-square-o"></i>&nbsp;&nbsp;Show Advanced Parameters') {
@@ -217,10 +217,10 @@ function changeAdvParamsBtnText() {
     $('#adv_params').collapse('hide');
     $.cookie('GeneValidator_adv_params_status', 'closed');
   }
-}
+};
 
 // Changes the input to an examplar dna or protein sequence...
-function examplarSequence(type){
+var examplarSequence = function (type){
   'use strict';
   var dna = '>Insulin\n' +
                 'ATGGCTCTCTGGATCCGGTCGCTGCCTCTCCTGGCCCTTCTTGCTCTTTCTGGCCCTGGGATCAGCCACGCAGCTGCCAACCAGCACCTCTGTGGCTCCCACTTGGTTGAGGCTCTCTACCTGGTGTGTGGGGAGCGGGGTTTCTTCTACTCCCCCAAAACACGGCGGGACGTTGAGCAGCCTCTAGTGAACGGTCCCCTGCATGGCGAGGTGGGAGAGCTGCCGTTCCAGCATGAGGAATACCAGAAAGTCAAGCGAGGCATCGTTGAGCAATGCTGTGAAAACCCGTGCTCCCTCTACCAACTGGAAAACTACTGCAACTAG\n' +
@@ -236,11 +236,11 @@ function examplarSequence(type){
   } else if (type === 'protein') {
     document.getElementById('seq').value = protein;
   }
-}
+};
 
 // FROM BIONODE-Seq - See https://github.com/bionode/bionode-seq
 // Checks whether a sequence is a protein or dna sequence...
-function checkType(sequence, threshold, length, index) {
+var checkType = function (sequence, threshold, length, index) {
   'use strict';
   if (threshold === undefined) {
     threshold = 0.9;
@@ -274,4 +274,4 @@ function checkType(sequence, threshold, length, index) {
   } else if (proteinMatch >= threshold) {
     return 'protein';
   }
-}
+};
