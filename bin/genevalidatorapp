@@ -35,7 +35,7 @@ BANNER
        argument: true
 
     on 'b', 'bin=',
-       'Load BLAST+ and/or BLAST binaries from this directory',
+       'Load BLAST+ and/or MAFFT binaries from this directory',
        argument: true,
        as: Array
 
@@ -184,8 +184,7 @@ BANNER
         # Ask user if she already has BLAST+ downloaded.
         puts
         puts <<MSG
-GeneValidatorApp can use NCBI BLAST+ that you may have on your system already,
-or download the correct package for itself.
+GeneValidatorApp can use NCBI BLAST+ that you may have on your system already.
 Please enter the path to NCBI BLAST+.
 
 Press Ctrl+C to quit.
