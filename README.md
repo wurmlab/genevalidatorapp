@@ -40,7 +40,7 @@ Simply run the following command in the terminal.
 gem install genevalidatorapp
 ```
 
-If that doesn't work, try `sudo gem install genevalidator` instead.
+If that doesn't work, try `sudo gem install genevalidatorapp` instead.
 
 ##### Running From Source (Not Recommended)
 It is also possible to run from source. However, this is not recommended.
@@ -92,8 +92,9 @@ That's it! Open http://localhost:4567/ and start using GeneValidator!
 
 ## Advanced Usage
 
-See `$ genevalidator -h` for more information on all the options available when running GeneValidatorApp.
+See `$ genevalidatorapp -h` for more information on all the options available when running GeneValidatorApp.
 
+```bash
 SUMMARY:
   GeneValidator - Identify problems with predicted genes
 
@@ -123,6 +124,8 @@ Examples:
     -D, --devel                      Start GeneValidatorApp in development mode
     -v, --version                    Print version number of GeneValidatorApp that will be loaded
     -h, --help                       Display this help message.
+```
+
 
 <hr>
 
