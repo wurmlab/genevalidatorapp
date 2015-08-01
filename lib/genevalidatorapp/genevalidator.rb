@@ -225,7 +225,7 @@ module GeneValidatorApp
       end
 
       def copy_json_folder
-        json_dir = File.join("#{@input_fasta_file}.html", 'files/json')
+        json_dir = File.join("#{@input_fasta_file}.html", 'files/json', '/.')
         web_dir_json = File.join(public_dir, 'web_files/json')
         logger.debug("Moving JSON files from #{json_dir} to #{web_dir_json}")
         FileUtils.cp_r(json_dir, web_dir_json)
