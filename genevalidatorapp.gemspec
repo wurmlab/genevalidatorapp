@@ -6,12 +6,13 @@ require 'genevalidatorapp/version'
 Gem::Specification.new do |spec|
   spec.name          = 'genevalidatorapp'
   spec.version       = GeneValidatorApp::VERSION
-  spec.authors       = ['Ismail Moghul']
-  spec.email         = ['Ismail.Moghul@gmail.com']
+  spec.authors       = ['Monica Dragan', 'Ismail Moghul', 'Anurag Priyam',
+                        'Yannick Wurm']
+  spec.email         = 'y.wurm@qmul.ac.uk'
   spec.summary       = 'A Web App wrapper for GeneValidator.'
   spec.description   = 'A Web App wrapper for GeneValidator, a program for' \
                        ' validating gene predictions.'
-  spec.homepage      = 'https://github.com/wurmlab/genevalidatorapp'
+  spec.homepage      = 'https://wurmlab.github.io/tools/genevalidator/'
   spec.license       = 'AGPL'
 
   spec.files         = `git ls-files -z`.split("\x0")
@@ -23,18 +24,17 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', '~> 1.6'
   spec.add_development_dependency 'rake', '~>10.3'
-  spec.add_development_dependency 'rspec', '~> 3.2'
+  spec.add_development_dependency('rspec', '~> 2.8', '>= 2.8.0')
   spec.add_development_dependency 'rack-test', '~> 0.6'
+  spec.add_development_dependency('capybara', '~> 2.4', '>= 2.4.4')
+  spec.add_development_dependency 'w3c_validators', '~>1.1'
 
   spec.add_dependency 'genevalidator', '~>1.6'
   spec.add_dependency 'bio', '~>1.4'
   spec.add_dependency 'sinatra', '~>1.4'
-  spec.add_dependency 'sinatra-contrib', '~>1.4'
   spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
   spec.add_dependency 'slim', '~>3.0'
   spec.add_dependency 'slop', '~>3.6'
-  spec.add_dependency 'thin', '~>1.6'
-  spec.add_dependency 'w3c_validators', '~>1.1'
   spec.post_install_message = <<INFO
 
 ------------------------------------------------------------------------
