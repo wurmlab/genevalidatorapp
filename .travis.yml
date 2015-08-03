@@ -5,6 +5,12 @@ rvm:
   - '2.2.0'
 before_install:
   - wget -c "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.30/ncbi-blast-2.2.30+-x64-linux.tar.gz" && tar xvf ncbi-blast-2.2.30+-x64-linux.tar.gz && export PATH="./ncbi-blast-2.2.30+/bin:$PATH"
+  - wget -P ~ http://mafft.cbrc.jp/alignment/software/mafft-7.205-with-extensions-src.tgz
+  - tar -zxvf ~/mafft-7.205-with-extensions-src.tgz -C ~
+  - mkdir ~/mafft
+  - ruby -pi -e "gsub(/^PREFIX = \/usr\/local/, 'PREFIX = ~/mafft/')" ~/mafft-7.205-with-extensions/core/Makefile
+  - (cd ~/mafft-7.205-with-extensions/core/ && make clean && make && make install)
+  - export PATH=$PATH:~/mafft/bin
 cache: bundler
 sudo: false
 script: bundle exec rake test
