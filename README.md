@@ -1,7 +1,6 @@
 # GeneValidatorApp
 [![Build Status](https://travis-ci.org/wurmlab/genevalidatorapp.svg?branch=master)](https://travis-ci.org/wurmlab/genevalidatorapp)
 [![Gem Version](https://badge.fury.io/rb/genevalidatorapp.svg)](http://badge.fury.io/rb/genevalidatorapp)
-[![Dependency Status](https://gemnasium.com/wurmlab/genevalidatorapp.svg)](https://gemnasium.com/wurmlab/genevalidatorapp)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/wurmlab/genevalidatorapp/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/wurmlab/genevalidatorapp/?branch=master)
 
 
