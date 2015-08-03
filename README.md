@@ -1,101 +1,132 @@
 # GeneValidatorApp
 [![Build Status](https://travis-ci.org/wurmlab/genevalidatorapp.svg?branch=master)](https://travis-ci.org/wurmlab/genevalidatorapp)
-[![Gem Version](https://badge.fury.io/rb/GeneValidatorApp.svg)](http://badge.fury.io/rb/GeneValidatorApp)
-[![Dependency Status](https://gemnasium.com/wurmlab/GeneValidatorApp.svg)](https://gemnasium.com/wurmlab/GeneValidatorApp)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/wurmlab/GeneValidatorApp/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/wurmlab/GeneValidatorApp/?branch=master)
+[![Gem Version](https://badge.fury.io/rb/genevalidatorapp.svg)](http://badge.fury.io/rb/genevalidatorapp)
+[![Dependency Status](https://gemnasium.com/wurmlab/genevalidatorapp.svg)](https://gemnasium.com/wurmlab/genevalidatorapp)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/wurmlab/genevalidatorapp/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/wurmlab/genevalidatorapp/?branch=master)
 
-This is a Sinatra based web wrapper for [GeneValidator](https://github.com/monicadragan/GeneValidator); a program that validates gene predictions. A working example can be seen at [genevalidator.sbcs.qmul.ac.uk](http://genevalidator.sbcs.qmul.ac.uk).
 
-If you use this program in your research, please cite us as follows:
 
-"Dragan M, Moghul MI, Priyam A & Wurm Y (<em>in prep</em>) GeneValidator: identify problematic gene predictions" 
 
-This program was developed at [Wurm Lab](http://yannick.poulet.org), [QMUL](http://sbcs.qmul.ac.uk) with the support of a BBSRC grant.
 
+
+
+## Introduction
+
+This is a online web application for [GeneValidator](https://github.com/wurmlab/genevalidator). This app is currently hosted at: [genevalidator.sbcs.qmul.ac.uk](http://genevalidator.sbcs.qmul.ac.uk).
+
+GeneValidator helps in identifing problems with gene predictions and provides useful information extracted from analysing orthologs in BLAST databases. The results produced can be used by biocurators and researchers who need accurate gene predictions.
+
+If you use GeneValidator in your work, please cite us as follows:
+> "Dragan M<sup>&Dagger;</sup>, Moghul MI<sup>&Dagger;</sup>, Priyam A, Bustos C & Wurm Y (<em>in prep.</em>) GeneValidator: identify problematic gene predictions"
+
+
+
+
+
+
+-
 ## Installation
+### Installation Requirements
+* Ruby (>= 2.0.0)
+* NCBI BLAST+ (>= 2.2.30+) (download [here](http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download)).
+* MAFFT installation (download [here](http://mafft.cbrc.jp/alignment/software/)).
 
-1) Install all GeneValidator Prerequisites (ruby <= 2.0.0, Mafft, BLAST+). You would also require a BLAST database. 
-  * Please see [here](https://gist.github.com/IsmailM/b783e8a06565197084e6) for more information.
+Please see [here](https://gist.github.com/IsmailM/b783e8a06565197084e6) for more help with installing the prerequisites.
 
-2) Install GeneValidatorApp
+### Installation
+Simply run the following command in the terminal.
 
-    $ gem install genevalidatorapp
+```bash
+gem install genevalidatorapp
+```
 
-## Usage
+If that doesn't work, try `sudo gem install genevalidatorapp` instead.
 
-After installing simply type in:
+##### Running From Source (Not Recommended)
+It is also possible to run from source. However, this is not recommended.
 
-    $ genevalidatorapp
+```bash
+# Clone the repository.
+git clone https://github.com/wurmlab/genevalidatorapp.git
 
-and then go to [http://localhost:4567](http://localhost:4567) (if on a local server and using the default port: 4567)
+# Move into GeneValidatorApp source directory.
+cd GeneValidatorApp
 
-See `$ genevalidator -h` for more information on how to run GeneValidatorApp.
+# Install bundler
+gem install bundler
 
-    USAGE
-    
-    genevalidatorapp [options]
-    
-    Example
-    
-      # Launch GeneValidatorApp with the given config file
-      $ genevalidatorapp --config ~/.genevalidatorapp.conf
-    
-      # Launch GeneValidatorApp with 8 threads at port 8888
-      $ genevalidatorapp --num_threads 8 --port 8888
+# Use bundler to install dependencies
+bundle install
 
-      # Create a config file with the other arguments
-      $ genevalidatorapp -s -d ~/database_dir 
-    
-    Compulsory (unless set in a config file)
-        -d, --database_dir          Read BLAST database from this directory
-        
-    Optional
-        -f, --default_db            The Path to the the default database
-        -n, --num_threads           Number of threads to use to run a BLAST search
-        -c, --config_file           Use the given configuration file
-        -r, --require               Load extension from this file
-        -p, --port                  Port to run GeneValidatorApp on
-        -s, --set                   Set configuration value in default or given config file
-        -l, --list_databases        List BLAST databases
-        -b, --blast_bin             Load BLAST+ binaries from this directory
-        -m, --mafft_bin             Load Mafft binaries from this directory
-        -D, --devel                 Start GeneValidatorApp in development mode
-        -v, --version               Print version number of GeneValidatorApp that will be loaded
-        -h, --help                  Display this help message.
+# Optional: run tests and build the gem from source
+bundle exec rake
+
+# Run GeneValidator.
+bundle exec genevalidatorapp -h
+# note that `bundle exec` executes GeneValidatorApp in the context of the bundle
+
+# Alternativaly, install GeneValidatorApp as a gem
+bundle exec rake install
+genevalidatorapp -h
+```
 
 
-## Setting up a Config File
 
-GeneValidatorApp requires a number of arguments in order to work. You can either provide these variables to the app through a config file or through command line arguments.
 
-In order to create a config file, run genevalidator with the `-s` or `--set` argument as follows.
+## Launch GeneValidator
 
-    $ genevalidator -s -d database_dir -f default_db -n num_threads -p port -b blast_bin -m mafft_bin
+To configure and launch GeneValidatorApp, run the following from a command line.
 
-The `--set` argument create a config file at `~/.genevalidatorapp.conf` using all the other arguments used. Thereafter, GeneValidatorApp will read the config file before starting the app. This means that you are not required provide the same arguments again and again.
+```bash
+genevalidatorapp
+```
 
-### Config file
+GeneValidatorApp will automatically guide you through an interactive setup process to help locate BLAST+ binaries and ask for the location of BLAST+ databases.
 
-A config file can also be set up manually. Below is an example:   
+That's it! Open http://localhost:4567/ and start using GeneValidator!
 
-    :database_dir: "/Users/ismailm/blastdb"
-    :default_db: "/Users/ismailm/blastdb/SwissProt"
-    :web_dir: "/Users/ismailm/GV"
-    :num_threads: 8
-    :port: 4567
-    :host: localhost
-    :devel: true
-    :blast_bin: "/Users/ismailm/blast/bin"
-    :mafft_bin: "/Users/ismailm/mafft/bin"
 
-## API
 
-See [GeneValidatorApp-API](https://github.com/IsmailM/GeneValidatorApp-API) for more information.
 
-## Contributing
 
-1. Fork it ( https://github.com/wurmlab/GeneValidatorApp/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+
+## Advanced Usage
+
+See `$ genevalidatorapp -h` for more information on all the options available when running GeneValidatorApp.
+
+```bash
+SUMMARY:
+  GeneValidator - Identify problems with predicted genes
+
+USAGE:
+  $ genevalidatorapp [options]
+
+Examples:
+  # Launch GeneValidatorApp with the given config file
+  $ genevalidatorapp --config ~/.genevalidatorapp.conf
+
+  # Launch GeneValidatorApp with 8 threads at port 8888
+  $ genevalidatorapp --num_threads 8 --port 8888
+
+  # Create a config file with the other arguments
+  $ genevalidatorapp -s -d ~/database_dir
+
+    -c, --config_file                Use the given configuration file
+    -b, --bin                        Load BLAST+ and/or MAFFT binaries from this directory
+    -d, --database_dir               Read BLAST database from this directory
+    -f, --default_database_path      The path to the default BLAST database
+    -n, --num_threads                Number of threads to use to run a BLAST search
+    -r, --require                    Load extension from this file
+    -H, --host                       Host to run GeneValidatorApp on
+    -p, --port                       Port to run GeneValidatorApp on
+    -s, --set                        Set configuration value in default or given config file
+    -l, --list_databases             List BLAST databases
+    -D, --devel                      Start GeneValidatorApp in development mode
+    -v, --version                    Print version number of GeneValidatorApp that will be loaded
+    -h, --help                       Display this help message.
+```
+
+
+<hr>
+
+This program was developed at [Wurm Lab](https://wurmlab.github.io), [QMUL](http://sbcs.qmul.ac.uk) with the support of a BBSRC grant.
