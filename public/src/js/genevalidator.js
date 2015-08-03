@@ -162,7 +162,7 @@ var ajaxFunction = function () {
     },
     error: function (e, status) {
       var errorMessage;
-      if (e.status == 500) {
+      if (e.status == 500 || e.status == 400) {
         errorMessage = e.responseText;
         $('#results_box').show();
         $('#output').html(errorMessage);

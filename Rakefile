@@ -3,13 +3,16 @@ require 'rspec/core'
 require 'rspec/core/rake_task'
 
 task default: [:build]
-desc 'Installs the ruby gem'
-task :build do
-  lib = File.expand_path('../lib', __FILE__)
-  $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-  require 'genevalidatorapp/version'
-  exec('gem build genevalidatorapp.gemspec &&'\
-       " gem install ./genevalidatorapp-#{GeneValidatorApp::VERSION}.gem")
+
+desc 'Builds and installs'
+task install: [:build] do
+  require_relative 'lib/genevalidatorapp/version'
+  sh "gem install ./genevalidatorapp-#{GeneValidatorApp::VERSION}.gem"
+end
+
+desc 'Runs tests and builds gem (default)'
+task build: [:test] do
+  sh 'gem build genevalidatorapp.gemspec'
 end
 
 task test: :spec
