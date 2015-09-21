@@ -53,9 +53,9 @@ module GeneValidatorApp
       RunGeneValidator.init(request.url, params)
       @gv_results = RunGeneValidator.run
       @json_results = @gv_results[:parsed_json]
-      if @params[:result_link]
+      if @params[:results_url]
         @gv_results[:results_url]
-      elsif @params[:json_link]
+      elsif @params[:json_url]
         @gv_results[:json_url]
       else
         slim :results, layout: false

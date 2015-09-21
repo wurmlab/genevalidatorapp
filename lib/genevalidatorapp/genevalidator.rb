@@ -38,6 +38,7 @@ module GeneValidatorApp
         @params = params
         validate_params
         obtain_db_path
+        @json_url = produce_json_url_link(url)
         @url = produce_result_url_link(url)
       end
 
@@ -47,7 +48,7 @@ module GeneValidatorApp
         write_seq_to_file
         run_genevalidator
         copy_json_folder
-        { parsed_json: parse_output_json, json_url: output_json_file_path,
+        { parsed_json: parse_output_json, json_url: @json_url,
           results_url: @url }
       end
 
@@ -213,6 +214,12 @@ module GeneValidatorApp
       def produce_result_url_link(url)
         url.gsub(/input/, '').gsub(%r{/*$}, '') +
           "/GeneValidator/#{@unique_id}/input_file.fa.html/results1.html"
+      end
+
+      # Reuturns the URL of the results page.
+      def produce_json_url_link(url)
+        url.gsub(/input/, '').gsub(%r{/*$}, '') +
+          "/GeneValidator/#{@unique_id}/input_file.fa.json"
       end
 
       def parse_output_json
