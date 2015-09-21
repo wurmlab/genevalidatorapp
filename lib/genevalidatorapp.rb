@@ -108,8 +108,10 @@ module GeneValidatorApp
     # Copy the public folder (in the app root) to the gv_app_dir location - this
     #   gv_app_dir is then used by the app to serve all dependencies...
     def init_public_dir
-      root_web_files_dir  = File.join(GeneValidatorApp.root, 'public/web_files')
-      FileUtils.cp_r(root_web_files_dir, @public_dir)
+      root_web_files = File.join(GeneValidatorApp.root, 'public/web_files')
+      root_gv        = File.join(GeneValidatorApp.root, 'public/GeneValidator')
+      FileUtils.cp_r(root_web_files, @public_dir)
+      FileUtils.cp_r(root_gv, @public_dir)
     end
 
     def init_binaries

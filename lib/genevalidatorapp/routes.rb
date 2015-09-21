@@ -51,8 +51,15 @@ module GeneValidatorApp
     post '/' do
       cross_origin # Required for the API to work...
       RunGeneValidator.init(request.url, params)
-      @json_results = RunGeneValidator.run
-      slim :results, layout: false
+      @gv_results = RunGeneValidator.run
+      @json_results = @gv_results[:parsed_json]
+      if @params[:result_link]
+        @gv_results[:results_url]
+      elsif @params[:json_link]
+        @gv_results[:json_url]
+      else
+        slim :results, layout: false
+      end
     end
 
     # This error block will only ever be hit if the user gives us a funny
