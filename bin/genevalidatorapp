@@ -34,6 +34,10 @@ BANNER
        'Use the given configuration file',
        argument: true
 
+    on 'g', 'gv_public_dir=',
+       'The public directory that is served to the web application.',
+       argument: true
+
     on 'b', 'bin=',
        'Load BLAST+ and/or MAFFT binaries from this directory',
        argument: true,

@@ -38,9 +38,7 @@ module GeneValidatorApp
       init_binaries
       init_database
 
-      check_dirs
-      init_gv_tempdir
-      init_public_dir
+      init_dirs
 
       load_extension
       check_num_threads
@@ -91,23 +89,17 @@ module GeneValidatorApp
 
     private
 
-    def check_dirs
-      config[:gv_app_dir] = File.expand_path(config[:gv_app_dir])
-      unique_run_id       = 'GV_' + "#{Time.now.strftime('%Y%m%d-%H-%M-%S')}"
-      @public_dir         = File.join(config[:gv_app_dir], unique_run_id)
-      FileUtils.mkdir_p(File.join(@public_dir, 'GeneValidator'))
+    def init_dirs
+      config[:gv_public_dir] = File.expand_path(config[:gv_public_dir])
+      unique_start_id        = 'GV_' + "#{Time.now.strftime('%Y%m%d-%H-%M-%S')}"
+      @public_dir = File.join(config[:gv_public_dir], unique_start_id)
+      init_public_dir
     end
 
-    # Creates a Temp directory (starting with 'GeneValidator_') each time
-    #   GVapp is started. Within this Temp folder, sub directories are created
-    #   in which GeneValidator is run.
-    def init_gv_tempdir
-      @temp_dir = Dir.mktmpdir('GeneValidator_')
-    end
-
-    # Copy the public folder (in the app root) to the gv_app_dir location - this
-    #   gv_app_dir is then used by the app to serve all dependencies...
+    # Create the Public Dir and copy files from gem root - this public dir
+    #   is served by the app is accessible at URL/...
     def init_public_dir
+      FileUtils.mkdir_p(File.join(@public_dir, 'GeneValidator'))
       root_web_files = File.join(GeneValidatorApp.root, 'public/web_files')
       root_gv        = File.join(GeneValidatorApp.root, 'public/GeneValidator')
       FileUtils.cp_r(root_web_files, @public_dir)
@@ -210,12 +202,9 @@ module GeneValidatorApp
 
     # Check and warn user if host is 0.0.0.0 (default).
     def check_host
-      # rubocop:disable Style/GuardClause
-      if config[:host] == '0.0.0.0'
-        logger.warn 'Will listen on all interfaces (0.0.0.0).' \
-                    ' Consider using 127.0.0.1 (--host option).'
-      end
-      # rubocop:enable Style/GuardClause
+      return unless config[:host] == '0.0.0.0'
+      logger.warn 'Will listen on all interfaces (0.0.0.0).' \
+                  ' Consider using 127.0.0.1 (--host option).'
     end
 
     def server_url
