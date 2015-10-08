@@ -178,7 +178,7 @@ module GeneValidatorApp
       end
 
       def run_gv
-        cmd = "genevalidator -v '#{@params[:validations].join(', ')}'" \
+        cmd = "genevalidator -v '#{@params[:validations].join(',')}'" \
               " -d #{@db} -n #{config[:num_threads]} #{@input_file}"
         logger.debug("GV command: $ #{cmd}")
         log_file = (logger.debug?) ? '' : "> #{@gv_log_file} 2>&1"
