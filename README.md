@@ -16,7 +16,7 @@ This is a online web application for [GeneValidator](https://github.com/wurmlab/
 GeneValidator helps in identifing problems with gene predictions and provides useful information extracted from analysing orthologs in BLAST databases. The results produced can be used by biocurators and researchers who need accurate gene predictions.
 
 If you use GeneValidator in your work, please cite us as follows:
-> "Dragan M<sup>&Dagger;</sup>, Moghul MI<sup>&Dagger;</sup>, Priyam A, Bustos C & Wurm Y (<em>in prep.</em>) GeneValidator: identify problematic gene predictions"
+> [Dragan M<sup>&Dagger;</sup>, Moghul MI<sup>&Dagger;</sup>, Priyam A, Bustos C & Wurm Y. 2016. GeneValidator: identify problems with protein-coding gene predictions. <em>Bioinformatics</em>, doi: 10.1093/bioinformatics/btw015](http://bioinformatics.oxfordjournals.org/content/early/2016/01/18/bioinformatics.btw015).
 
 
 
