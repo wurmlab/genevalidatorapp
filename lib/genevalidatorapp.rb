@@ -75,8 +75,9 @@ module GeneValidatorApp
       puts
       puts '** Thank you for using GeneValidatorApp :).'
       puts '   Please cite: '
-      puts '        Dragan M., Moghul M.I., Priyam A., Wurm Y (in prep).'
-      puts '        GeneValidator: identify problematic gene predictions.'
+      puts '        Dragan M, Moghul MI, Priyam A, Bustos C, Wurm Y. 2016.'
+      puts '        GeneValidator: identify problems with protein-coding gene'
+      puts '        predictions. Bioinformatics, doi: 10.1093/bioinformatics/btw015.'
     end
 
     # Rack-interface.
