@@ -126,6 +126,12 @@ Examples:
 ```
 
 
+## Using Docker
+```bash
+# With protein database files inside a folder named db
+docker run --rm -ti -p 4567:4567 -v $(pwd)/db:/db wurmlab/genevalidator
+```
+
 <hr>
 
 This program was developed at [Wurm Lab](https://wurmlab.github.io), [QMUL](http://sbcs.qmul.ac.uk) with the support of a BBSRC grant.
