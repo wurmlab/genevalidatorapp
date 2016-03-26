@@ -144,7 +144,7 @@ module GeneValidatorApp
     end
 
     def assert_blast_databases_present_in_database_dir
-      cmd = "blastdbcmd -recursive -list #{config[:database_dir]}"
+      cmd = "blastdbcmd -recursive -list '#{config[:database_dir]}'"
       out = `#{cmd}`
       errpat = /BLAST Database error/
       fail NO_BLAST_DATABASE_FOUND, config[:database_dir] if out.empty?

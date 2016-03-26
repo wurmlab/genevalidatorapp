@@ -29,6 +29,14 @@ MSG
     end
   end
 
+  ## NUM THREADS ##
+  # Raised if num_threads set by the user is incorrect.
+  class NUM_THREADS_INCORRECT < StandardError
+    def to_s
+      'Number of threads should be a number greater than or equal to 1.'
+    end
+  end
+
   ## ENOENT ##
 
   # Name borrowed from standard Errno::ENOENT, this class serves as a template
@@ -59,13 +67,6 @@ MSG
     end
   end
 
-  # Raised if database dir set, but does not exist.
-  class DATABASE_DIR_NOT_FOUND < ENOENT
-    def initialize(ent)
-      super 'database dir', ent
-    end
-  end
-
   # Raised if extension file set, but does not exist.
   class EXTENSION_FILE_NOT_FOUND < ENOENT
     def initialize(ent)
@@ -73,12 +74,10 @@ MSG
     end
   end
 
-  ## NUM THREADS ##
-
-  # Raised if num_threads set by the user is incorrect.
-  class NUM_THREADS_INCORRECT < StandardError
-    def to_s
-      'Number of threads should be a number greater than or equal to 1.'
+  # Raised if database dir set, but does not exist.
+  class DATABASE_DIR_NOT_FOUND < ENOENT
+    def initialize(ent)
+      super 'database dir', ent
     end
   end
 
@@ -136,6 +135,19 @@ MSG
 
     def to_s
       "Could not find BLAST+ databases in: #{database_dir}."
+    end
+  end
+
+  # Raised if no protein BLAST+ database was found in database_dir.
+  class NO_PROTEIN_BLAST_DATABASE_FOUND < StandardError
+    def initialize(database_dir)
+      @database_dir = database_dir
+    end
+
+    attr_reader :database_dir
+
+    def to_s
+      "Could not find any Protein BLAST+ databases in: #{database_dir}."
     end
   end
 

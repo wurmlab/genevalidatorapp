@@ -115,36 +115,9 @@ BANNER
       # error scenarios either when creating a new GeneValidatorApp (first
       # time or later), or updating config values using -s CLI option.
 
-      rescue GeneValidatorApp::CONFIG_FILE_ERROR,
-             GeneValidatorApp::BLAST_DATABASE_ERROR => e
+      rescue GeneValidatorApp::CONFIG_FILE_ERROR => e
 
         puts e
-        exit!
-
-      rescue GeneValidatorApp::BIN_DIR_NOT_FOUND => e
-
-        puts e
-
-        unless bin?
-          puts 'You can set the correct value by running:'
-          puts
-          puts '  genevalidatorapp -s -b <value>'
-          puts
-        end
-
-        exit!
-
-      rescue GeneValidatorApp::DATABASE_DIR_NOT_FOUND => e
-
-        puts e
-
-        unless database_dir?
-          puts 'You can set the correct value by running:'
-          puts
-          puts '  genevalidatorapp -s -d <value>'
-          puts
-        end
-
         exit!
 
       rescue GeneValidatorApp::NUM_THREADS_INCORRECT => e
@@ -160,6 +133,19 @@ BANNER
 
         exit!
 
+      rescue GeneValidatorApp::BIN_DIR_NOT_FOUND => e
+
+        puts e
+
+        unless bin?
+          puts 'You can set the correct value by running:'
+          puts
+          puts '  genevalidatorapp -s -b <value>'
+          puts
+        end
+
+        exit!
+
       rescue GeneValidatorApp::EXTENSION_FILE_NOT_FOUND => e
 
         puts e
@@ -168,6 +154,19 @@ BANNER
           puts 'You can set the correct value by running:'
           puts
           puts '  genevalidatorapp -s -r <value>'
+          puts
+        end
+
+        exit!
+
+      rescue GeneValidatorApp::DATABASE_DIR_NOT_FOUND => e
+
+        puts e
+
+        unless database_dir?
+          puts 'You can set the correct value by running:'
+          puts
+          puts '  genevalidatorapp -s -d <value>'
           puts
         end
 
@@ -204,6 +203,7 @@ MSG
           redo
         end
 
+
       rescue GeneValidatorApp::DATABASE_DIR_NOT_SET => e
 
         # Show original error message.
@@ -229,14 +229,19 @@ MSG
         fetch_option(:database_dir).value = response
         redo
 
-      rescue GeneValidatorApp::NO_BLAST_DATABASE_FOUND => e
+      rescue GeneValidatorApp::NO_BLAST_DATABASE_FOUND,
+             GeneValidatorApp::NO_PROTEIN_BLAST_DATABASE_FOUND => e
         unless list_databases?
-
           # Print error raised.
           puts
           puts e
-
+          exit!
         end
+
+      rescue GeneValidatorApp::BLAST_DATABASE_ERROR => e
+
+        puts e
+        exit!
 
       rescue => e
         # This will catch any unhandled error and some very special errors.
@@ -254,7 +259,7 @@ https://github.com/wurmlab/genevalidatorapp/issues
 Error:
 #{e.backtrace.unshift(e.message).join("\n")}
 MSG
-        exit
+        exit!
       end
 
       if list_databases?
