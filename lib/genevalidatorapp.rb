@@ -150,6 +150,10 @@ module GeneValidatorApp
       fail NO_BLAST_DATABASE_FOUND, config[:database_dir] if out.empty?
       fail BLAST_DATABASE_ERROR, cmd, out if out.match(errpat) ||
                                              !$CHILD_STATUS.success?
+      type = []
+      out.lines.each { |l| type << l.split[1] }
+      return if type.include? 'Protein'
+      fail NO_PROTEIN_BLAST_DATABASE_FOUND, config[:database_dir]
     end
 
     def check_num_threads
