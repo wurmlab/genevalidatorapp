@@ -28,7 +28,7 @@ If you use GeneValidator in your work, please cite us as follows:
 ### Installation Requirements
 * Ruby (>= 2.0.0)
 * NCBI BLAST+ (>= 2.2.30+) (download [here](http://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download)).
-* MAFFT installation (download [here](http://mafft.cbrc.jp/alignment/software/)).
+* MAFFT installation (>=7.273) (download [here](http://mafft.cbrc.jp/alignment/software/)).
 
 Please see [here](https://gist.github.com/IsmailM/b783e8a06565197084e6) for more help with installing the prerequisites.
 
