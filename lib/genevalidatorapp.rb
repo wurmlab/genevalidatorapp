@@ -178,7 +178,7 @@ module GeneValidatorApp
 
     def init_bins
       bins = []
-      config[:bin].each do |bin|
+      Array(config[:bin]).each do |bin|
         bins << File.expand_path(bin)
         unless File.exist?(bin) && File.directory?(bin)
           fail BIN_DIR_NOT_FOUND, config[:bin]
