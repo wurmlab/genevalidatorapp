@@ -66,15 +66,16 @@ module GeneValidatorApp
       last_response.status.should == 400
     end
 
-    it 'validate the html' do
-      get '/'
-      html = last_response.body
+    # W3C_Validator Gem is broken - https://github.com/alexdunae/w3c_validators/issues/16 
+    # it 'validate the html' do
+      # get '/'
+      # html = last_response.body
 
-      validator = MarkupValidator.new
-      results = validator.validate_text(html)
-
-      results.errors.each { |err| puts err.to_s } if results.errors.length > 0
-      results.errors.length.should == 0
-    end
+      # validator = MarkupValidator.new
+      # results = validator.validate_text(html.to_s)
+      # results.errors.each { |err| puts err.to_s } if results.errors.length > 0
+      # puts results.errors
+      # results.errors.length.should == 0
+    # end
   end
 end
