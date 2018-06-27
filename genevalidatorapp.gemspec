@@ -23,18 +23,16 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.0.0'
 
   spec.add_development_dependency 'bundler', '~> 1.6'
-  spec.add_development_dependency 'rake', '~>10.3'
-  spec.add_development_dependency('rspec', '~> 2.8', '>= 2.8.0')
-  spec.add_development_dependency 'rack-test', '~> 0.6'
-  spec.add_development_dependency('capybara', '~> 2.4', '>= 2.4.4')
-  spec.add_development_dependency 'w3c_validators', '~>1.1'
+  spec.add_development_dependency 'capybara', '~> 2.4', '>= 2.4.4'
+  spec.add_development_dependency 'minitest', '~> 5.10'
+  spec.add_development_dependency 'rake', '~> 12.3'
+  # s.add_development_dependency 'w3c_validators', '~>1.1'
 
   spec.add_dependency 'genevalidator', '~>1.6'
   spec.add_dependency 'bio', '~>1.4'
   spec.add_dependency 'sinatra', '~>1.4'
   spec.add_dependency 'sinatra-cross_origin', '~> 0.3'
   spec.add_dependency 'slim', '~>3.0'
-  spec.add_dependency 'slop', '~>3.6'
   spec.post_install_message = <<INFO
 
 ------------------------------------------------------------------------

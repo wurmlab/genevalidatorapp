@@ -15,7 +15,14 @@ task build: [:test] do
   sh 'gem build genevalidatorapp.gemspec'
 end
 
-task test: :spec
-RSpec::Core::RakeTask.new(:spec) do |spec|
-  spec.pattern = FileList['spec/**/*_spec.rb']
+
+
+desc 'Runs tests'
+task :test do
+  Rake::TestTask.new do |t|
+    t.libs.push 'lib'
+    t.test_files = FileList['test/test_*.rb']
+    t.verbose = false
+    t.warning = false
+  end
 end
