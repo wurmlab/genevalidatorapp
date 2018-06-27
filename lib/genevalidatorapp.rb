@@ -57,7 +57,7 @@ module GeneValidatorApp
       puts "   Is GeneValidator already accessible at #{server_url}?"
       puts '   No? Try running GeneValidator on another port, like so:'
       puts
-      puts '       genevalidatorapp -p 4570.'
+      puts '       genevalidator app -p 4570.'
     rescue Errno::EACCES
       puts "** Need root privilege to bind to port #{config[:port]}."
       puts '   It is not advisable to run GeneValidator as root.'
@@ -73,7 +73,7 @@ module GeneValidatorApp
 
     def on_stop
       puts
-      puts '** Thank you for using GeneValidatorApp :).'
+      puts '** Thank you for using GeneValidator :).'
       puts '   Please cite: '
       puts '        Dragan M, Moghul MI, Priyam A, Bustos C, Wurm Y. 2016.'
       puts '        GeneValidator: identify problems with protein-coding gene'

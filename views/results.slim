@@ -1,7 +1,7 @@
 h4 Overview
 #overview.text-left
   #overview_text
-  button#overview_btn.btn.btn-primary.btn-sm data-toggle="button" onclick="GV.toggleOverviewBtn();"
+  button#overview_btn.btn.btn-primary.btn-sm data-toggle="button" onclick="GV.toggleOverviewBtn();" data-overviewjson="/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/overview.json"
 br/
 hr/
 h4#results_header Results
@@ -34,7 +34,7 @@ table#sortable_table.table.table-striped.table-collapsed.table-bordered.table-co
       th.sorter-false.chart-column
   tbody
     - @json_results.each do |query|
-      - json_file = "web_files/json/input_file.fa_#{query['idx']}.json"
+      - json_file = "/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/input_file_#{query['idx']}.json"
       tr data-jsonfile="#{uri(json_file)}" data-target="toggle#{query['idx']}"
         td title="idx" = query['idx']
         td data-score="#{query['overall_score']}"
