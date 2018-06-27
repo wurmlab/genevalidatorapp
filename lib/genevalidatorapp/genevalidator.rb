@@ -44,9 +44,8 @@ module GeneValidatorApp
       def run
         write_seq_to_file
         run_genevalidator
-        copy_json_folder
         { parsed_json: parse_output_json, json_url: @json_url,
-          results_url: @url }
+          results_url: @url, unique_id: @unique_id }
       end
 
       private
@@ -90,24 +89,24 @@ module GeneValidatorApp
       # Simply asserts whether that the seq param is present
       def check_seq_param_present
         return if @params[:seq]
-        fail ArgumentError, 'No input sequence provided.'
+        raise ArgumentError, 'No input sequence provided.'
       end
 
       def check_seq_length
         return unless config[:max_characters] != 'undefined'
         return if @params[:seq].length < config[:max_characters]
-        fail ArgumentError, 'The input sequence is too long.'
+        raise ArgumentError, 'The input sequence is too long.'
       end
 
       # Asserts whether the validations param are specified
       def check_validations_param_present
         return if @params[:validations]
-        fail ArgumentError, 'No validations specified'
+        raise ArgumentError, 'No validations specified'
       end
 
       # Asserts whether the database parameter is present
       def check_database_params_present
-        fail ArgumentError, 'No database specified' unless @params[:database]
+        raise ArgumentError, 'No database specified' unless @params[:database]
       end
 
       def obtain_db_path
@@ -155,17 +154,7 @@ module GeneValidatorApp
       # Asserts that the input file has been generated and is not empty
       def assert_input_file_present
         return if File.exist?(@input_file) && !File.zero?(@input_file)
-        fail 'GeneValidatorApp was unable to create the input file.'
-      end
-
-      # Returns 'blastp' if sequence contains amino acids or returns 'blastx'
-      #   if it contains nucleic acids.
-      def get_blast_type(sequences)
-        (check_seq_type(sequences) == Bio::Sequence::AA) ? 'blastp' : 'blastx'
-      end
-
-      def check_seq_type(sequences)
-        Bio::Sequence.new(Bio::FastaFormat.new(sequences).seq).guess(0.9)
+        raise 'GeneValidatorApp was unable to create the input file.'
       end
 
       # Runs GeneValidator
@@ -178,11 +167,20 @@ module GeneValidatorApp
       end
 
       def run_gv
-        cmd = "genevalidator -v '#{@params[:validations].join(',')}'" \
-              " -d #{@db} -n #{config[:num_threads]} #{@input_file}"
-        logger.debug("GV command: $ #{cmd}")
-        log_file = (logger.debug?) ? '' : "> #{@gv_log_file} 2>&1"
-        `#{cmd} #{log_file}`
+        run_opt = gv_params
+        GeneValidator.init(run_opt)
+        GeneValidator.run
+      end
+
+      def gv_params
+        {
+          validations: @params[:validations],
+          db: @db,
+          num_threads: config[:num_threads],
+          input_fasta_file: @input_file,
+          output_formats: %w[json html],
+          output_dir: File.join(@run_dir, 'output')
+        }
       end
 
       def create_gv_log_file
@@ -192,21 +190,21 @@ module GeneValidatorApp
 
       # Assets whether the results file is produced by GeneValidator.
       def assert_json_output_file_produced
-        @json_file = File.join(@run_dir, 'input_file.fa.json')
+        @json_file = File.join(@run_dir, 'output/input_file_results.json')
         return if File.exist?(@json_file)
-        fail 'GeneValidator did not produce the required output file.'
+        raise 'GeneValidator did not produce the required output file.'
       end
 
       # Reuturns the URL of the results page.
       def produce_result_url_link(url)
         url.gsub(/input/, '').gsub(%r{/*$}, '') +
-          "/GeneValidator/#{@unique_id}/input_file.fa.html/results1.html"
+          "/GeneValidator/#{@unique_id}/output/results.html"
       end
 
       # Reuturns the URL of the results page.
       def produce_json_url_link(url)
         url.gsub(/input/, '').gsub(%r{/*$}, '') +
-          "/GeneValidator/#{@unique_id}/input_file.fa.json"
+          "/GeneValidator/#{@unique_id}/output/input_file_results.json"
       end
 
       def parse_output_json
@@ -215,14 +213,11 @@ module GeneValidatorApp
       end
 
       def output_json_file_path
-        "#{@input_file}.json"
+        File.join(@run_dir, 'output/input_file_results.json')
       end
 
-      def copy_json_folder
-        json_dir = File.join("#{@input_file}.html", 'files/json', '/.')
-        web_dir_json = File.join(public_dir, 'web_files/json')
-        logger.debug("Moving JSON files from #{json_dir} to #{web_dir_json}")
-        FileUtils.cp_r(json_dir, web_dir_json)
+      def individual_json_path
+        "/GeneValidator/#{@unique_id}/output/html_files/json"
       end
     end
   end
