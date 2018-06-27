@@ -1,284 +1,200 @@
 #!/usr/bin/env ruby
 require 'readline'
 require 'English'
-require 'slop'
+
 
 ENV['RACK_ENV'] ||= 'production'
 
 # display name for tools like `ps`
 $PROGRAM_NAME = 'genevalidatorapp'
 
-begin
-  Slop.parse!(strict: true, help: true) do
-    banner <<BANNER
+
+opt = {}
+
+global = OptionParser.new do |opts|
+  opts.banner = <<BANNER
 SUMMARY:
-  GeneValidator - Identify problems with predicted genes
+  Launch GeneValidator as a web application
 
 USAGE:
-  $ genevalidatorapp [options]
+  $ genevalidator app [options]
 
 Examples:
   # Launch GeneValidatorApp with the given config file
-  $ genevalidatorapp --config ~/.genevalidatorapp.conf
+  $ genevalidator app --config ~/.genevalidatorapp.conf
 
   # Launch GeneValidatorApp with 8 threads at port 8888
-  $ genevalidatorapp --num_threads 8 --port 8888
+  $ genevalidator app --num_threads 8 --port 8888
 
   # Create a config file with the other arguments
-  $ genevalidatorapp -s -d ~/database_dir
+  $ genevalidator app -s -d ~/database_dir
 
 BANNER
-    # - Add Web_dir ? or simply default to ~/.genevalidatorapp/runs/
 
-    on 'c', 'config_file=',
-       'Use the given configuration file',
-       argument: true
+  opts.separator 'MANDATORY ARGUMENTS'
+  opts.separator ' '
 
-    on 'g', 'gv_public_dir=',
-       'The public directory that is served to the web application.',
-       argument: true
+  opts.on('-d', '--database_dir [PATH]',
+          'Path to the directory containing BLAST database') do |path|
+    opt[:database_dir] = path
+  end
 
-    on 'b', 'bin=',
-       'Load BLAST+ and/or MAFFT binaries from this directory',
-       argument: true,
-       as: Array
+  opts.separator ' '
+  opts.separator 'OPTIONAL ARGUMENTS'
+  opts.separator ' '
 
-    on 'd', 'database_dir=',
-       'Read BLAST database from this directory',
-       argument: true
+  opts.on('-c', '--config_file [PATH]',
+          'Path to the directory containing BLAST database') do |path|
+    opt[:config_file] = path
+  end
 
-    on 'f', 'default_database_path=',
-       'The path to the default BLAST database',
-       argument: true
+  opts.on('-g', '--gv_public_dir [PATH]',
+          'The public directory that is served to the web application') do |path|
+    opt[:gv_public_dir] = path
+  end
 
-    on 'n', 'num_threads=',
-       'Number of threads to use to run a BLAST search',
-       argument: true
+  opts.on('-b', '--bin [PATH]', Array,
+          'Path to BLAST and MAFFT bin folders (is added to $PATH variable)',
+          'To be provided as follows:',
+          'e.g.   genevalidator -b /blast/bin/path/ -b /mafft/bin/path/') do |bin|
+    (opt[:bin] ||= []).concat(bin)
+  end
 
-    on 'r', 'require=',
-       'Load extension from this file',
-       argument: true
+  opts.on('-f', '--default_database_path  [PATH]',
+          'Path to the default BLAST database') do |path|
+    opt[:default_database_path] = path
+  end
 
-    on 'H', 'host=',
-       'Host to run GeneValidatorApp on',
-       argument: true
+  opts.on('-H', '--host [HOST]',
+          'Host to run GeneValidatorApp on') do |host|
+    opt[:host] = host
+  end
 
-    on 'p', 'port=',
-       'Port to run GeneValidatorApp on',
-       argument: true
+  opts.on('-p', '--port [PORT]',
+          'Port to run GeneValidatorApp on') do |port|
+    opt[:port] = port
+  end
 
-    on 's', 'set',
-       'Set configuration value in default or given config file'
+  opts.on('-s', '--set',
+          'Set configuration value in default or given config file') do
+    opt[:set] = true
+  end
 
-    on 'l', 'list_databases',
-       'List BLAST databases'
+  opts.on('-l', '--list_databases',
+          'List found BLAST databases') do
+    opt[:list_databases] = true
+  end
 
-    on 'D', 'devel',
-       'Start GeneValidatorApp in development mode'
+  opt[:num_threads] = 1
+  opts.on('-n', '--num_threads [THREADS]',
+          'Number of threads to use to running the app') do |num_threads|
+    opt[:num_threads] = num_threads
+  end
 
-    on '-v', '--version',
-       'Print version number of GeneValidatorApp that will be loaded'
+  opts.on('-D', '--devel',
+          'Start GeneValidatorApp in development mode') do
+    opt[:devel] = true
+  end
 
-    on '-h', '--help',
-       'Display this help message'
+  opts.on('-h', '--help', 'Show this screen.') do
+    warn subcommands['app']
+    exit
+  end
+end
 
-    clean_opts = lambda do |hash|
-      hash.delete_if { |k, v| k == :set || v.nil? }
-      hash
-    end
+begin
+  global.order!
+rescue OptionParser::ParseError
+  $stderr.print 'Error: ' + $ERROR_INFO.to_s + "\n"
+  exit 1
+end
 
-    run do
-      if version?
-        require 'genevalidatorapp/version'
-        puts GeneValidatorApp::VERSION
-        exit
-      end
+ENV['RACK_ENV'] = 'development' if opt[:devel]
 
-      ENV['RACK_ENV'] = 'development' if devel?
+# Exit gracefully on SIGINT.
+stty = `stty -g`.chomp
+trap('INT') do
+  puts ''
+  puts 'Aborted.'
+  system('stty', stty)
+  exit
+end
 
-      # Exit gracefully on SIGINT.
-      stty = `stty -g`.chomp
-      trap('INT') do
-        puts ''
-        puts 'Aborted.'
-        system('stty', stty)
-        exit
-      end
+require 'genevalidatorapp'
 
-      require 'genevalidatorapp'
+begin
+  GeneValidatorApp.init opt
 
-      begin
-        GeneValidatorApp.init clean_opts[to_h]
+  # The aim of following error recovery scenarios is to guide user to a
+  # working GeneValidatorApp installation. We expect to land following
+  # error scenarios either when creating a new GeneValidatorApp (first
+  # time or later), or updating config values using -s CLI option.
+rescue GeneValidatorApp::CONFIG_FILE_ERROR => e
+  puts e
+  exit!
+rescue GeneValidatorApp::NUM_THREADS_INCORRECT => e
+  puts e
 
-      # The aim of following error recovery scenarios is to guide user to a
-      # working GeneValidatorApp installation. We expect to land following
-      # error scenarios either when creating a new GeneValidatorApp (first
-      # time or later), or updating config values using -s CLI option.
+  if opt[:num_threads].nil?
+    puts 'You can set the correct value by running:'
+    puts
+    puts '  genevalidatorapp -s -n <value>'
+    puts
+  end
 
-      rescue GeneValidatorApp::CONFIG_FILE_ERROR => e
+  exit!
+rescue GeneValidatorApp::BIN_DIR_NOT_FOUND => e
+  puts e
 
-        puts e
-        exit!
+  if opt[:bin].nil?
+    puts 'You can set the correct value by running:'
+    puts
+    puts '  genevalidatorapp -s -b <value>'
+    puts
+  end
 
-      rescue GeneValidatorApp::NUM_THREADS_INCORRECT => e
+  exit!
+rescue GeneValidatorApp::DATABASE_DIR_NOT_FOUND => e
+  puts e
 
-        puts e
+  if opt[:database_dir].nil?
+    puts 'You can set the correct value by running:'
+    puts
+    puts '  genevalidatorapp -s -d <value>'
+    puts
+  end
 
-        unless num_threads?
-          puts 'You can set the correct value by running:'
-          puts
-          puts '  genevalidatorapp -s -n <value>'
-          puts
-        end
-
-        exit!
-
-      rescue GeneValidatorApp::BIN_DIR_NOT_FOUND => e
-
-        puts e
-
-        unless bin?
-          puts 'You can set the correct value by running:'
-          puts
-          puts '  genevalidatorapp -s -b <value>'
-          puts
-        end
-
-        exit!
-
-      rescue GeneValidatorApp::EXTENSION_FILE_NOT_FOUND => e
-
-        puts e
-
-        unless require?
-          puts 'You can set the correct value by running:'
-          puts
-          puts '  genevalidatorapp -s -r <value>'
-          puts
-        end
-
-        exit!
-
-      rescue GeneValidatorApp::DATABASE_DIR_NOT_FOUND => e
-
-        puts e
-
-        unless database_dir?
-          puts 'You can set the correct value by running:'
-          puts
-          puts '  genevalidatorapp -s -d <value>'
-          puts
-        end
-
-        exit!
-
-      rescue GeneValidatorApp::BLAST_NOT_INSTALLED,
-             GeneValidatorApp::BLAST_NOT_EXECUTABLE,
-             GeneValidatorApp::BLAST_NOT_COMPATIBLE => e
-
-        # Show original error message first.
-        puts
-        puts e
-
-        # Set a flag so that if we recovered from error resulting config can be
-        # saved. Config will be saved unless invoked with -b option.
-        fetch_option(:set).value = !bin?
-
-        # Ask user if she already has BLAST+ downloaded.
-        puts
-        puts <<MSG
-GeneValidatorApp can use NCBI BLAST+ that you may have on your system already.
-Please enter the path to NCBI BLAST+.
-
-Press Ctrl+C to quit.
-MSG
-        puts
-        response = Readline.readline('>> ').to_s.strip
-        unless response.empty?
-          unless File.basename(response) == 'bin'
-            response = File.join(response, 'bin')
-          end
-          fetch_option(:bin).value = File.join(response)
-          puts
-          redo
-        end
-
-
-      rescue GeneValidatorApp::DATABASE_DIR_NOT_SET => e
-
-        # Show original error message.
-        puts
-        puts e
-
-        # Set a flag so that if we recovered from error resulting config can be
-        # saved. Config will be saved unless invoked with -d option.
-        fetch_option(:set).value = !database_dir?
-
-        # Ask user for the directory containing sequences or BLAST+
-        # databases.
-        puts
-        puts <<MSG
-GeneValidatorApp needs to know where your BLAST+ databases are.
-Please enter the path to the relevant directory.
-
-Press Ctrl+C to quit.
-MSG
-
-        puts
-        response = Readline.readline('>> ').to_s.strip
-        fetch_option(:database_dir).value = response
-        redo
-
-      rescue GeneValidatorApp::NO_BLAST_DATABASE_FOUND,
-             GeneValidatorApp::NO_PROTEIN_BLAST_DATABASE_FOUND => e
-        unless list_databases?
-          # Print error raised.
-          puts
-          puts e
-          exit!
-        end
-
-      rescue GeneValidatorApp::BLAST_DATABASE_ERROR => e
-
-        puts e
-        exit!
-
-      rescue => e
-        # This will catch any unhandled error and some very special errors.
-        # Ideally we will never hit this block. If we do, there's a bug in
-        # GeneValidatorApp or something really weird going on. If we hit this
-        # error block we show the stacktrace to the user requesting them to
-        # post the same to our Google Group.
-        puts <<MSG
+  exit!
+rescue GeneValidatorApp::BLAST_DATABASE_ERROR => e
+  puts e
+  exit!
+rescue => e
+  # This will catch any unhandled error and some very special errors.
+  # Ideally we will never hit this block. If we do, there's a bug in
+  # GeneValidatorApp or something really weird going on. If we hit this
+  # error block we show the stacktrace to the user requesting them to
+  # post the same to our Google Group.
+  puts <<MSG
 Something went wonky
 
 Looks like you have encountered a bug in GeneValidatorApp. Please could you
 report this incident here -
-https://github.com/wurmlab/genevalidatorapp/issues
+https://github.com/wurmlab/genevalidator/issues
 
 Error:
 #{e.backtrace.unshift(e.message).join("\n")}
 MSG
-        exit!
-      end
+  exit!
+end
 
-      if list_databases?
-        puts GeneValidatorApp::Database.all
-        exit
-      end
-
-      if set?
-        GeneValidatorApp.config.write_config_file
-        exit
-      end
-
-      GeneValidatorApp.config.write_config_file if fetch_option(:set).value
-
-      GeneValidatorApp.run
-    end
-  end
-rescue Slop::Error => e
-  puts e
-  puts "Run '#{$PROGRAM_NAME} -h' for help with command line options."
+if opt[:list_databases]
+  puts GeneValidatorApp::Database.all
   exit
 end
+
+if opt[:set]
+  GeneValidatorApp.config.write_config_file
+  exit
+end
+
+GeneValidatorApp.run
