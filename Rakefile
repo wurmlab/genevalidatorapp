@@ -1,21 +1,17 @@
-require 'bundler/gem_tasks'
-require 'rspec/core'
-require 'rspec/core/rake_task'
+require 'rake/testtask'
+GEMSPEC = Gem::Specification::load('genevalidatorapp.gemspec')
 
 task default: [:build]
 
 desc 'Builds and installs'
 task install: [:build] do
-  require_relative 'lib/genevalidatorapp/version'
-  sh "gem install ./genevalidatorapp-#{GeneValidatorApp::VERSION}.gem"
+  sh "gem install #{Rake.original_dir}/genevalidatorapp-#{GEMSPEC.version}.gem"
 end
 
 desc 'Runs tests and builds gem (default)'
 task build: [:test] do
-  sh 'gem build genevalidatorapp.gemspec'
+  sh "gem build #{Rake.original_dir}/genevalidatorapp.gemspec"
 end
-
-
 
 desc 'Runs tests'
 task :test do
