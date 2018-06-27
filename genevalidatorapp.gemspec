@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 12.3'
   # s.add_development_dependency 'w3c_validators', '~>1.1'
 
-  s.add_dependency 'genevalidator', '~>1.6'
   s.add_dependency 'bio', '~>1.4'
   s.add_dependency 'sinatra', '~>1.4'
   s.add_dependency 'sinatra-cross_origin', '~> 0.3'
