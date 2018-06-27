@@ -30,10 +30,10 @@ module GeneValidatorApp
       set :logging, nil
 
       # This is the app root...
-      set :root,          lambda { GeneValidatorApp.root }
+      set :root,          -> { GeneValidatorApp.root }
 
       # This is the full path to the public folder...
-      set :public_folder, lambda { GeneValidatorApp.public_dir }
+      set :public_folder, -> { GeneValidatorApp.public_dir }
     end
 
     # Set up global variables for the templates...

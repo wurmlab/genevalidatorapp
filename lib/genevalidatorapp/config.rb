@@ -76,7 +76,7 @@ module GeneValidatorApp
         :port           => 4567,
         :host           => '0.0.0.0',
         :gv_public_dir  => File.join(Dir.home, '.genevalidatorapp/'),
-        :max_characters => 'undefined',
+        :max_characters => 'undefined'
       }
     end
 
