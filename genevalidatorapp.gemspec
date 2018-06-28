@@ -32,17 +32,4 @@ Gem::Specification.new do |s|
   s.add_dependency 'sinatra', '~>1.4'
   s.add_dependency 'sinatra-cross_origin', '~> 0.3'
   s.add_dependency 'slim', '~>3.0'
-  s.post_install_message = <<INFO
-
-------------------------------------------------------------------------
-  Thank you for validating your gene predictions with GeneValidator!
-
-  To launch GeneValidatorApp execute 'genevalidatorapp' from command line.
-
-    $ genevalidatorapp [options]
-
-  Visit https://github.com/wurmlab/genevalidatorapp for more information.
-------------------------------------------------------------------------
-
-INFO
 end
