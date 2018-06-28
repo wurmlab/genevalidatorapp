@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   # s.add_development_dependency 'w3c_validators', '~>1.1'
 
   s.add_dependency 'bio', '~>1.4'
-  s.add_dependency 'sinatra', '~>1.4'
+  s.add_dependency 'sinatra', '~> 2.0'
   s.add_dependency 'sinatra-cross_origin', '~> 0.3'
   s.add_dependency 'slim', '~>3.0'
 end
