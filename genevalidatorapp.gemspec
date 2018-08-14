@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.name          = 'genevalidatorapp'
   s.version       = GeneValidatorApp::VERSION
   s.authors       = ['Monica Dragan', 'Ismail Moghul', 'Anurag Priyam',
-                        'Yannick Wurm']
+                     'Yannick Wurm']
   s.email         = 'y.wurm@qmul.ac.uk'
   s.summary       = 'A Web App wrapper for GeneValidator.'
   s.description   = 'A Web App wrapper for GeneValidator, a program for' \
@@ -16,13 +16,11 @@ Gem::Specification.new do |s|
   s.license       = 'AGPL'
 
   s.files         = `git ls-files -z`.split("\x0")
-  s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']
 
   s.required_ruby_version = '>= 2.2.0'
 
-  s.add_development_dependency 'bundler', '~> 1.6'
   s.add_development_dependency 'capybara', '~> 2.4', '>= 2.4.4'
   s.add_development_dependency 'minitest', '~> 5.10'
   s.add_development_dependency 'rake', '~> 12.3'
