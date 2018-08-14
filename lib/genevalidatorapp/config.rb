@@ -73,7 +73,7 @@ module GeneValidatorApp
     def defaults
       {
         :num_threads    => 1,
-        :port           => 4567,
+        :port           => 5678,
         :host           => '0.0.0.0',
         :gv_public_dir  => File.join(Dir.home, '.genevalidatorapp/'),
         :max_characters => 'undefined'
