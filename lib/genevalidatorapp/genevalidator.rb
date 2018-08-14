@@ -177,8 +177,10 @@ module GeneValidatorApp
           validations: @params[:validations],
           db: @db,
           num_threads: config[:num_threads],
+          mafft_threads: config[:mafft_threads],
+          min_blast_hits: 5,
           input_fasta_file: @input_file,
-          output_formats: %w[json html],
+          output_formats: %w[html csv json summary],
           output_dir: File.join(@run_dir, 'output')
         }
       end
@@ -209,7 +211,7 @@ module GeneValidatorApp
 
       def parse_output_json
         json_contents = File.read(output_json_file_path)
-        JSON.parse(json_contents)
+        JSON.parse(json_contents,symbolize_names: true)
       end
 
       def output_json_file_path

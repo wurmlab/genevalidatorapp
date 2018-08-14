@@ -52,7 +52,7 @@ module GeneValidatorApp
       cross_origin # Required for the API to work...
       RunGeneValidator.init(request.url, params)
       @gv_results = RunGeneValidator.run
-      @json_results = @gv_results[:parsed_json]
+      @json_data_section = @gv_results[:parsed_json]
       if @params[:results_url]
         @gv_results[:results_url]
       elsif @params[:json_url]
