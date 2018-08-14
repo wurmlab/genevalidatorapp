@@ -1,7 +1,24 @@
 h4 Overview
 #overview.text-left
+  span
+    strong BLAST Database Used: 
+    = @params[:database]
+    br
+    strong BLAST E-Value Used: 
+    | 10<sup>-5</sup>
+  br
   #overview_text
-  button#overview_btn.btn.btn-primary.btn-sm data-toggle="button" onclick="GV.toggleOverviewBtn();" data-overviewjson="/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/overview.json"
+  button#overview_btn.btn.btn-primary.btn-sm style="margin-bottom:10px" data-toggle="button" onclick="GV.toggleOverviewBtn();" data-overviewjson="/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/overview.json"
+  br
+
+  - output_dir = "/GeneValidator/#{@gv_results[:unique_id]}/output/"
+  - csv_file = File.join(output_dir, 'input_file_results.csv')
+  - json_file = File.join(output_dir, 'input_file_results.json')
+  - summary_file = File.join(output_dir, 'input_file_summary.csv')
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(csv_file)}" CSV Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(json_file)}" JSON Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(summary_file)}" Summary CSV Output File
+
 br/
 hr/
 h4#results_header Results
