@@ -47,14 +47,14 @@ module GeneValidatorApp
         uri = [host = '']
         if absolute
           host << (GeneValidatorApp.ssl? ? 'https://' : 'http://')
-          if request.forwarded? || request.port != (request.secure? ? 443 : 80)
-            host << request.host_with_port
-          else
-            host << request.host
-          end
+          host << if request.forwarded? || request.port != (request.secure? ? 443 : 80)
+                    request.host_with_port
+                  else
+                    request.host
+                  end
         end
         uri << request.script_name.to_s if add_script_name
-        uri << (addr ? addr : request.path_info).to_s
+        uri << (addr || request.path_info).to_s
         File.join uri
       end
 

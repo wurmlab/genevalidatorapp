@@ -1,5 +1,5 @@
 require 'rake/testtask'
-GEMSPEC = Gem::Specification::load('genevalidatorapp.gemspec')
+GEMSPEC = Gem::Specification.load('genevalidatorapp.gemspec')
 
 task default: [:build]
 

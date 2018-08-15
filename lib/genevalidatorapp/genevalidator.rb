@@ -211,7 +211,7 @@ module GeneValidatorApp
 
       def parse_output_json
         json_contents = File.read(output_json_file_path)
-        JSON.parse(json_contents,symbolize_names: true)
+        JSON.parse(json_contents, symbolize_names: true)
       end
 
       def output_json_file_path

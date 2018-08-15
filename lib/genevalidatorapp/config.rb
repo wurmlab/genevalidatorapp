@@ -61,7 +61,7 @@ module GeneValidatorApp
 
       logger.debug "Reading configuration file: #{config_file}."
       symbolise YAML.load_file(config_file)
-    rescue => error
+    rescue StandardError => error
       raise CONFIG_FILE_ERROR.new(config_file, error)
     end
 
@@ -72,13 +72,13 @@ module GeneValidatorApp
     # Default configuration data.
     def defaults
       {
-        :num_threads    => 1,
-        :mafft_threads  => 1,
-        :port           => 5678,
-        :ssl            => false,
-        :host           => '0.0.0.0',
-        :gv_public_dir  => File.join(Dir.home, '.genevalidatorapp/'),
-        :max_characters => 'undefined'
+        num_threads: 1,
+        mafft_threads: 1,
+        port: 5678,
+        ssl: false,
+        host: '0.0.0.0',
+        gv_public_dir: File.join(Dir.home, '.genevalidatorapp/'),
+        max_characters: 'undefined'
       }
     end
 
