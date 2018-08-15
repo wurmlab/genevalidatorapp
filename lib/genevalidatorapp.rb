@@ -27,6 +27,10 @@ module GeneValidatorApp
       File.dirname(File.dirname(__FILE__))
     end
 
+    def ssl?
+      @config[:ssl]
+    end
+
     def logger
       @logger ||= Logger.new(STDERR, verbose?)
     end
