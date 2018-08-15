@@ -38,11 +38,11 @@ section#search
       .form-group.form-inline
         label.control-label  Advanced Parameters: Database
         br/
-        label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+        label.radio-inline.no_indent.col-xs-12
           <input type="radio" name="database" value="#{@default_db.title.chomp}" checked=""> #{@default_db.title.chomp}
         - unless @non_default_dbs.empty?
           - @non_default_dbs.each do |db|
-            label.radio-inline.no_indent.col-lg-3.col-md-5.col-sm-6.col-xs-12
+            label.radio-inline.no_indent.col-xs-12
               <input type="radio" name="database" value="#{db.title.chomp}"> #{db.title.chomp}
       .clearfix
     .form-group

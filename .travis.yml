@@ -1,16 +1,21 @@
 language: ruby
 rvm:
-  - "2.0.0"
-  - "2.1.3"
-  - '2.2.0'
+  - "2.2.10"
+  - "2.3.7"
+  - "2.4.4"
+  - "2.5.1"
 before_install:
-  - wget -c "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.30/ncbi-blast-2.2.30+-x64-linux.tar.gz" && tar xvf ncbi-blast-2.2.30+-x64-linux.tar.gz && export PATH="./ncbi-blast-2.2.30+/bin:$PATH"
-  - wget -P ~ http://mafft.cbrc.jp/alignment/software/mafft-7.205-with-extensions-src.tgz
-  - tar -zxvf ~/mafft-7.205-with-extensions-src.tgz -C ~
-  - mkdir ~/mafft
-  - ruby -pi -e "gsub(/^PREFIX = \/usr\/local/, 'PREFIX = ~/mafft/')" ~/mafft-7.205-with-extensions/core/Makefile
-  - (cd ~/mafft-7.205-with-extensions/core/ && make clean && make && make install)
-  - export PATH=$PATH:~/mafft/bin
-cache: bundler
-sudo: false
+  # Install MAFFT
+  - mkdir dependencies
+  - mkdir dependencies/mafft
+  - curl -L --fail https://mafft.cbrc.jp/alignment/software/mafft-7.397-linux.tgz | tar -xzf - --strip-components=1 -C dependencies/mafft
+  - MAFFT_DIR="$PWD/dependencies/mafft/mafftdir"
+  - MAFFT_BINARIES="${MAFFT_DIR}/libexec"; export MAFFT_BINARIES;
+  # BLAST
+  - mkdir dependencies/blast
+  - curl -L --fail https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/ncbi-blast-2.7.1+-x64-linux.tar.gz | tar -xzf - --strip-components=1 -C dependencies/blast
+  - BLAST_BIN="$PWD/dependencies/blast/bin"
+  - export PATH=${MAFFT_DIR}/bin:${BLAST_BIN}:$PATH
+  # add GV as a dependency
+  - echo  "gem 'genevalidator'" >> Gemfile
 script: bundle exec rake test

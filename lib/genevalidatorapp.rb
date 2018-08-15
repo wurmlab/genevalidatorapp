@@ -12,7 +12,7 @@ require 'genevalidatorapp/version'
 
 module GeneValidatorApp
   # Use a fixed minimum version of BLAST+
-  MINIMUM_BLAST_VERSION = '2.2.30+'
+  MINIMUM_BLAST_VERSION = '2.2.30+'.freeze
 
   class << self
     def environment
@@ -25,6 +25,10 @@ module GeneValidatorApp
 
     def root
       File.dirname(File.dirname(__FILE__))
+    end
+
+    def ssl?
+      @config[:ssl]
     end
 
     def logger
@@ -57,7 +61,7 @@ module GeneValidatorApp
       puts "   Is GeneValidator already accessible at #{server_url}?"
       puts '   No? Try running GeneValidator on another port, like so:'
       puts
-      puts '       genevalidatorapp -p 4570.'
+      puts '       genevalidator app -p 4570.'
     rescue Errno::EACCES
       puts "** Need root privilege to bind to port #{config[:port]}."
       puts '   It is not advisable to run GeneValidator as root.'
@@ -73,7 +77,7 @@ module GeneValidatorApp
 
     def on_stop
       puts
-      puts '** Thank you for using GeneValidatorApp :).'
+      puts '** Thank you for using GeneValidator :).'
       puts '   Please cite: '
       puts '        Dragan M, Moghul MI, Priyam A, Bustos C, Wurm Y. 2016.'
       puts '        GeneValidator: identify problems with protein-coding gene'
@@ -92,7 +96,7 @@ module GeneValidatorApp
 
     def init_dirs
       config[:gv_public_dir] = File.expand_path(config[:gv_public_dir])
-      unique_start_id        = 'GV_' + "#{Time.now.strftime('%Y%m%d-%H-%M-%S')}"
+      unique_start_id        = 'GV_' + Time.now.strftime('%Y%m%d-%H-%M-%S').to_s
       @public_dir = File.join(config[:gv_public_dir], unique_start_id)
       init_public_dir
     end
@@ -114,12 +118,12 @@ module GeneValidatorApp
     end
 
     def init_database
-      fail DATABASE_DIR_NOT_SET unless config[:database_dir]
+      raise DATABASE_DIR_NOT_SET unless config[:database_dir]
 
       config[:database_dir] = File.expand_path(config[:database_dir])
       unless File.exist?(config[:database_dir]) &&
              File.directory?(config[:database_dir])
-        fail DATABASE_DIR_NOT_FOUND, config[:database_dir]
+        raise DATABASE_DIR_NOT_FOUND, config[:database_dir]
       end
 
       assert_blast_databases_present_in_database_dir
@@ -136,7 +140,7 @@ module GeneValidatorApp
       return unless config[:require]
       config[:require] = File.expand_path config[:require]
       unless File.exist?(config[:require]) && File.file?(config[:require])
-        fail EXTENSION_FILE_NOT_FOUND, config[:require]
+        raise EXTENSION_FILE_NOT_FOUND, config[:require]
       end
 
       logger.debug("Loading extension: #{config[:require]}")
@@ -147,24 +151,24 @@ module GeneValidatorApp
       cmd = "blastdbcmd -recursive -list '#{config[:database_dir]}'"
       out = `#{cmd}`
       errpat = /BLAST Database error/
-      fail NO_BLAST_DATABASE_FOUND, config[:database_dir] if out.empty?
-      fail BLAST_DATABASE_ERROR, cmd, out if out.match(errpat) ||
-                                             !$CHILD_STATUS.success?
+      raise NO_BLAST_DATABASE_FOUND, config[:database_dir] if out.empty?
+      raise BLAST_DATABASE_ERROR, cmd, out if out.match(errpat) ||
+                                              !$CHILD_STATUS.success?
       type = []
       out.lines.each { |l| type << l.split[1] }
       return if type.include? 'Protein'
-      fail NO_PROTEIN_BLAST_DATABASE_FOUND, config[:database_dir]
+      raise NO_PROTEIN_BLAST_DATABASE_FOUND, config[:database_dir]
     end
 
     def check_num_threads
       num_threads = Integer(config[:num_threads])
-      fail NUM_THREADS_INCORRECT unless num_threads > 0
+      raise NUM_THREADS_INCORRECT unless num_threads > 0
 
       logger.debug "Will use #{num_threads} threads to run BLAST."
       if num_threads > 256
         logger.warn "Number of threads set at #{num_threads} is unusually high."
       end
-    rescue
+    rescue StandardError
       raise NUM_THREADS_INCORRECT
     end
 
@@ -172,7 +176,7 @@ module GeneValidatorApp
       if config[:max_characters] != 'undefined'
         config[:max_characters] = Integer(config[:max_characters])
       end
-    rescue
+    rescue StandardError
       raise MAX_CHARACTERS_INCORRECT
     end
 
@@ -181,7 +185,7 @@ module GeneValidatorApp
       Array(config[:bin]).each do |bin|
         bins << File.expand_path(bin)
         unless File.exist?(bin) && File.directory?(bin)
-          fail BIN_DIR_NOT_FOUND, config[:bin]
+          raise BIN_DIR_NOT_FOUND, config[:bin]
         end
         export_bin_dir(bin)
       end
@@ -196,13 +200,13 @@ module GeneValidatorApp
     end
 
     def assert_blast_installed_and_compatible
-      fail BLAST_NOT_INSTALLED unless command? 'blastdbcmd'
+      raise BLAST_NOT_INSTALLED unless command? 'blastdbcmd'
       version = `blastdbcmd -version`.split[1]
-      fail BLAST_NOT_COMPATIBLE, version unless version >= MINIMUM_BLAST_VERSION
+      raise BLAST_NOT_COMPATIBLE, version unless version >= MINIMUM_BLAST_VERSION
     end
 
     def assert_mafft_installed
-      fail MAFFT_NOT_INSTALLED unless command? 'mafft'
+      raise MAFFT_NOT_INSTALLED unless command? 'mafft'
     end
 
     # Check and warn user if host is 0.0.0.0 (default).

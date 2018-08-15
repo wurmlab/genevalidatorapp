@@ -35,13 +35,13 @@ module GeneValidatorApp
     # rubocop:disable Metrics/AbcSize
     def options
       @options ||= {
-        :BindAddress      => app.config[:host],
-        :Port             => app.config[:port],
-        :StartCallback    => proc { app.on_start },
-        :StopCallback     => proc { app.on_stop  },
-        :OutputBufferSize => 5,
-        :AccessLog        => [[logdev, WEBrick::AccessLog::COMMON_LOG_FORMAT]],
-        :Logger           => WEBrick::Log.new(logdev)
+        BindAddress: app.config[:host],
+        Port: app.config[:port],
+        StartCallback: proc { app.on_start },
+        StopCallback: proc { app.on_stop },
+        OutputBufferSize: 5,
+        AccessLog: [[logdev, WEBrick::AccessLog::COMMON_LOG_FORMAT]],
+        Logger: WEBrick::Log.new(logdev)
       }
     end
     # rubocop:enable Metrics/AbcSize
@@ -49,7 +49,7 @@ module GeneValidatorApp
     private
 
     def setup_signal_handlers
-      [:INT, :TERM].each do |sig|
+      %i[INT TERM].each do |sig|
         trap sig do
           stop
         end

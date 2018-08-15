@@ -1,7 +1,24 @@
 h4 Overview
 #overview.text-left
+  span
+    strong BLAST Database Used: 
+    = @params[:database]
+    br
+    strong BLAST E-Value Used: 
+    | 10<sup>-5</sup>
+  br
   #overview_text
-  button#overview_btn.btn.btn-primary.btn-sm data-toggle="button" onclick="GV.toggleOverviewBtn();"
+  button#overview_btn.btn.btn-primary.btn-sm style="margin-bottom:10px" data-toggle="button" onclick="GV.toggleOverviewBtn();" data-overviewjson="/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/overview.json"
+  br
+
+  - output_dir = "/GeneValidator/#{@gv_results[:unique_id]}/output/"
+  - csv_file = File.join(output_dir, 'input_file_results.csv')
+  - json_file = File.join(output_dir, 'input_file_results.json')
+  - summary_file = File.join(output_dir, 'input_file_summary.csv')
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(csv_file)}" CSV Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(json_file)}" JSON Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(summary_file)}" Summary CSV Output File
+
 br/
 hr/
 h4#results_header Results
@@ -18,35 +35,33 @@ table#sortable_table.table.table-striped.table-collapsed.table-bordered.table-co
         | No. Hits 
         span data-placement="top" data-toggle="tooltip" title=("Number of non-identical hits found by BLAST.")
           i.fa.fa-question-circle
-      - @json_results[0]['validations'].each do |_short_header, item|
-        th.sorter-false
-          b= item['header']
-          |  &nbsp;
-          - if item['header'] == "Length Cluster" || item['header'] == "Gene Merge" || item['header'] == "Main ORF" || item['header'] == "Missing/Extra Sequences"
-            span data-placement="top" data-toggle="tooltip" title=("Charts available for this validation")
-              i.fa.fa-bar-chart-o.chartIcon
-            |  &nbsp;
-            span data-placement="top" data-toggle="tooltip" title="#{item['description']}"
-              i.fa.fa-question-circle
-          - else
-            span data-placement="top" data-toggle="tooltip" title="#{item['description']}"
+      - @json_data_section[0][:validations].each do |_short_header, item|
+          th.sorter-false
+            strong
+              = item[:header]
+            |  
+            - if item[:header] == "Length Cluster" || item[:header] == "Gene Merge" || item[:header] == "Main ORF" || item[:header] == "Missing/Extra Sequences"
+              span data-placement="top" data-toggle="tooltip" title=("Charts available for this validation")
+                i.fa.fa-bar-chart-o.chartIcon
+            |  
+            span data-placement="top" data-toggle="tooltip" title="#{item[:description]}"
               i.fa.fa-question-circle
       th.sorter-false.chart-column
   tbody
-    - @json_results.each do |query|
-      - json_file = "web_files/json/input_file.fa_#{query['idx']}.json"
-      tr data-jsonfile="#{uri(json_file)}" data-target="toggle#{query['idx']}"
-        td title="idx" = query['idx']
-        td data-score="#{query['overall_score']}"
+    - @json_data_section.each do |row|
+      - json_file = "/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/input_file_#{row[:idx]}.json"
+      tr data-jsonfile="#{uri(json_file)}" data-target="toggle#{row[:idx]}"
+        td title="idx" = row[:idx]
+        td data-score="#{row[:overall_score]}"
           .ratings
             .empty-stars
-            .full-stars style=("width:#{query['overall_score']}%;")
-        td title="Definition" = query['definition']
-        td title=("No. Hits") = query['no_hits']
-        - query['validations'].each do |_short_header, item|
-          td class="#{item['status']}" title="#{item['header']}"
-            == item['print'].gsub(/\s/, '&nbsp;').gsub(';&nbsp;', '; ')
-        - if query['validations'].select{|_short_header, item| item['graphs'] != nil}.map{|_short_header, item| item['graphs'].length}.inject(0){|r, e| r+e } != 0
+            .full-stars style=("width:#{row[:overall_score]}%;")
+        td title="Definition" = row[:definition]
+        td title=("No. Hits") = row[:no_hits]
+        - row[:validations].each do |_short_header, item|
+          td class="#{item[:status]}" title="#{item[:header]}"
+            == item[:print].gsub(' ', '&nbsp;').gsub(';&nbsp;', '; ')
+        - if row[:validations].select { |_short_header, item| item[:graphs] != nil }.map{ |_short_header, item| item[:graphs].length }.inject(0) { |r, e| r + e } != 0
           td
             button.plot_btn.btn.btn-default title=("Show plots")
               i.fa.fa-bar-chart-o

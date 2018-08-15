@@ -73,9 +73,9 @@ module GeneValidatorApp
                ' "%p::%f::%t"'
         list = `#{cmd} 2>&1`
         list.each_line do |line|
-          type, name, title =  line.split('::', 3)
+          type, name, title = line.split('::', 3)
           next if multipart_database_name?(name)
-          next unless type.downcase == 'protein'
+          next unless type.casecmp('protein').zero?
           self << Database.new(name, title, type)
         end
       end
@@ -88,7 +88,7 @@ module GeneValidatorApp
       # /home/ben/pd.ben/sequenceserver/db/nr => no
       # /home/ben/pd.ben/sequenceserver/db/img3.5.finished.faa.01 => yes
       def multipart_database_name?(db_name)
-        !(db_name.match(/.+\/\S+\d{2}$/).nil?)
+        !db_name.match(%r{.+\/\S+\d{2}$}).nil?
       end
     end
 

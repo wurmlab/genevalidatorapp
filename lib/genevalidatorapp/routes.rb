@@ -30,10 +30,52 @@ module GeneValidatorApp
       set :logging, nil
 
       # This is the app root...
-      set :root,          lambda { GeneValidatorApp.root }
+      set :root,          -> { GeneValidatorApp.root }
 
       # This is the full path to the public folder...
-      set :public_folder, lambda { GeneValidatorApp.public_dir }
+      set :public_folder, -> { GeneValidatorApp.public_dir }
+    end
+
+    helpers do
+      # Overide default URI helper method - to hardcode a https://
+      # In our setup, we are running passenger on http:// (not secure) and then
+      # reverse proxying that onto a 443 port (i.e. https://)
+      # Generates the absolute URI for a given path in the app.
+      # Takes Rack routers and reverse proxies into account.
+      def uri(addr = nil, absolute = true, add_script_name = true)
+        return addr if addr =~ /\A[a-z][a-z0-9\+\.\-]*:/i
+        uri = [host = '']
+        if absolute
+          host << (GeneValidatorApp.ssl? ? 'https://' : 'http://')
+          host << if request.forwarded? || request.port != (request.secure? ? 443 : 80)
+                    request.host_with_port
+                  else
+                    request.host
+                  end
+        end
+        uri << request.script_name.to_s if add_script_name
+        uri << (addr || request.path_info).to_s
+        File.join uri
+      end
+
+      def host_with_port
+        forwarded = request.env['HTTP_X_FORWARDED_HOST']
+        if forwarded
+          forwarded.split(/,\s?/).last
+        else
+          request.env['HTTP_HOST'] || "#{request.env['SERVER_NAME'] ||
+            request.env['SERVER_ADDR']}:#{request.env['SERVER_PORT']}"
+        end
+      end
+
+      # Remove port number.
+      def host
+        host_with_port.to_s.sub(/:\d+\z/, '')
+      end
+
+      def base_url
+        @base_url ||= "#{GeneValidatorApp.ssl? ? 'https' : 'http'}://#{host}"
+      end
     end
 
     # Set up global variables for the templates...
@@ -52,7 +94,7 @@ module GeneValidatorApp
       cross_origin # Required for the API to work...
       RunGeneValidator.init(request.url, params)
       @gv_results = RunGeneValidator.run
-      @json_results = @gv_results[:parsed_json]
+      @json_data_section = @gv_results[:parsed_json]
       if @params[:results_url]
         @gv_results[:results_url]
       elsif @params[:json_url]
