@@ -5,7 +5,17 @@ rvm:
   - "2.4.4"
   - "2.5.1"
 before_install:
-  - gem install genevalidator
-  - sh -c "$(curl -fsSL install-genevalidator.wurmlab.com)"
-cache: bundler
-script: rake test
+  # Install MAFFT
+  - mkdir dependencies
+  - mkdir dependencies/mafft
+  - curl -L --fail https://mafft.cbrc.jp/alignment/software/mafft-7.397-linux.tgz | tar -xzf - --strip-components=1 -C dependencies/mafft
+  - MAFFT_DIR="$PWD/dependencies/mafft/mafftdir"
+  - MAFFT_BINARIES="${MAFFT_DIR}/libexec"; export MAFFT_BINARIES;
+  # BLAST
+  - mkdir dependencies/blast
+  - curl -L --fail https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/ncbi-blast-2.7.1+-x64-linux.tar.gz | tar -xzf - --strip-components=1 -C dependencies/blast
+  - BLAST_BIN="$PWD/dependencies/blast/bin"
+  - export PATH=${MAFFT_DIR}/bin:${BLAST_BIN}:$PATH
+  # add GV as a dependency
+  - echo  "gem 'genevalidator'" >> Gemfile
+script: bundle exec rake test
