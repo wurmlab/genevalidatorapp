@@ -81,9 +81,19 @@ MSG
     end
   end
 
+  ## MAFFT NOT INSTALLED OR NOT COMPATIBLE ##
+
+  # Raised if GV could not locate MAFFT binaries on
+  # user's system.
+  class MAFFT_NOT_INSTALLED < StandardError
+    def to_s
+      'Could not locate MAFFT binaries.'
+    end
+  end
+
   ## BLAST NOT INSTALLED OR NOT COMPATIBLE ##
 
-  # Raised if SequenceServer could not locate NCBI BLAST+ installation on
+  # Raised if GV could not locate NCBI BLAST+ installation on
   # user's system.
   class BLAST_NOT_INSTALLED < StandardError
     def to_s
@@ -91,7 +101,7 @@ MSG
     end
   end
 
-  # Raised if SequenceServer could not successfully execute 'blastp -version'
+  # Raised if GV could not successfully execute 'blastp -version'
   # on user's system (see #141).
   class BLAST_NOT_EXECUTABLE < StandardError
     def to_s
@@ -99,8 +109,8 @@ MSG
     end
   end
 
-  # Raised if SequenceServer determined NCBI BLAST+ present on the user's
-  # system but not meeting SequenceServer's minimum version requirement.
+  # Raised if GV determined NCBI BLAST+ present on the user's
+  # system but not meeting GV's minimum version requirement.
   class BLAST_NOT_COMPATIBLE < StandardError
     def initialize(version)
       @version = version
@@ -111,7 +121,7 @@ MSG
     def to_s
       <<MSG
 Your BLAST+ version #{version} is outdated.
-SequenceServer needs NCBI BLAST+ version #{MINIMUM_BLAST_VERSION} or higher.
+GV needs NCBI BLAST+ version #{MINIMUM_BLAST_VERSION} or higher.
 MSG
     end
   end
@@ -167,7 +177,7 @@ Tried: #{cmd}
 Error:
 #{out.strip}
 
-Please could you report this to 'https://groups.google.com/forum/#!forum/sequenceserver'?
+Please could you report this to 'https://groups.google.com/forum/#!forum/GV'?
 MSG
     end
   end
