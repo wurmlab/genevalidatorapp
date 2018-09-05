@@ -2,7 +2,7 @@ section#search
   h1.page-header
     span  GeneValidator&nbsp;
     span.small  Identify problems with gene predictions
-  form#input action="#{uri('/')}" method="POST"
+  form#input action="/" method="POST"
     .form-group#input_seq_group
       label.control-label.input_seq-label for="seq"  Input Sequences:
       - if @max_characters != 'undefined'

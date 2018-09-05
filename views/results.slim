@@ -15,9 +15,9 @@ h3 Overview
   - csv_file = File.join(output_dir, 'input_file_results.csv')
   - json_file = File.join(output_dir, 'input_file_results.json')
   - summary_file = File.join(output_dir, 'input_file_summary.csv')
-  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(csv_file)}" CSV Output File
-  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(json_file)}" JSON Output File
-  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{uri(summary_file)}" Summary CSV Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{csv_file}" CSV Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{json_file}" JSON Output File
+  a.btn.btn-primary.btn-sm target="_blank" download="" style="margin-right:10px;" href="#{summary_file}" Summary CSV Output File
 
 br/
 hr/
@@ -50,7 +50,7 @@ table#sortable_table.table.table-striped.table-collapsed.table-bordered.table-co
   tbody
     - @json_data_section.each do |row|
       - json_file = "/GeneValidator/#{@gv_results[:unique_id]}/output/html_files/json/input_file_#{row[:idx]}.json"
-      tr data-jsonfile="#{uri(json_file)}" data-target="toggle#{row[:idx]}"
+      tr data-jsonfile="#{json_file}" data-target="toggle#{row[:idx]}"
         td title="idx" = row[:idx]
         td data-score="#{row[:overall_score]}"
           .ratings
