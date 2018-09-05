@@ -22,3 +22,28 @@ task :test do
     t.warning = false
   end
 end
+
+desc 'Build Assets'
+task :assets do
+  # Requires uglifycss and uglifyjs
+  # npm install uglifycss -g
+  # npm install uglify-js -g
+  src_assets_dir = File.expand_path('public/src', __dir__)
+  assets_dir = File.expand_path('public/web_files', __dir__)
+  `rm #{assets_dir}/css/gv.compiled.min.css`
+  `rm #{assets_dir}/js/gv.compiled.min.js`
+  sh "uglifycss --output '#{assets_dir}/css/gv.compiled.min.css'" \
+    " '#{src_assets_dir}/css/bootstrap1.min.css'" \
+    " '#{src_assets_dir}/css/font-awesome.min.css'" \
+     " '#{src_assets_dir}/css/custom.css'"
+
+  sh "uglifyjs '#{src_assets_dir}/js/jquery.min.js'" \
+     " '#{src_assets_dir}/js/bootstrap.min.js'" \
+     " '#{src_assets_dir}/js/jquery.tablesorter.min.js'" \
+     " '#{src_assets_dir}/js/jquery.validate.min.js'" \
+     " '#{src_assets_dir}/js/jquery.cookie.min.js'" \
+     " '#{src_assets_dir}/js/d3.v3.min.js'" \
+     " '#{src_assets_dir}/js/plots.js'" \
+     " '#{src_assets_dir}/js/genevalidator.js'" \
+     " -m -c -o '#{assets_dir}/js/gv.compiled.min.js'"
+end

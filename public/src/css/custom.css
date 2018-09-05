@@ -98,19 +98,19 @@ h1 .small {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 5px;
+  margin-top: 20px;
 }
 
 #input_btn {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 20px;
 }
 
 .show_examples_text {
   font-size: 17px;
   text-align: center;
+  margin-top: 10px;
 }
 
 .control-label{
@@ -478,12 +478,11 @@ ___________________________*/
 @media (min-width: 768px) {
   #adv_params_btn {
     float:left !important;
-    margin-top: 5px;
+    margin-top:0;
   }
 
   #input_btn {
     float:right !important;
-    margin-top: -43px;
   }
 
   .show_examples_text {

@@ -10,9 +10,13 @@ section#search
       - else
         textarea#seq.form-control autofocus="" name="seq" placeholder="Paste your sequence(s) here..." rows="10" spellcheck="false"
     .clearfix
-    button#adv_params_btn.btn.btn-primary type="button" onclick="changeAdvParamsBtnText()"
-      i.fa.fa-pencil-square-o
-      | &nbsp;&nbsp;Show Advanced Parameters
+    .form-group
+      button#input_btn.btn.btn-lg.btn-primary type="submit" value="input"
+        i.fa.fa-search
+        | &nbsp;&nbsp;Analyse Sequences
+      button#adv_params_btn.btn.btn-primary type="button" onclick="changeAdvParamsBtnText()"
+        i.fa.fa-pencil-square-o
+        | &nbsp;&nbsp;Show Advanced Parameters
     .clearfix
     #adv_params.collapse
       .form-group.form-inline#validations_group
@@ -44,11 +48,6 @@ section#search
           - @non_default_dbs.each do |db|
             label.radio-inline.no_indent.col-xs-12
               <input type="radio" name="database" value="#{db.title.chomp}"> #{db.title.chomp}
-      .clearfix
-    .form-group
-      button#input_btn.btn.btn-lg.btn-primary type="submit" value="input"
-        i.fa.fa-search
-        | &nbsp;&nbsp;Analyse Sequences
       .clearfix
     .show_examples_text
       span 
