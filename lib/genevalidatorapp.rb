@@ -118,6 +118,7 @@ module GeneValidatorApp
     end
 
     def init_database
+      set_database_from_env unless config[:database_dir]
       raise DATABASE_DIR_NOT_SET unless config[:database_dir]
 
       config[:database_dir] = File.expand_path(config[:database_dir])
@@ -134,6 +135,11 @@ module GeneValidatorApp
         logger.debug("Found #{database.type.chomp} database" \
                      " '#{database.title.chomp}' at '#{database.name.chomp}'")
       end
+    end
+
+    # attempt to set the database dir to GV_BLAST_DB_DIR if it exists
+    def set_database_from_env
+      config[:database_dir] = ENV['GV_BLAST_DB_DIR']
     end
 
     def load_extension
