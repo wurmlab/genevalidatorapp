@@ -77,7 +77,7 @@ module GeneValidatorApp
         port: 5678,
         ssl: false,
         host: '0.0.0.0',
-        gv_public_dir: File.join(Dir.home, '.genevalidatorapp/'),
+        serve_public_dir: File.join(Dir.home, '.genevalidatorapp/'),
         max_characters: 'undefined'
       }
     end

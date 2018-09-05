@@ -95,9 +95,9 @@ module GeneValidatorApp
     private
 
     def init_dirs
-      config[:gv_public_dir] = File.expand_path(config[:gv_public_dir])
-      unique_start_id        = 'GV_' + Time.now.strftime('%Y%m%d-%H-%M-%S').to_s
-      @public_dir = File.join(config[:gv_public_dir], unique_start_id)
+      config[:serve_public_dir] = File.expand_path(config[:serve_public_dir])
+      unique_start_id = 'GV_' + Time.now.strftime('%Y%m%d-%H-%M-%S').to_s
+      @public_dir = File.join(config[:serve_public_dir], unique_start_id)
       init_public_dir
     end
 
