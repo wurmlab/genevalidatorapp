@@ -74,6 +74,7 @@ module GeneValidatorApp
         list = `#{cmd} 2>&1`
         list.each_line do |line|
           type, name, title = line.split('::', 3)
+          next if name.nil?
           next if multipart_database_name?(name)
           next unless type.casecmp('protein').zero?
           self << Database.new(name, title, type)
