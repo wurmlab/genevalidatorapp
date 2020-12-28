@@ -12,7 +12,7 @@ require 'genevalidatorapp/version'
 
 module GeneValidatorApp
   # Use a fixed minimum version of BLAST+
-  MINIMUM_BLAST_VERSION = '2.2.30+'.freeze
+  MINIMUM_BLAST_VERSION = '2.11.0+'.freeze
 
   class << self
     def environment
@@ -208,7 +208,8 @@ module GeneValidatorApp
     def assert_blast_installed_and_compatible
       raise BLAST_NOT_INSTALLED unless command? 'blastdbcmd'
       version = `blastdbcmd -version`.split[1]
-      raise BLAST_NOT_COMPATIBLE, version unless version >= MINIMUM_BLAST_VERSION
+      return if is_compatible(version, MINIMUM_BLAST_VERSION)
+      raise BLAST_NOT_COMPATIBLE, version 
     end
 
     def assert_mafft_installed
@@ -248,6 +249,20 @@ module GeneValidatorApp
     # Return `true` if the given command exists and is executable.
     def command?(command)
       system("which #{command} > /dev/null 2>&1")
+    end
+
+    # Returns true if the given version is higher than the minimum expected
+    # version string.
+    def is_compatible(given, expected)
+      # The speceship operator (<=>) below returns -1, 0, 1 depending on
+      # on whether the left operand is lower, same, or higher than the
+      # right operand. We want the left operand to be the same or higher.
+      (parse_version(given) <=> parse_version(expected)) >= 0
+    end
+
+    # Turn version string into an arrary of its component numbers.
+    def parse_version(version_string)
+      version_string.split('.').map(&:to_i)
     end
   end
 end
